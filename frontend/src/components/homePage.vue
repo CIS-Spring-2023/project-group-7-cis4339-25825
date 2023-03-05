@@ -112,12 +112,6 @@ export default {
               :label="labels"
               :chart-data="chartData"
             ></AttendanceChart>
-            <div>
-            <DataChart
-              :label="labels"
-              :chart-data="chartData"
-            ></DataChart>
-            </div>
 
             <!-- Start of loading animation -->
             <div class="mt-40" v-if="loading">
@@ -139,6 +133,12 @@ export default {
               </p>
             </div>
             <!-- End of error alert -->
+          </div>
+          <div>
+            <DataChart
+              :label="labels"
+              :chart-data="chartData"
+            ></DataChart>
           </div>
         </div>
       </div>
