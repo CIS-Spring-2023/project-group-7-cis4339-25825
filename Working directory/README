@@ -1,5 +1,8 @@
-Working directory - keeping original folders as backup
+Build the workspace:
+npm install
 
-Started implementing front-end framework and routing
+Uses a JSON data file to supply initial data. Implemented to practice with JSON formats.
+npm install -g json-server
 
-Still need to figure out how to connect to local mongoDBCompass to start loading data
+Run file in a server:
+json-server --watch data/db.json
