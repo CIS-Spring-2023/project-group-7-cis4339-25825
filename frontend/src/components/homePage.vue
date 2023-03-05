@@ -2,11 +2,13 @@
 import { DateTime } from 'luxon'
 import axios from 'axios'
 import AttendanceChart from './barChart.vue'
+import DataChart from './dashChart.vue'
 const apiURL = import.meta.env.VITE_ROOT_API
 
 export default {
   components: {
-    AttendanceChart
+    AttendanceChart,
+    DataChart
   },
   data() {
     return {
@@ -110,6 +112,12 @@ export default {
               :label="labels"
               :chart-data="chartData"
             ></AttendanceChart>
+            <div>
+            <DataChart
+              :label="labels"
+              :chart-data="chartData"
+            ></DataChart>
+            </div>
 
             <!-- Start of loading animation -->
             <div class="mt-40" v-if="loading">
