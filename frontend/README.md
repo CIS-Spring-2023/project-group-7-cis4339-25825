@@ -18,3 +18,11 @@ VITE_ROOT_API is the URL for the backend API, either on localhost or in the clou
 ### Compiles and hot-reloads for development
 
     npm run dev
+   
+Uses a /data/db.json file to supply initial data. Just wanted to get used to working with JSON:
+    npm install -g json-server
+
+JSON file must be served:
+    json-server --watch data/db.json
+
+Project uses vuex for state session management
