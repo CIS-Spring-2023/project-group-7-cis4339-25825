@@ -6,3 +6,5 @@ npm install -g json-server
 
 Run file in a server:
 json-server --watch data/db.json
+
+Uses Vuex for state session management.
