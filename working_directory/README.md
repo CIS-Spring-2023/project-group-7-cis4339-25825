@@ -17,7 +17,7 @@ Run JSON file from local server:
 
     json-server --watch data/db.json
 
-VITE_ROOT_API is the URL for the backend API, either on localhost or in the cloud.
+
 ### Compiles and hot-reloads for development
 
     npm run dev
