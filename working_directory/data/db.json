@@ -1,0 +1,252 @@
+{
+  "organizations": [
+    {
+      "id": 1,
+      "name": "Organization 1",
+      "users": [
+        {
+          "username": "viewer1",
+          "password": "viewer1",
+          "role": "viewer"
+        },
+        {
+          "username": "editor1",
+          "password": "editor1",
+          "role": "editor"
+        }
+      ],
+      "events": [
+        {
+          "id": 1,
+          "name": "Event 1",
+          "description": "Description of Event 1",
+          "date": "2023-04-15",
+          "address1": "1 Main St.",
+          "address2": "",
+          "county": "",
+          "city": "",
+          "zip": ""
+        },
+        {
+          "id": 2,
+          "name": "Event 2",
+          "description": "Description of Event 2",
+          "date": "2023-05-20",
+          "address1": "2 Main St.",
+          "address2": "",
+          "county": "",
+          "city": "",
+          "zip": ""
+        }
+      ],
+      "clients": [
+        {
+          "id": 1,
+          "firstName": "John",
+          "middleName": "",
+          "lastName": "Doe",
+          "email": "johndoe@example.com",
+          "phone": "5555555555",
+          "altPhone": "",
+          "address1": "123 Main St",
+          "address2": "",
+          "city": "Anytown",
+          "county": "Any County",
+          "zip": "12345"
+        },
+        {
+          "id": 2,
+          "firstName": "Jane",
+          "middleName": "Mary",
+          "lastName": "Smith",
+          "email": "janesmith@example.com",
+          "phone": "1111111111",
+          "altPhone": "555-555-5556",
+          "address1": "456 Oak St",
+          "address2": "",
+          "city": "Anytown",
+          "county": "Any County",
+          "zip": "12345"
+        },
+        {
+          "id": 3,
+          "firstName": "Bob",
+          "middleName": "",
+          "lastName": "Johnson",
+          "email": "bobjohnson@example.com",
+          "phone": "3333333333",
+          "altPhone": "",
+          "address1": "789 Elm St",
+          "address2": "",
+          "city": "Anytown",
+          "county": "Any County",
+          "zip": "12345"
+        }
+      ],
+      "services": [
+        {
+          "id": 1,
+          "name": "Service 1",
+          "description": "Description of Service 1",
+          "active": true
+        },
+        {
+          "id": 2,
+          "name": "Service 2",
+          "description": "Description of Service 2",
+          "active": true
+        },
+        {
+          "id": 3,
+          "name": "Service 3",
+          "description": "Description of Service 3",
+          "active": true
+        }
+      ],
+      "eventServices": [
+          {
+              "eventId": 1,
+              "serviceIds": [1,2]
+          },
+          {
+              "eventId": 2,
+              "serviceIds": [3]
+          }
+      ],
+      "eventClients": [
+          {
+              "eventId": 1,
+              "clientIds": [1,2]
+          },
+          {
+              "eventId": 2,
+              "clientIds": [2, 3]
+          }
+      ]
+    },
+    {
+      "id": 2,
+      "name": "Organization 2",
+      "users": [
+        {
+          "username": "viewer2",
+          "password": "viewer2",
+          "role": "viewer"
+        },
+        {
+          "username": "editor2",
+          "password": "editor2",
+          "role": "editor"
+        }
+      ],
+      "events": [
+        {
+          "id": 1,
+          "name": "Org2Event 1",
+          "description": "Org2Description of Event 1",
+          "date": "2023-04-15",
+          "address1": "1 Main St.",
+          "address2": "",
+          "county": "",
+          "city": "",
+          "zip": ""
+        },
+        {
+          "id": 2,
+          "name": "Org2Event 2",
+          "description": "Org2Description of Event 2",
+          "date": "2023-05-20",
+          "address1": "2 Main St.",
+          "address2": "",
+          "county": "",
+          "city": "",
+          "zip": ""
+        }
+      ],
+      "clients": [
+        {
+          "id": 1,
+          "firstName": "Org2John",
+          "middleName": "",
+          "lastName": "Org2Doe",
+          "email": "johndoe@example.com",
+          "phone": "5555555555",
+          "altPhone": "",
+          "address1": "123 Main St",
+          "address2": "",
+          "city": "Anytown",
+          "county": "Any County",
+          "zip": "12345"
+        },
+        {
+          "id": 2,
+          "firstName": "Org2Jane",
+          "middleName": "Org2Mary",
+          "lastName": "Org2Smith",
+          "email": "janesmith@example.com",
+          "phone": "1111111111",
+          "altPhone": "555-555-5556",
+          "address1": "456 Oak St",
+          "address2": "",
+          "city": "Anytown",
+          "county": "Any County",
+          "zip": "12345"
+        },
+        {
+          "id": 3,
+          "firstName": "Org2Bob",
+          "middleName": "",
+          "lastName": "Org2Johnson",
+          "email": "bobjohnson@example.com",
+          "phone": "3333333333",
+          "altPhone": "",
+          "address1": "789 Elm St",
+          "address2": "",
+          "city": "Anytown",
+          "county": "Any County",
+          "zip": "12345"
+        }
+      ],
+      "services": [
+        {
+          "id": 1,
+          "name": "Org2Service 1",
+          "description": "Org2Description of Service 1",
+          "active": true
+        },
+        {
+          "id": 2,
+          "name": "Org2Service 2",
+          "description": "Org2Description of Service 2",
+          "active": true
+        },
+        {
+          "id": 3,
+          "name": "Org2Service 3",
+          "description": "Org2Description of Service 3",
+          "active": true
+        }
+      ],
+      "eventServices": [
+          {
+              "eventId": 1,
+              "serviceIds": [1,2]
+          },
+          {
+              "eventId": 2,
+              "serviceIds": [3]
+          }
+      ],
+      "eventClients": [
+          {
+              "eventId": 1,
+              "clientIds": [1,2]
+          },
+          {
+              "eventId": 2,
+              "clientIds": [2, 3]
+          }
+      ]
+    }
+  ]
+}
