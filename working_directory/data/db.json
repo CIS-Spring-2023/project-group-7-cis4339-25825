@@ -1,0 +1,756 @@
+{
+  "organizations": [
+    {
+      "id": 1,
+      "name": "Community Garden",
+      "users": [
+        {
+          "username": "viewer1",
+          "password": "viewer1",
+          "role": "viewer"
+        },
+        {
+          "username": "editor1",
+          "password": "editor1",
+          "role": "editor"
+        }
+      ],
+      "events": [
+        {
+          "id": 1,
+          "name": "Spring Planting Day",
+          "description": "Help us plant our seasonal flowers and vegetables for the year!",
+          "date": "2023-04-15",
+          "address1": "123 Main St.",
+          "address2": "",
+          "county": "Any County",
+          "city": "Anytown",
+          "zip": "12345"
+        },
+        {
+          "id": 2,
+          "name": "Garden Cleanup Day",
+          "description": "Join us for a day of tidying up and preparing the garden for summer.",
+          "date": "2023-05-20",
+          "address1": "123 Main St.",
+          "address2": "",
+          "county": "Any County",
+          "city": "Anytown",
+          "zip": "12345"
+        },
+        {
+          "id": 3,
+          "name": "Spring Painting Day",
+          "description": "Join us for a day of painting a mural in our garden!",
+          "date": "2023-05-15",
+          "address1": "1234 Maple Avenue",
+          "address2": "",
+          "county": "Marion",
+          "city": "Cedar Rapids",
+          "zip": "52404"
+        },
+        {
+          "id": 4,
+          "name": "Garden Harvest Festival",
+          "description": "Celebrate the end of the growing season with a festival!",
+          "date": "2023-09-30",
+          "address1": "5678 Elm Street",
+          "address2": "",
+          "county": "Johnson",
+          "city": "Iowa City",
+          "zip": "52240"
+        },
+        {
+          "id": 5,
+          "name": "Seed Swap",
+          "description": "Exchange seeds and tips with other gardeners.",
+          "date": "2023-06-10",
+          "address1": "Community Center",
+          "address2": "1234 Park Ave",
+          "county": "King",
+          "city": "Seattle",
+          "zip": "98101"
+        },
+        {
+          "id": 6,
+          "name": "Garden Tour",
+          "description": "Tour of the community garden and demonstration of different gardening techniques.",
+          "date": "2023-07-08",
+          "address1": "Community Garden",
+          "address2": "5678 Main St",
+          "county": "Maricopa",
+          "city": "Phoenix",
+          "zip": "85001"
+        }        
+      ],
+      "clients": [
+        {
+          "id": 1,
+          "firstName": "John",
+          "middleName": "",
+          "lastName": "Doe",
+          "email": "johndoe@example.com",
+          "phone": "8372531140",
+          "altPhone": "",
+          "address1": "123 Main St",
+          "address2": "",
+          "city": "Anytown",
+          "county": "Any County",
+          "zip": "12345"
+        },
+        {
+          "id": 2,
+          "firstName": "Jane",
+          "middleName": "Mary",
+          "lastName": "Smith",
+          "email": "janesmith@example.com",
+          "phone": "1329589372",
+          "altPhone": "5555555556",
+          "address1": "456 Oak St",
+          "address2": "",
+          "city": "Anytown",
+          "county": "Any County",
+          "zip": "12345"
+        },
+        {
+          "id": 3,
+          "firstName": "Bob",
+          "middleName": "",
+          "lastName": "Johnson",
+          "email": "bobjohnson@example.com",
+          "phone": "3748194345",
+          "altPhone": "",
+          "address1": "789 Elm St",
+          "address2": "",
+          "city": "Anytown",
+          "county": "Any County",
+          "zip": "12345"
+        },
+        {
+          "id": 4,
+          "firstName": "Maria",
+          "middleName": "L.",
+          "lastName": "Garcia",
+          "email": "maria.garcia@example.com",
+          "phone": "9876543210",
+          "altPhone": "1234567890",
+          "address1": "10 Maple Ave",
+          "address2": "",
+          "city": "Anytown",
+          "county": "Any County",
+          "zip": "67890"
+        },
+        {
+          "id": 5,
+          "firstName": "Ahmed",
+          "middleName": "",
+          "lastName": "Ali",
+          "email": "ahmed.ali@example.com",
+          "phone": "5551234567",
+          "altPhone": "",
+          "address1": "456 Main St",
+          "address2": "",
+          "city": "Anytown",
+          "county": "Any County",
+          "zip": "12345"
+        },
+        {
+          "id": 6,
+          "firstName": "Sophie",
+          "middleName": "Grace",
+          "lastName": "Williams",
+          "email": "sophie.williams@example.com",
+          "phone": "6172345678",
+          "altPhone": "",
+          "address1": "321 Chestnut St",
+          "address2": "",
+          "city": "Anytown",
+          "county": "Any County",
+          "zip": "54321"
+        },
+        {
+          "id": 7,
+          "firstName": "Emily",
+          "middleName": "Grace",
+          "lastName": "Lee",
+          "email": "emilylee@example.com",
+          "phone": "9823649012",
+          "altPhone": "5555555555",
+          "address1": "456 Pine St",
+          "address2": "",
+          "city": "Another City",
+          "county": "Another County",
+          "zip": "54321"
+        },
+        {
+          "id": 8,
+          "firstName": "David",
+          "middleName": "Michael",
+          "lastName": "Nguyen",
+          "email": "davidnguyen@example.com",
+          "phone": "7328562908",
+          "altPhone": "",
+          "address1": "789 Maple St",
+          "address2": "",
+          "city": "Different City",
+          "county": "Different County",
+          "zip": "67890"
+        }        
+      ],
+      "services": [
+        {
+          "id": 1,
+          "name": "Garden Plot Rental",
+          "description": "Rent a plot in the community garden to grow your own vegetables and flowers.",
+          "active": true
+        },
+        {
+          "id": 2,
+          "name": "Composting",
+          "description": "Bring your food scraps and yard waste to the community garden to be turned into nutrient-rich compost.",
+          "active": true
+        },
+        {
+          "id": 3,
+          "name": "Weeding and Maintenance",
+          "description": "Volunteer to help keep the community garden free of weeds and well-maintained.",
+          "active": true
+        },
+        {
+          "id": 4,
+          "name": "Garden Workshops",
+          "description": "Attend a workshop to learn new gardening techniques and best practices for growing healthy plants.",
+          "active": true
+        },
+        {
+          "id": 5,
+          "name": "Harvest Sharing",
+          "description": "Donate surplus produce from your garden plot to be shared with the community.",
+          "active": true
+        }
+      ],
+      "eventServices": [
+          {
+              "eventId": 1,
+              "serviceIds": [1,2]
+          },
+          {
+              "eventId": 2,
+              "serviceIds": [3]
+          },
+          {
+            "eventId": 3,
+            "serviceIds": [1,2,3]
+        },
+        {
+            "eventId": 4,
+            "serviceIds": [5]
+        },
+        {
+          "eventId": 5,
+          "serviceIds": [1,4,5]
+      },
+      {
+          "eventId": 6,
+          "serviceIds": [2,3]
+      }
+      ],
+      "eventClients": [
+          {
+              "eventId": 1,
+              "clientIds": [1,2]
+          },
+          {
+              "eventId": 2,
+              "clientIds": [2,3]
+          },
+          {
+            "eventId": 3,
+            "clientIds": [1,4]
+          },
+          {
+              "eventId": 4,
+              "clientIds": [5]
+          },
+          {
+            "eventId": 5,
+            "clientIds": [1,5]
+        },
+        {
+            "eventId": 6,
+            "clientIds": [1,3,4]
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "name": "NextGen Weightlifting",
+      "users": [
+        {
+          "username": "viewer2",
+          "password": "viewer2",
+          "role": "viewer"
+        },
+        {
+          "username": "editor2",
+          "password": "editor2",
+          "role": "editor"
+        }
+      ],
+      "events": [
+        {
+          "id": 1,
+          "name": "Beginner Weightlifting Workshop",
+          "description": "Join us for a beginner weightlifting workshop where our coaches will teach you proper form and technique for lifts like the squat, bench press, and deadlift.",
+          "date": "2023-06-10",
+          "address1": "123 Main St.",
+          "address2": "",
+          "county": "Maricopa",
+          "city": "Phoenix",
+          "zip": "85001"
+        },
+        {
+          "id": 2,
+          "name": "NextGen Weightlifting Championships",
+          "description": "Compete against other weightlifters in our annual championships. Cash prizes for winners!",
+          "date": "2023-08-12",
+          "address1": "456 Elm St.",
+          "address2": "",
+          "county": "Cook",
+          "city": "Chicago",
+          "zip": "60601"
+        },
+        {
+          "id": 3,
+          "name": "Weightlifting Seminar with Olympian",
+          "description": "Join us for a special seminar with Olympic weightlifting champion, Jenny Arthur. She'll be sharing her training techniques and advice.",
+          "date": "2023-09-22",
+          "address1": "789 Oak St.",
+          "address2": "",
+          "county": "Los Angeles",
+          "city": "Santa Monica",
+          "zip": "90401"
+        },
+        {
+          "id": 4,
+          "name": "Fundraising Event",
+          "description": "Join NextGen Weightlifting for a fundraising event to support our athletes!",
+          "date": "2023-09-10",
+          "address1": "5678 University Drive",
+          "address2": "Suite 201",
+          "county": "Maricopa",
+          "city": "Tempe",
+          "zip": "85281"
+        },
+        {
+          "id": 5,
+          "name": "NextGen Open House",
+          "description": "Come see our state-of-the-art facility and meet our coaches and athletes!",
+          "date": "2023-10-15",
+          "address1": "9101 E. Shea Blvd.",
+          "address2": "",
+          "county": "Maricopa",
+          "city": "Scottsdale",
+          "zip": "85260"
+        },
+        {
+          "id": 6,
+          "name": "Youth Training Camp",
+          "description": "NextGen Weightlifting is hosting a training camp for youth athletes.",
+          "date": "2023-11-18",
+          "address1": "9876 W. Happy Valley Road",
+          "address2": "",
+          "county": "Maricopa",
+          "city": "Peoria",
+          "zip": "85383"
+        },
+        {
+          "id": 7,
+          "name": "Strongman Camp",
+          "description": "Test your strength and endurance in our annual strongman challenge featuring events such as tire flip, atlas stone carry, and farmer's walk.",
+          "date": "2023-08-20",
+          "address1": "9101 Elm St, Anytown",
+          "address2": "",
+          "county": "Any County",
+          "city": "Any Town",
+          "zip": "54321"
+        }
+      ],
+      "clients": [
+          {
+              "id": 1,
+              "firstName": "Michael",
+              "middleName": "",
+              "lastName": "Jones",
+              "email": "mikejones@example.com",
+              "phone": "5551234567",
+              "altPhone": "",
+              "address1": "123 Main St",
+              "address2": "",
+              "city": "Anytown",
+              "county": "Any County",
+              "zip": "12345"
+            },
+            {
+              "id": 2,
+              "firstName": "Max",
+              "middleName": "Alexander",
+              "lastName": "Lee",
+              "email": "maxlee@example.com",
+              "phone": "5559876543",
+              "altPhone": "5555555556",
+              "address1": "456 Oak St",
+              "address2": "",
+              "city": "Anytown",
+              "county": "Any County",
+              "zip": "12345"
+            },
+            {
+              "id": 3,
+              "firstName": "Ava",
+              "middleName": "",
+              "lastName": "Williams",
+              "email": "avawilliams@example.com",
+              "phone": "5473829104",
+              "altPhone": "",
+              "address1": "789 Elm St",
+              "address2": "",
+              "city": "Anytown",
+              "county": "Any County",
+              "zip": "12345"
+            },
+            {
+              "id": 4,
+              "firstName": "Samantha",
+              "middleName": "Lee",
+              "lastName": "Nguyen",
+              "email": "sam.nguyen@example.com",
+              "phone": "5551112222",
+              "altPhone": "",
+              "address1": "1234 5th Avenue",
+              "address2": "Apt 101",
+              "city": "New York",
+              "county": "New York County",
+              "zip": "10029"
+            },
+            {
+              "id": 5,
+              "firstName": "Robert",
+              "middleName": "John",
+              "lastName": "Gonzalez",
+              "email": "robert.gonzalez@example.com",
+              "phone": "5553334444",
+              "altPhone": "",
+              "address1": "5678 Main Street",
+              "address2": "",
+              "city": "Los Angeles",
+              "county": "Los Angeles County",
+              "zip": "90012"
+            },
+            {
+              "id": 6,
+              "firstName": "Emily",
+              "middleName": "Marie",
+              "lastName": "Chen",
+              "email": "emily.chen@example.com",
+              "phone": "5555556666",
+              "altPhone": "",
+              "address1": "9101 Park Blvd",
+              "address2": "",
+              "city": "San Diego",
+              "county": "San Diego County",
+              "zip": "92101"
+            },
+            {
+              "id": 7,
+              "firstName": "Michael",
+              "middleName": "",
+              "lastName": "Jackson",
+              "email": "michael.jackson@example.com",
+              "phone": "5557778888",
+              "altPhone": "",
+              "address1": "4321 Elm Street",
+              "address2": "",
+              "city": "Chicago",
+              "county": "Cook County",
+              "zip": "60601"
+            },
+            {
+              "id": 8,
+              "firstName": "Sophia",
+              "middleName": "Grace",
+              "lastName": "Brown",
+              "email": "sophia.brown@example.com",
+              "phone": "5559990000",
+              "altPhone": "",
+              "address1": "123 Main Street",
+              "address2": "",
+              "city": "Houston",
+              "county": "Harris County",
+              "zip": "77001"
+            }
+      ],
+      "services": [
+          {
+              "id": 1,
+              "name": "Personal Training",
+              "description": "Get one-on-one training with a certified personal trainer to improve your strength and technique.",
+              "active": true
+            },
+            {
+              "id": 2,
+              "name": "Group Training",
+              "description": "Join a group of like-minded individuals and train together in a supportive and motivating environment.",
+              "active": true
+            },
+            {
+              "id": 3,
+              "name": "Nutrition Counseling",
+              "description": "Get personalized nutrition advice and guidance to help you fuel your body for optimal performance.",
+              "active": true
+            },
+            {
+              "id": 4,
+              "name": "Weightlifting Workshops",
+              "description": "Learn proper weightlifting techniques and tips from experienced coaches and trainers.",
+              "active": true
+            },
+            {
+              "id": 5,
+              "name": "Online Coaching",
+              "description": "Get customized workouts and support from a certified coach, no matter where you are in the world.",
+              "active": true
+            }          
+      ],
+      "eventServices": [
+          {
+              "eventId": 1,
+              "serviceIds": [1,2]
+          },
+          {
+              "eventId": 2,
+              "serviceIds": [3,4,5]
+          },
+          {
+              "eventId": 3,
+              "serviceIds": [1,2,5]
+          },
+          {
+              "eventId": 4,
+              "serviceIds": [3]
+          },
+          {
+              "eventId": 5,
+              "serviceIds": [1,2]
+          },
+          {
+              "eventId": 6,
+              "serviceIds": [3,4]
+          },
+          {
+              "eventId": 7,
+              "serviceIds": [1]
+          }
+      ],
+      "eventClients": [
+          {
+              "eventId": 1,
+              "clientIds": [3,4,7,8]
+          },
+          {
+              "eventId": 2,
+              "clientIds": [2,3]
+          },
+          {
+              "eventId": 3,
+              "clientIds": [1,5,6]
+          },
+          {
+              "eventId": 4,
+              "clientIds": [1,7,8]
+          },
+          {
+              "eventId": 5,
+              "clientIds": [4,5]
+          },
+          {
+              "eventId": 6,
+              "clientIds": [3,8]
+          },
+          {
+              "eventId": 7,
+              "clientIds": [1]
+          }
+      ]
+    },
+    {
+      "id": 3,
+      "name": "Animal Welfare Community",
+      "users": [
+        {
+          "username": "viewer3",
+          "password": "viewer3",
+          "role": "viewer"
+        },
+        {
+          "username": "editor3",
+          "password": "editor3",
+          "role": "editor"
+        }
+      ],
+      "events": [
+        {
+          "id": 1,
+          "name": "Canine Fitness Workshop",
+          "description": "Learn how to keep your furry friend fit and healthy with our canine fitness workshop. Our experts will demonstrate various exercises and techniques to keep your dog active and happy.",
+          "date": "2023-07-15",
+          "address1": "234 Maple Ave.",
+          "address2": "",
+          "county": "Middlesex",
+          "city": "Cambridge",
+          "zip": "02139"
+        },
+        {
+          "id": 2,
+          "name": "Kitten Adoption Day",
+          "description": "Come meet our adorable kittens available for adoption! We'll have a variety of breeds and ages, all looking for their forever homes.",
+          "date": "2023-10-07",
+          "address1": "567 Elm St.",
+          "address2": "",
+          "county": "Boulder",
+          "city": "Boulder",
+          "zip": "80301"
+        },
+        {
+          "id": 3,
+          "name": "Puppy Socialization Class",
+          "description": "Is your new puppy nervous around other dogs? Join our puppy socialization class to help your furry friend build confidence and learn important socialization skills.",
+          "date": "2023-11-12",
+          "address1": "890 Main St.",
+          "address2": "",
+          "county": "Orange",
+          "city": "Irvine",
+          "zip": "92612"
+        }
+      ],
+      "clients": [
+        {
+          "id": 1,
+          "firstName": "Emily",
+          "middleName": "",
+          "lastName": "Nguyen",
+          "email": "emilynguyen@example.com",
+          "phone": "5552345678",
+          "altPhone": "",
+          "address1": "456 Maple Ave",
+          "address2": "",
+          "city": "Sometown",
+          "county": "Any County",
+          "zip": "12345"
+        },
+        {
+          "id": 2,
+          "firstName": "William",
+          "middleName": "Henry",
+          "lastName": "Lee",
+          "email": "williamlee@example.com",
+          "phone": "5553456789",
+          "altPhone": "",
+          "address1": "789 Oak St",
+          "address2": "",
+          "city": "Anycity",
+          "county": "Any County",
+          "zip": "67676"
+        },
+        {
+          "id": 3,
+          "firstName": "Ava",
+          "middleName": "",
+          "lastName": "Garcia",
+          "email": "avagarcia@example.com",
+          "phone": "5554567890",
+          "altPhone": "",
+          "address1": "1010 Park Ave",
+          "address2": "",
+          "city": "Anyville",
+          "county": "Any County",
+          "zip": "67676"
+        },
+        {
+          "id": 4,
+          "firstName": "Daniel",
+          "middleName": "Joseph",
+          "lastName": "Kim",
+          "email": "danielkim@example.com",
+          "phone": "5555678901",
+          "altPhone": "",
+          "address1": "1111 Pine St",
+          "address2": "",
+          "city": "Anycity",
+          "county": "Any County",
+          "zip": "67676"
+        }    
+      ],
+      "services": [
+        {
+          "id": 1,
+          "name": "Animal Adoption",
+          "description": "Adopt a new furry friend and give them a loving home.",
+          "active": true
+        },
+        {
+          "id": 2,
+          "name": "Pet Vaccinations",
+          "description": "Keep your pet healthy and up-to-date with their vaccinations.",
+          "active": true
+        },
+        {
+          "id": 3,
+          "name": "Animal Behavior Training",
+          "description": "Get help training your pet to improve their behavior and socialization skills.",
+          "active": true
+        },
+        {
+          "id": 4,
+          "name": "Low-Cost Spay and Neuter Services",
+          "description": "Help control the animal population and prevent unwanted litters with our affordable spay and neuter services.",
+          "active": true
+        },
+        {
+          "id": 5,
+          "name": "Pet Foster Care",
+          "description": "Provide a temporary home for pets in need while they wait to be adopted.",
+          "active": true
+        }      
+      ],
+      "eventServices": [
+          {
+              "eventId": 1,
+              "serviceIds": [3,4]
+          },
+          {
+              "eventId": 2,
+              "serviceIds": [5]
+          },
+          {
+              "eventId": 3,
+              "serviceIds": [1,3]
+          }
+      ],
+      "eventClients": [
+          {
+              "eventId": 1,
+              "clientIds": [4,5]
+          },
+          {
+              "eventId": 2,
+              "clientIds": [2,3]
+          },
+          {
+              "eventId": 3,
+              "clientIds": [1]
+          }
+      ]
+    }
+  ]
+}
