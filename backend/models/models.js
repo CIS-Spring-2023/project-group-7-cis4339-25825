@@ -79,9 +79,9 @@ const clientDataSchema = new Schema(
 // collection for events
 const eventDataSchema = new Schema(
   {
-    _id: { type: String, default: uuid.v1 },
+    _id: { type: mongoose.Schema.Types.ObjectId, default: () => new mongoose.Types.ObjectId() },
     org: {
-      type: String,
+      type: mongoose.Schema.Types.ObjectId,
       required: true
     },
     name: {
@@ -90,7 +90,7 @@ const eventDataSchema = new Schema(
     },
     services: [
       {
-        type: String
+        type: mongoose.Schema.Types.ObjectId
       }
     ],
     date: {
@@ -119,13 +119,13 @@ const eventDataSchema = new Schema(
     },
     attendees: [
       {
-        type: String,
+        type: mongoose.Schema.Types.ObjectId,
         ref: 'client'
       }
     ]
   },
   {
-    collection: 'event'
+    collection: 'events'
   }
 )
 

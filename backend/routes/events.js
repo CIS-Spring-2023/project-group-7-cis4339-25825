@@ -1,18 +1,38 @@
 const express = require('express')
+const mongoose = require('mongoose')
 const router = express.Router()
 
-const org = process.env.ORG
+// const org = process.env.ORG
+const org = mongoose.Types.ObjectId(process.env.ORG)
 
 // importing data model schemas
 const { events } = require('../models/models')
 
 // GET 10 most recent events for org
+// router.get('/', (req, res, next) => {
+//   console.log('org:', org)
+//   events
+//     .find({ org: org }, (error, data) => {
+//       if (error) {
+//         return next(error)
+//       } else {
+//         console.log("data:", data)
+//         return res.json(data)
+//       }
+//     })
+//     // sort by date ascending
+//     .sort({ date: 1 })
+//     .limit(10)
+// })
+
 router.get('/', (req, res, next) => {
+  console.log('org:', org)
   events
-    .find({ org: org }, (error, data) => {
+    .find({}, (error, data) => {
       if (error) {
         return next(error)
       } else {
+        console.log("data:", data)
         return res.json(data)
       }
     })
