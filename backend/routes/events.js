@@ -8,27 +8,12 @@ const org = mongoose.Types.ObjectId(process.env.ORG)
 // importing data model schemas
 const { events } = require('../models/models')
 
+// checked
 // GET 10 most recent events for org
-// router.get('/', (req, res, next) => {
-//   console.log('org:', org)
-//   events
-//     .find({ org: org }, (error, data) => {
-//       if (error) {
-//         return next(error)
-//       } else {
-//         console.log("data:", data)
-//         return res.json(data)
-//       }
-//     })
-//     // sort by date ascending
-//     .sort({ date: 1 })
-//     .limit(10)
-// })
-
 router.get('/', (req, res, next) => {
   console.log('org:', org)
   events
-    .find({}, (error, data) => {
+    .find({ org: org }, (error, data) => {
       if (error) {
         return next(error)
       } else {
@@ -41,6 +26,7 @@ router.get('/', (req, res, next) => {
     .limit(10)
 })
 
+// checked
 // GET single event by ID
 router.get('/id/:id', (req, res, next) => {
   // use findOne instead of find to not return array
@@ -55,6 +41,7 @@ router.get('/id/:id', (req, res, next) => {
   })
 })
 
+// checked
 // GET events based on search query
 // Ex: '...?name=Food&searchBy=name'
 router.get('/search/', (req, res, next) => {
@@ -79,6 +66,7 @@ router.get('/search/', (req, res, next) => {
   })
 })
 
+// checked
 // GET events for which a client is signed up
 router.get('/client/:id', (req, res, next) => {
   events.find({ attendees: req.params.id, org: org }, (error, data) => {
@@ -90,6 +78,7 @@ router.get('/client/:id', (req, res, next) => {
   })
 })
 
+// checked
 // GET org event attendance for the past two months
 router.get('/attendance', (req, res, next) => {
   const twoMonthsAgo = new Date()
@@ -105,6 +94,7 @@ router.get('/attendance', (req, res, next) => {
     .sort({ date: 1 })
 })
 
+// checked
 // POST new event
 router.post('/', (req, res, next) => {
   const newEvent = req.body
@@ -118,6 +108,7 @@ router.post('/', (req, res, next) => {
   })
 })
 
+// checked
 // PUT update event
 router.put('/update/:id', (req, res, next) => {
   events.findByIdAndUpdate(req.params.id, req.body, (error, data) => {
@@ -129,6 +120,7 @@ router.put('/update/:id', (req, res, next) => {
   })
 })
 
+// checked
 // PUT add attendee to event
 router.put('/register', (req, res, next) => {
   events.find(
@@ -137,7 +129,7 @@ router.put('/register', (req, res, next) => {
       if (error) {
         return next(error)
       } else {
-        // only add attendee if not yet signed up
+        // only add attendee is not yet signed up
         if (!data.length) {
           events.findByIdAndUpdate(
             req.query.event,
@@ -159,6 +151,7 @@ router.put('/register', (req, res, next) => {
   )
 })
 
+// checked
 // PUT remove attendee from event
 router.put('/deregister', (req, res, next) => {
   events.findByIdAndUpdate(
@@ -175,6 +168,7 @@ router.put('/deregister', (req, res, next) => {
   )
 })
 
+// checked
 // hard DELETE event by ID, as per project specifications
 router.delete('/:id', (req, res, next) => {
   events.findByIdAndDelete(req.params.id, (error, data) => {

@@ -6,6 +6,7 @@ const org = process.env.ORG
 // importing data model schemas
 const { clients } = require('../models/models')
 
+// checked
 // GET 10 most recent clients for org
 router.get('/', (req, res, next) => {
   clients
@@ -20,6 +21,7 @@ router.get('/', (req, res, next) => {
     .limit(10)
 })
 
+// checked
 // GET single client by ID
 router.get('/id/:id', (req, res, next) => {
   // use findOne instead of find to not return array
@@ -34,6 +36,7 @@ router.get('/id/:id', (req, res, next) => {
   })
 })
 
+// checked
 // GET entries based on search query
 // Ex: '...?firstName=Bob&lastName=&searchBy=name'
 router.get('/search', (req, res, next) => {
@@ -61,6 +64,7 @@ router.get('/search', (req, res, next) => {
   })
 })
 
+
 // GET lookup by phone, verify org membership on frontend
 router.get('/lookup/:phoneNumber', (req, res, next) => {
   clients.findOne(
@@ -80,6 +84,7 @@ router.get('/lookup/:phoneNumber', (req, res, next) => {
   )
 })
 
+// checked
 // POST new client
 router.post('/', (req, res, next) => {
   const newClient = req.body
@@ -93,6 +98,7 @@ router.post('/', (req, res, next) => {
   })
 })
 
+// checked
 // PUT update client
 router.put('/update/:id', (req, res, next) => {
   clients.findByIdAndUpdate(req.params.id, req.body, (error, data) => {
@@ -104,6 +110,7 @@ router.put('/update/:id', (req, res, next) => {
   })
 })
 
+// checked
 // PUT add existing client to org
 router.put('/register/:id', (req, res, next) => {
   clients.findByIdAndUpdate(
@@ -120,6 +127,7 @@ router.put('/register/:id', (req, res, next) => {
   )
 })
 
+// checked
 // PUT remove existing client from org
 router.put('/deregister/:id', (req, res, next) => {
   clients.findByIdAndUpdate(
@@ -136,6 +144,7 @@ router.put('/deregister/:id', (req, res, next) => {
   )
 })
 
+// checked
 // hard DELETE client by ID, as per project specifications
 router.delete('/:id', (req, res, next) => {
   clients.findByIdAndDelete(req.params.id, (error, data) => {
