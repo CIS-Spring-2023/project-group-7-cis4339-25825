@@ -1,14 +1,13 @@
 const express = require('express');
 const router = express.Router();
 
-const org = process.env.ORG;
-
 const { services } = require('../models/models');
+const authMiddleWare = require('../auth/authMiddleWare');
 
 // checked
 // GET 10 most recent services for org
-router.get('/', (req, res, next) => {
-    console.log('org:', org)
+router.get('/', authMiddleWare, (req, res, next) => {
+  const org = req.user.org;
   services
     .find({ org: org }, (error, data) => {
       if (error) {
@@ -23,7 +22,8 @@ router.get('/', (req, res, next) => {
 
 // checked
 // GET single service by ID
-router.get('/id/:id', (req, res, next) => {
+router.get('/id/:id', authMiddleWare, (req, res, next) => {
+  const org = req.user.org;
   services.findOne({ _id: req.params.id, org: org }, (error, data) => {
     if (error) {
       return next(error);
@@ -37,7 +37,8 @@ router.get('/id/:id', (req, res, next) => {
 
 // checked
 // GET entries based on search query
-router.get('/search', (req, res, next) => {
+router.get('/search', authMiddleWare, (req, res, next) => {
+  const org = req.user.org;
   const dbQuery = { org: org };
   switch (req.query.searchBy) {
     case 'name':
@@ -60,7 +61,8 @@ router.get('/search', (req, res, next) => {
 
 // checked
 // POST new service
-router.post('/', (req, res, next) => {
+router.post('/', authMiddleWare, (req, res, next) => {
+  const org = req.user.org;
   const newService = req.body;
   newService.org = [org];
   services.create(newService, (error, data) => {
@@ -74,7 +76,8 @@ router.post('/', (req, res, next) => {
 
 // checked
 // PUT update service
-router.put('/update/:id', (req, res, next) => {
+router.put('/update/:id', authMiddleWare, (req, res, next) => {
+  const org = req.user.org;
   services.findByIdAndUpdate(req.params.id, req.body, (error, data) => {
     if (error) {
       return next(error);
@@ -86,7 +89,8 @@ router.put('/update/:id', (req, res, next) => {
 
 // checked
 // hard DELETE service by ID
-router.delete('/:id', (req, res, next) => {
+router.delete('/:id', authMiddleWare, (req, res, next) => {
+  const org = req.user.org;
   services.findByIdAndDelete(req.params.id, (error, data) => {
     if (error) {
       return next(error);

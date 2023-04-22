@@ -1,14 +1,14 @@
 const express = require('express')
 const router = express.Router()
-
-const org = process.env.ORG
+const authMiddleWare = require('../auth/authMiddleWare')
 
 // importing data model schemas
 const { orgs } = require('../models/models')
 
 // checked
 // GET org
-router.get('/', (req, res, next) => {
+router.get('/', authMiddleWare, (req, res, next) => {
+  const org = req.user.org;
   orgs.findById(org, (error, data) => {
     if (error) {
       return next(error)
