@@ -38,10 +38,9 @@ const userDataSchema = new Schema(
       type: String,
       required: true
     },
-    orgs: {
-      type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'org' }],
-      required: true,
-      validate: [(org) => org.length > 0, 'needs at least one org']
+    org: {
+      type: mongoose.Schema.Types.ObjectId, 
+      ref: 'org'
     }
   },
   {
@@ -119,7 +118,8 @@ const eventDataSchema = new Schema(
     },
     services: [
       {
-        type: mongoose.Schema.Types.ObjectId
+        type: mongoose.Schema.Types.ObjectId, 
+        ref: 'services'
       }
     ],
     date: {
@@ -149,7 +149,7 @@ const eventDataSchema = new Schema(
     attendees: [
       {
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'client'
+        ref: 'clients'
       }
     ]
   },
@@ -175,11 +175,9 @@ const serviceDataSchema = new Schema(
     active: {
       type: Boolean
     },
-    orgs: [
-      {
-        type: mongoose.Schema.Types.ObjectId
-      }
-    ]
+    org: {
+      type: mongoose.Schema.Types.ObjectId, ref: 'org'
+    }
   },
   {
     collection: 'services'
@@ -194,4 +192,4 @@ const events = mongoose.model('events', eventDataSchema)
 const services = mongoose.model('services', serviceDataSchema)
 
 // package the models in an object to export
-module.exports = { clients, orgs, events, users }
+module.exports = { clients, orgs, events, users, services }

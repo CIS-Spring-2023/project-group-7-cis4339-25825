@@ -168,6 +168,48 @@ router.put('/deregister', (req, res, next) => {
   )
 })
 
+// GET events for which a service is assigned
+router.get('/service/:id', (req, res, next) => {
+  events.find({ services: req.params.id, org: org }, (error, data) => {
+    if (error) {
+      return next(error);
+    } else {
+      res.json(data);
+    }
+  });
+});
+
+// PUT add service to event
+router.put('/add-service/:id', (req, res, next) => {
+  events.findByIdAndUpdate(
+    req.params.id,
+    { $addToSet: { services: req.body.serviceId } },
+    (error, data) => {
+      if (error) {
+        return next(error);
+      } else {
+        res.send('Service added to event');
+      }
+    }
+  );
+});
+
+// PUT remove service from event
+router.put('/remove-service/:id', (req, res, next) => {
+  events.findByIdAndUpdate(
+    req.params.id,
+    { $pull: { services: req.body.serviceId } },
+    (error, data) => {
+      if (error) {
+        return next(error);
+      } else {
+        res.send('Service removed from event');
+      }
+    }
+  );
+});
+
+
 // checked
 // hard DELETE event by ID, as per project specifications
 router.delete('/:id', (req, res, next) => {
