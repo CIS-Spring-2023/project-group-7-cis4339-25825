@@ -100,18 +100,30 @@ export const getOrgRecentEvents = async () => {
   };
   
   // GET events based on search query
-  export const searchEvents = async (searchBy, query, token) => {
-    const response = await axios.get(`/api/events/search`, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-      params: {
-        searchBy: searchBy,
-        ...query,
-      },
-    });
-    return response.data;
+  export const searchEvents = async (query) => {
+    try {
+      let params = {};
+      if (query.searchBy === 'name') {
+        params.searchBy = query.searchBy;
+        params.name = query.name || '';
+      } else if (query.searchBy === 'date') {
+        params.searchBy = 'date'
+        params.eventDate = query.eventDate || '';
+      }
+      console.log('searchEvents params', params)
+      const response = await apiClient.get(`/events/search`, {
+        params: params
+      });
+     return response.data;
+   } catch(error) {
+      console.log('searchEvents error', error)
+      throw (error)
+   }
   };
+
+
+
+
   
   // GET events for which a client is signed up
   export const getClientEvents = async (id, token) => {
@@ -284,20 +296,26 @@ export const getOrgClients = async () => {
     return response.data;
   };
   
-  
-// GET entries based on search query
+  // GET entries based on search query
 export const searchClients = async (query) => {
+  console.log('searchClients query', query)
   try {
+    let params = {};
+    if (query.searchBy === 'name') {
+      params.searchBy = query.searchBy;
+      params.firstName = query.firstName || '';
+      params.lastName = query.lastName || '';
+    } else if (query.searchBy === 'number') {
+      params.searchBy = query.searchBy;
+      params.phoneNumber = query.phoneNumber || '';
+    }
     const response = await apiClient.get('/clients/search', {
-      params: {
-        firstName: query.firstName || '',
-        lastName: query.lastName || ''
-      },
+      params: params
     });
     return response.data;
   } catch (error) {
-    console.log('searchClients error', error);
-    throw (error);
+      console.log('searchClients error', error);
+      throw error;
   }
 };
 

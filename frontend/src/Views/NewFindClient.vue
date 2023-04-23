@@ -53,7 +53,7 @@
             <input
               class="w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
               type="text"
-              v-model="phone"
+              v-model="phoneNumber"
               v-on:keyup.enter="handleSubmitForm"
               placeholder="Enter Client Phone Number"
             />
@@ -146,15 +146,15 @@ export default {
             searchBy: '',
             firstName: '',
             lastName: '',
-            phone: '',
+            phoneNumber: '',
             // variable stores the ID of the row that the mouse is currently hovering over (to highlight the row red)
             hoverId: null,
         }
     },
     computed: {
-    //computed states so they can be referenced in code
-    ...mapState(['role'])
-  },
+        //computed states so they can be referenced in code
+        ...mapState(['role'])
+    },
     mounted() {
         this.loadData();
     },
@@ -164,7 +164,7 @@ export default {
             this.searchBy = ''
             this.firstName = ''
             this.lastName = ''
-            this.phone = ''
+            this.phoneNumber = ''
             console.log('loadData called')
             try {
                 const response = await getOrgRecentClients();
@@ -174,24 +174,38 @@ export default {
             }
         },
         async handleSubmitForm() {
-            if (this.searchBy === 'Client Name') {
-                if (this.firstName || this.lastName) {
-                    try {
-                        const query = {
-                            searchBy: 'name',
-                            firstName: this.firstName,
-                            lastName: this.lastName,
-                        }
-                        const response = await searchClients(query)
-                        this.clients = response;
-                    } catch (error) {
-                        console.error('Error searching clients:', error)
-                    }
+        if (this.searchBy === 'Client Name') {
+            if (this.firstName || this.lastName) {
+            try {
+                const query = {
+                    searchBy: 'name',
+                    firstName: this.firstName,
+                    lastName: this.lastName,
                 }
-            } else if (this.searchBy === 'Client Number') {
-                console.log('search by client number')
+                console.log('query', query)
+                const response = await searchClients(query)
+                this.clients = response;
+            } catch (error) {
+                console.error('Error searching clients:', error)
+            }
+            }
+        } else if (this.searchBy === 'Client Number') {
+            if (this.phoneNumber) {
+                try {
+                    const query = {
+                        searchBy: 'number',
+                        phoneNumber: this.phoneNumber
+                    }
+                    const response = await searchClients(query)
+                    this.clients = response;
+                } catch (error) {
+                    console.error('Error searching clients:', error)
+                }
             }
         }
+    },
+    
+
     },
 }
 </script>

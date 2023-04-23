@@ -256,7 +256,11 @@ export default {
     },
 
     formatDate(date) {
-      return new Date(date).toLocaleDateString();
+        const isoDate = new Date(date);
+        const year = isoDate.getUTCFullYear();
+        const month = String(isoDate.getUTCMonth() + 1).padStart(2, '0');
+        const day = String(isoDate.getUTCDate()).padStart(2, '0');
+        return `${month}/${day}/${year}`;
     },
   },
 }

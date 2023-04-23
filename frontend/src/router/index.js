@@ -114,7 +114,7 @@ const routes = [
   {
     path: '/findevents',
     name: 'findevents',
-    component: () => import('../Views/FindEvent.vue'),
+    component: () => import('../Views/NewFindEvent.vue'),
     //if page is accessed without logging in, this routes to 404 Not Found page
     beforeEnter: (to, from, next) => {
       if (!store.state.role) {

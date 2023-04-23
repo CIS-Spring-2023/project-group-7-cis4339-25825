@@ -71,15 +71,25 @@ router.get('/search', authMiddleWare, (req, res, next) => {
   const org = req.user.org;
   const dbQuery = { orgs: org };
   let queryArray = [];
-  if (req.query.firstName) {
-    queryArray.push({ firstName: { $regex: `.*${req.query.firstName}.*`, $options: 'i' } })
+
+  switch (req.query.searchBy) {
+    case 'name':
+      if (req.query.firstName) {
+        queryArray.push({ firstName: { $regex: `.*${req.query.firstName}.*`, $options: 'i' } })
+      }
+      if (req.query.lastName) {
+        queryArray.push({ lastName: { $regex: `.*${req.query.lastName}.*`, $options: 'i' } })
+      }
+      break;
+    case 'number':
+      if (req.query.phoneNumber) {
+        queryArray.push({ 'phoneNumber.primary': { $regex: `.*${req.query.phoneNumber}.*`, $options: 'i' } })
+      }
+      break;
+    default:
+      return res.status(400).send('invalid searchBy');
   }
-  if (req.query.lastName) {
-    queryArray.push({ lastName: { $regex: `.*${req.query.lastName}.*`, $options: 'i' } })
-  }
-  if (queryArray.length === 0) {
-    return res.status(400).send('no search query')
-  }
+
   dbQuery['$and'] = queryArray;
   clients.find(dbQuery, (error, data) => {
     if (error) {
@@ -89,6 +99,7 @@ router.get('/search', authMiddleWare, (req, res, next) => {
     }
   });
 });
+
 
 
 

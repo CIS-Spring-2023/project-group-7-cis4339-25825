@@ -76,6 +76,7 @@ router.get('/search/', authMiddleWare, (req, res, next) => {
     default:
       return res.status(400).send('invalid searchBy');
   }
+  console.log('search events API endpoint dbQuery', dbQuery)
   events.find(dbQuery, (error, data) => {
     if (error) {
       return next(error);
