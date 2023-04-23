@@ -439,13 +439,14 @@ export const getActiveServices = async () => {
   };
 
   // POST new service
-  export const createService = async (newService, token) => {
-    const response = await axios.post('/api/services', newService, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
-    return response.data;
+  export const createService = async (newService) => {
+    try {
+      const response = await apiClient.post('/services', newService);
+      return response.data
+    } catch (error) {
+      console.log('createService API call error', error);
+      throw (error);
+    }
   };
   
   // PUT update service

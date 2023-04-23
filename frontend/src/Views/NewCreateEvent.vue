@@ -237,7 +237,7 @@ export default {
                         console.log(response.message);
                         this.$router.push('/findevents')
                     } else {
-                        console.log('Client creation failed');
+                        console.log('Event creation failed');
                     }
             } catch (error) {
                 console.log('error creating new event:', error)

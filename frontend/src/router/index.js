@@ -98,7 +98,7 @@ const routes = [
   {
     path: '/serviceform',
     name: 'serviceform',
-    component: () => import('../Views/CreateService.vue'),
+    component: () => import('../Views/NewCreateService.vue'),
     //if page is accessed without logging in, this routes to 404 Not Found page
     beforeEnter: (to, from, next) => {
       if (!store.state.role || !store.state.role === 'editor') {

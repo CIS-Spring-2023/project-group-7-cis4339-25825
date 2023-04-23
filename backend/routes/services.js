@@ -82,7 +82,9 @@ router.post('/', authMiddleWare, (req, res, next) => {
     if (error) {
       return next(error);
     } else {
-      res.json(data);
+      // res.json(data);
+      const message = { success: true, message: "New service created successfully" };
+      res.status(201).json(message);
     }
   });
 });
