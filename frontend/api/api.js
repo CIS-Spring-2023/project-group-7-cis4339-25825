@@ -9,6 +9,7 @@ const apiClient = axios.create({
   },
 });
 
+// Login API calls
 function setAuthHeader(token) {
   apiClient.defaults.headers.common['Authorization'] = `Bearer ${token}`;
 }
@@ -42,6 +43,23 @@ export function initializeAuthHeaderFromLocalStorage() {
     setAuthHeader(token);
   }
 }
+
+export async function getUserById(userId) {
+  console.log('getUserById api call')
+  console.log('getUserById userId', userId)
+  const response = await apiClient.get(`/users/id/${userId}`);
+  console.log('getUserById response', response.data)
+  return response.data;
+};
+
+export async function getOrgById(orgId) {
+  console.log('getOrgyId api call')
+  console.log('getOrgById orgId', orgId)
+  const response = await apiClient.get(`/org/id/${orgId}`);
+  console.log('getOrgById response', response.data)
+  return response.data;
+};
+
 
 // API Calls for events
 // GET 10 most recent events for org

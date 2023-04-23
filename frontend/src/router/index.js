@@ -9,7 +9,7 @@ const routes = [
   {
     path: '/',
     props: true,
-    component: () => import('../Views/LoginView.vue')
+    component: () => import('../Views/NewLoginView.vue')
   },
   // route to the client intake form - only appears for users with "editor" role
   {

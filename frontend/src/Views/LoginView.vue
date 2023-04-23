@@ -1,7 +1,7 @@
 <template>
     <div>
       <!--Header-->
-      <h1 class="font-bold text-4xl text-red-700 tracking-widest text-center mt-10">Login</h1>
+      <h1 class="font-bold text-4xl text-red-700 tracking-widest text-center mt-10">Old Login</h1>
       <br>
       <!--Form-->
       <form class="flex flex-col items-center" @submit.prevent="userLogin">
