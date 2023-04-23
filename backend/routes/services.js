@@ -20,6 +20,19 @@ router.get('/', authMiddleWare, (req, res, next) => {
     .limit(10);
 });
 
+// GET all active services from org
+router.get('/active', authMiddleWare, (req, res, next) => {
+  const org = req.user.org;
+  services
+    .find({ org: org, active: true }, { _id: 1, name: 1 }, (error, data) => {
+      if (error) {
+        return next(error);
+      } else {
+        res.json(data);
+      }
+    })
+});
+
 // checked
 // GET single service by ID
 router.get('/id/:id', authMiddleWare, (req, res, next) => {

@@ -146,13 +146,14 @@ export const getOrgRecentEvents = async () => {
   };
   
   // POST new event
-  export const createEvent = async (eventData, token) => {
-    const response = await axios.post(`/api/events/`, eventData, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
-    return response.data;
+  export const createEvent = async (eventData) => {
+    try {
+      const response = await apiClient.post('/events/', eventData);
+      return response.data;
+    } catch (error) {
+      console.log('createEvent API call error', error);
+      throw (error);
+    }
   };
   
   // PUT update event
@@ -390,7 +391,19 @@ export const getOrgRecentServices = async () => {
       const response = await apiClient.get('/services/');
       return response.data;
   } catch (error) {
-    console.log('getOrgRecentServices error', error)
+    console.log('getOrgRecentServices API call error', error)
+    throw (error);
+  }
+};
+
+
+// GET all active services for org
+export const getActiveServices = async () => {
+  try {
+    const response = await apiClient.get('/services/active');
+    return response.data
+  } catch (error) {
+    console.log('getActiveServices API call error', error)
     throw (error);
   }
 };

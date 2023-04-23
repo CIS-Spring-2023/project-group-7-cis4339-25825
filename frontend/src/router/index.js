@@ -82,7 +82,7 @@ const routes = [
   {
     path: '/eventform',
     name: 'eventform',
-    component: () => import('../Views/CreateEvent.vue'),
+    component: () => import('../Views/NewCreateEvent.vue'),
     //if page is accessed without logging in, this routes to 404 Not Found page
     beforeEnter: (to, from, next) => {
       if (!store.state.role || !store.state.role === 'editor') {
