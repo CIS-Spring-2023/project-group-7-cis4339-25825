@@ -170,7 +170,7 @@ const routes = [
   {
     path: '/findservice',
     name: 'findservice',
-    component: () => import('../Views/FindService.vue'),
+    component: () => import('../Views/NewFindService.vue'),
     //if page is accessed without logging in, this routes to 404 Not Found page
     beforeEnter: (to, from, next) => {
       if (!store.state.role) {

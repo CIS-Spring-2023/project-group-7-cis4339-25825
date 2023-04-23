@@ -384,14 +384,15 @@ export const searchClients = async (query) => {
 // API calls for services
 
 // GET 10 most recent services for org
-export const getRecentServices = async (token) => {
-    const response = await axios.get('/api/services', {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
-    return response.data;
-  };
+export const getOrgRecentServices = async () => {
+  try {
+      const response = await apiClient.get('/services/');
+      return response.data;
+  } catch (error) {
+    console.log('getOrgRecentServices error', error)
+    throw (error);
+  }
+};
   
   // GET single service by ID
   export const getServiceById = async (id, token) => {
@@ -404,16 +405,25 @@ export const getRecentServices = async (token) => {
   };
   
   // GET services based on search query
-  export const searchServices = async (query, token) => {
-    const response = await axios.get('/api/services/search', {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-      params: query,
-    });
-    return response.data;
+  export const searchServices = async (query) => {
+    try {
+      let params = {};
+      params.searchBy = query.searchBy;
+      if (query.searchBy === 'name') {
+        params.name = query.name || '';
+      } else if (query.searchBy === 'description') {
+        params.description = query.description;
+      }
+      const response = await apiClient.get('/services/search', {
+        params: params,
+      });
+      return response.data;
+    } catch (error) {
+      console.log('searchServices API call error', error);
+      throw (error);
+    }
   };
-  
+
   // POST new service
   export const createService = async (newService, token) => {
     const response = await axios.post('/api/services', newService, {

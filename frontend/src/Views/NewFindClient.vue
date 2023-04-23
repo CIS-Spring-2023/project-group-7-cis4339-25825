@@ -174,36 +174,36 @@ export default {
             }
         },
         async handleSubmitForm() {
-        if (this.searchBy === 'Client Name') {
-            if (this.firstName || this.lastName) {
-            try {
-                const query = {
-                    searchBy: 'name',
-                    firstName: this.firstName,
-                    lastName: this.lastName,
-                }
-                console.log('query', query)
-                const response = await searchClients(query)
-                this.clients = response;
-            } catch (error) {
-                console.error('Error searching clients:', error)
-            }
-            }
-        } else if (this.searchBy === 'Client Number') {
-            if (this.phoneNumber) {
+            if (this.searchBy === 'Client Name') {
+                if (this.firstName || this.lastName) {
                 try {
                     const query = {
-                        searchBy: 'number',
-                        phoneNumber: this.phoneNumber
+                        searchBy: 'name',
+                        firstName: this.firstName,
+                        lastName: this.lastName,
                     }
+                    console.log('query', query)
                     const response = await searchClients(query)
                     this.clients = response;
                 } catch (error) {
                     console.error('Error searching clients:', error)
                 }
+                }
+            } else if (this.searchBy === 'Client Number') {
+                if (this.phoneNumber) {
+                    try {
+                        const query = {
+                            searchBy: 'number',
+                            phoneNumber: this.phoneNumber
+                        }
+                        const response = await searchClients(query)
+                        this.clients = response;
+                    } catch (error) {
+                        console.error('Error searching clients:', error)
+                    }
+                }
             }
-        }
-    },
+        },
     
 
     },
