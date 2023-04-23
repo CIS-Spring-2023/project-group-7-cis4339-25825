@@ -16,10 +16,10 @@ const routes = [
     path: '/intakeform',
     name: 'intakeform',
     props: true,
-    component: () => import('../Views/ClientIntakeForm.vue'),
+    component: () => import('../Views/NewClientIntakeForm.vue'),
     //if page is accessed without logging in, this routes to 404 Not Found page
     beforeEnter: (to, from, next) => {
-      if (!store.state.role) {
+      if (!store.state.role || !store.state.role === 'editor') {
         // redirect to 404 page if user is not logged in
         next('/404notfound')
       } else {
@@ -69,7 +69,7 @@ const routes = [
     component: () => import('../Views/ViewClient.vue'),
     //if page is accessed without logging in, this routes to 404 Not Found page
     beforeEnter: (to, from, next) => {
-      if (!store.state.role) {
+      if (!store.state.role || !store.state.role === 'viewer') {
         // redirect to 404 page if user is not logged in
         next('/404notfound')
       } else {
@@ -85,7 +85,7 @@ const routes = [
     component: () => import('../Views/CreateEvent.vue'),
     //if page is accessed without logging in, this routes to 404 Not Found page
     beforeEnter: (to, from, next) => {
-      if (!store.state.role) {
+      if (!store.state.role || !store.state.role === 'editor') {
         // redirect to 404 page if user is not logged in
         next('/404notfound')
       } else {
@@ -101,7 +101,7 @@ const routes = [
     component: () => import('../Views/CreateService.vue'),
     //if page is accessed without logging in, this routes to 404 Not Found page
     beforeEnter: (to, from, next) => {
-      if (!store.state.role) {
+      if (!store.state.role || !store.state.role === 'editor') {
         // redirect to 404 page if user is not logged in
         next('/404notfound')
       } else {
@@ -151,7 +151,7 @@ const routes = [
     component: () => import('../Views/ViewEvent.vue'),
     //if page is accessed without logging in, this routes to 404 Not Found page
     beforeEnter: (to, from, next) => {
-      if (!store.state.role) {
+      if (!store.state.role || !store.state.role === 'viewer') {
         // redirect to 404 page if user is not logged in
         next('/404notfound')
       } else {
@@ -207,7 +207,7 @@ const routes = [
     component: () => import('../Views/ViewService.vue'),
     //if page is accessed without logging in, this routes to 404 Not Found page
     beforeEnter: (to, from, next) => {
-      if (!store.state.role) {
+      if (!store.state.role || !store.state.role === 'viewer') {
         // redirect to 404 page if user is not logged in
         next('/404notfound')
       } else {

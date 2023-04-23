@@ -331,13 +331,14 @@ export const searchClients = async (query) => {
   };
   
   // POST new client
-  export const createClient = async (newClient, token) => {
-    const response = await axios.post('/api/clients', newClient, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
-    return response.data;
+  export const createClient = async (newClient) => {
+    try {
+      const response = await apiClient.post('/clients', newClient);
+      return response.data;
+    } catch(error) {
+      console.log('createClient API call error', error);
+      throw (error);
+    }
   };
   
   // PUT update client
