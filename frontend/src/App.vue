@@ -136,6 +136,7 @@
 <script>
 import { mapState, mapActions } from 'vuex'
 import modalComponent from './components/modalComponent.vue'
+import { logoutUser } from '../api/api'
 
 export default {
   name: 'App',
@@ -158,19 +159,27 @@ export default {
     })
   },
   methods: {
+    ...mapActions(['clearSessionData']),
     // method called when user clicks the "Logout" router link -> it renders the Logout modal component
-    logout() {
-      this.logoutModal = true
+    async logout() {
+      // this.logoutModal = true
+      try {
+        await logoutUser();
+        this.$store.dispatch('clearSessionData');
+        this.$router.push('/')
+      } catch (error) {
+        console.log('logout error', error)
+      }
     },
     // method called when Logout modal component emits a 'close' event - this will calls the "logOut" action from /store/index.js, then push the user back to login view
     // ...mapActions(['logOut']),
-    logoutPush() {
-      this.logoutModal = false
-      this.$nextTick(() => {
-        this.logOut()
-        this.$router.push('/')
-      });
-    }
+    // logoutPush() {
+    //   this.logoutModal = false
+    //   this.$nextTick(() => {
+    //     this.logOut()
+    //     this.$router.push('/')
+    //   });
+    // }
   }
 }
 </script>

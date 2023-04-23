@@ -14,6 +14,11 @@ export default createStore({
       state.orgName = orgName;
       console.log('New user data:', state.username, state.role, state.orgName);
     },
+    clearSessionData(state) {
+      state.username = null;
+      state.role = null;
+      state.orgName = null;
+    }
   },
   actions: {
     async fetchUserData({ commit }, { userId, orgId } ) {
@@ -33,6 +38,9 @@ export default createStore({
         throw error; // Throw the error back to the frontend
       }
     },
+    clearSessionData({ commit }) {
+      commit('clearSessionData');
+    }
   },
   getters: {
     username: (state) => state.username,

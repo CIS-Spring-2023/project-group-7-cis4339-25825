@@ -32,7 +32,7 @@ const routes = [
   {
     path: '/findclient',
     name: 'findclient',
-    component: () => import('../Views/FindClient.vue'),
+    component: () => import('../Views/NewFindClient.vue'),
     //if page is accessed without logging in, this routes to 404 Not Found page
     beforeEnter: (to, from, next) => {
       if (!store.state.role) {

@@ -34,7 +34,7 @@ export async function loginUser(username, password) {
 export function logoutUser() {
   localStorage.removeItem('authToken');
   removeAuthHeader();
-}
+};
 
 // Call this function when your app initializes to set the auth header if a token exists in local storage
 export function initializeAuthHeaderFromLocalStorage() {
@@ -264,13 +264,14 @@ export const getOrgClients = async () => {
 };
 
   // GET 10 most recent clients for org
-  export const getRecentClients = async (token) => {
-    const response = await axios.get('/api/clients', {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
-    return response.data;
+  export const getOrgRecentClients = async () => {
+    try {
+      const response = await apiClient.get('clients/');
+      return response.data
+    } catch (error) {
+      console.log('getOrgRecentClients error', error)
+      throw(error);
+    }
   };
   
   // GET single client by ID
@@ -283,16 +284,23 @@ export const getOrgClients = async () => {
     return response.data;
   };
   
-  // GET entries based on search query
-  export const searchClients = async (query, token) => {
-    const response = await axios.get('/api/clients/search', {
-      headers: {
-        Authorization: `Bearer ${token}`,
+  
+// GET entries based on search query
+export const searchClients = async (query) => {
+  try {
+    const response = await apiClient.get('/clients/search', {
+      params: {
+        firstName: query.firstName || '',
+        lastName: query.lastName || ''
       },
-      params: query,
     });
     return response.data;
-  };
+  } catch (error) {
+    console.log('searchClients error', error);
+    throw (error);
+  }
+};
+
   
   // GET lookup by phone, verify org membership on frontend
   export const lookupClientByPhone = async (phoneNumber, token) => {

@@ -70,20 +70,17 @@ router.get('/id/:id', authMiddleWare, (req, res, next) => {
 router.get('/search', authMiddleWare, (req, res, next) => {
   const org = req.user.org;
   const dbQuery = { orgs: org };
-  switch (req.query.searchBy) {
-    case 'name':
-      dbQuery.firstName = { $regex: `^${req.query.firstName}`, $options: 'i' };
-      dbQuery.lastName = { $regex: `^${req.query.lastName}`, $options: 'i' };
-      break;
-    case 'number':
-      dbQuery['phoneNumber.primary'] = {
-        $regex: `^${req.query['phoneNumber.primary']}`,
-        $options: 'i',
-      };
-      break;
-    default:
-      return res.status(400).send('invalid searchBy');
+  let queryArray = [];
+  if (req.query.firstName) {
+    queryArray.push({ firstName: { $regex: `.*${req.query.firstName}.*`, $options: 'i' } })
   }
+  if (req.query.lastName) {
+    queryArray.push({ lastName: { $regex: `.*${req.query.lastName}.*`, $options: 'i' } })
+  }
+  if (queryArray.length === 0) {
+    return res.status(400).send('no search query')
+  }
+  dbQuery['$and'] = queryArray;
   clients.find(dbQuery, (error, data) => {
     if (error) {
       return next(error);
@@ -92,6 +89,9 @@ router.get('/search', authMiddleWare, (req, res, next) => {
     }
   });
 });
+
+
+
 
 // checked
 // GET lookup by phone, verify org membership on frontend
