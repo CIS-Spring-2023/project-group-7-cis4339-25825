@@ -126,13 +126,14 @@ export const getOrgRecentEvents = async () => {
 
   
   // GET events for which a client is signed up
-  export const getClientEvents = async (id, token) => {
-    const response = await axios.get(`/api/events/client/${id}`, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
-    return response.data;
+  export const getClientEvents = async (id) => {
+    try {
+      const response = await apiClient.get(`/events/client/${id}`);
+      return response.data
+    } catch (error) {
+      console.log('getClientEvents API call error', error);
+      throw (error);
+    }
   };
   
   // GET org event attendance for the past two months
@@ -288,13 +289,14 @@ export const getOrgClients = async () => {
   };
   
   // GET single client by ID
-  export const getClientById = async (id, token) => {
-    const response = await axios.get(`/api/clients/id/${id}`, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
-    return response.data;
+  export const getClientById = async (id) => {
+    try {
+      const response = await apiClient.get(`/clients/id/${id}`);
+      return response.data
+    } catch (error) {
+      console.log('getClientById API call error', error);
+      throw (error);
+    }
   };
   
   // GET entries based on search query

@@ -66,7 +66,7 @@ const routes = [
     path: '/viewclient/:id',
     name: 'viewclient',
     props: true,
-    component: () => import('../Views/ViewClient.vue'),
+    component: () => import('../Views/NewViewClient.vue'),
     //if page is accessed without logging in, this routes to 404 Not Found page
     beforeEnter: (to, from, next) => {
       if (!store.state.role || !store.state.role === 'viewer') {
