@@ -7,6 +7,25 @@ const authMiddleWare = require('../auth/authMiddleWare');
 const { events } = require('../models/models');
 
 // checked
+// GET 10 most recent events for all orgs
+router.get('/all', (req, res, next) => {
+  console.log('events/all endpoint')
+  events
+    .find({}, (error, data) => {
+      if (error) {
+        return next(error);
+      } else {
+        console.log('data:', data);
+        return res.json(data);
+      }
+    })
+    // sort by date descending
+    .sort({ date: -1 })
+    .limit(10);
+});
+
+
+// checked
 // GET 10 most recent events for org
 router.get('/', authMiddleWare, (req, res, next) => {
   const org = req.user.org;  
@@ -19,8 +38,8 @@ router.get('/', authMiddleWare, (req, res, next) => {
         return res.json(data);
       }
     })
-    // sort by date ascending
-    .sort({ date: 1 })
+    // sort by date descending
+    .sort({ date: -1 })
     .limit(10);
 });
 

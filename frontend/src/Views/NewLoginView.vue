@@ -98,11 +98,20 @@ export default {
 
             // Fetch the user data and org name
             console.log('token before dispatch', token)
-            await this.$store.dispatch('fetchUserData', { userId, orgId, token });
+            try {
+                await this.$store.dispatch('fetchUserData', { userId, orgId, token });
+            } catch (error) {
+                console.error('Error fetching user data:', error);
+                console.log('login failed')
+                this.showLoginFailed = true
+                console.log('login failed after')
+            }
 
             console.log('Login Success!')
+            this.$router.push('/dashboard')
         } catch (error) {
             console.error('Error logging in:', error);
+            this.showLoginFailed = true
         }
     },
 

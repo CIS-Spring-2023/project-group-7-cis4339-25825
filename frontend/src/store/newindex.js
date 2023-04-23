@@ -17,16 +17,21 @@ export default createStore({
   },
   actions: {
     async fetchUserData({ commit }, { userId, orgId } ) {
-      // Call the API to get user information and organization name
-      console.log('store userId:', userId)
-      const user = await getUserById(userId);
-      const org = await getOrgById(orgId);
+      try {
+        // Call the API to get user information and organization name
+        console.log('store userId:', userId)
+        const user = await getUserById(userId);
+        const org = await getOrgById(orgId);
 
-      commit('setUserData', {
-        username: user.username,
-        role: user.role,
-        orgName: org.name,
-      });
+        commit('setUserData', {
+          username: user.username,
+          role: user.role,
+          orgName: org.name,
+        });
+      } catch (error) {
+        console.error('Error fetching user data:', error);
+        throw error; // Throw the error back to the frontend
+      }
     },
   },
   getters: {

@@ -47,9 +47,14 @@ export function initializeAuthHeaderFromLocalStorage() {
 export async function getUserById(userId) {
   console.log('getUserById api call')
   console.log('getUserById userId', userId)
-  const response = await apiClient.get(`/users/id/${userId}`);
-  console.log('getUserById response', response.data)
-  return response.data;
+  try {
+    const response = await apiClient.get(`/users/id/${userId}`);
+    console.log('getUserById response', response.data)
+    return response.data;
+  } catch (error) {
+    console.log(error)
+    throw error;
+  }
 };
 
 export async function getOrgById(orgId) {
@@ -62,14 +67,26 @@ export async function getOrgById(orgId) {
 
 
 // API Calls for events
-// GET 10 most recent events for org
-export const getRecentEvents = async (token) => {
-    const response = await axios.get('/api/events/', {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
+// GET 10 most recent events for all orgs
+export const getAllRecentEvents = async () => {
+  console.log('getAllRecentEvents')
+  try {
+    const response = await axios.get('http://localhost:3000/events/all');
     return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
+
+// GET 10 most recent events for org
+export const getOrgRecentEvents = async () => {
+    try {
+      const response = await apiClient.get('/events/');
+      return response.data;
+    } catch (error) {
+      console.log('getOrgRecentEvents error', error);
+      throw (error);
+    }
   };
   
   // GET single event by ID
@@ -224,15 +241,28 @@ export const removeServiceFromEvent = async (id, serviceId, token) => {
 // API calls for clients
 
 // GET all clients
-export const getAllClients = async (token) => {
-    const response = await axios.get('/api/clients/test', {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
-    return response.data;
+export const getAllClients = async () => {
+    try {
+      const response = await axios.get('http://localhost:3000/clients/all');
+      return response.data;
+    } catch (error) {
+      console.log('getAllClients error', error)
+      throw(error);
+    }
   };
   
+// GET all clients for org
+export const getOrgClients = async () => {
+  try {
+    const response = await apiClient.get('clients/org');
+    console.log('getOrgClients response:', response)
+    return response.data;
+  } catch (error) {
+    console.log('getAllClients error', error)
+    throw(error);
+  }
+};
+
   // GET 10 most recent clients for org
   export const getRecentClients = async (token) => {
     const response = await axios.get('/api/clients', {

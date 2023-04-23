@@ -9,7 +9,7 @@
         <nav class="mt-10">
           <ul class="flex flex-col gap-4">
             <!--Login link - Link only shows is user is logged out-->
-            <li v-if="!$store.state.userRole">
+            <li v-if="!$store.state.role">
               <router-link to="/">
                 <span
                   style="position:relative; top: 6px"
@@ -19,7 +19,7 @@
               </router-link>
             </li>
             <!--Logout link - Link only shows is user is logged in-->
-            <li v-if="$store.state.userRole" @click.prevent="logout" style="cursor: pointer;">
+            <li v-if="$store.state.role" @click.prevent="logout" style="cursor: pointer;">
                 <span
                   style="position:relative; top: 6px"
                   class="material-icons"
@@ -38,7 +38,7 @@
               </router-link>
             </li>
             <!--Client Intake Form link - only shows if user is an editor-->
-            <li v-if="userRole === 'editor'">
+            <li v-if="role === 'editor'">
               <router-link to="/intakeform">
                 <span
                   style="position: relative; top: 6px"
@@ -49,7 +49,7 @@
               </router-link>
             </li>
             <!--Create Event link - only shows if user is an editor-->
-            <li v-if="userRole === 'editor'">
+            <li v-if="role === 'editor'">
               <router-link to="/eventform">
                 <span
                   style="position: relative; top: 6px"
@@ -60,7 +60,7 @@
               </router-link>
             </li>
             <!--Create Service link - only shows if user is an editor-->
-            <li v-if="userRole === 'editor'">
+            <li v-if="role === 'editor'">
               <router-link to="/serviceform">
                 <span
                   style="position: relative; top: 6px"
@@ -71,7 +71,7 @@
               </router-link>
             </li>
             <!--Find Client link - only shows if user is logged in-->
-            <li v-if="$store.state.userRole">
+            <li v-if="$store.state.role">
               <router-link to="/findclient">
                 <span
                   style="position: relative; top: 6px"
@@ -82,7 +82,7 @@
               </router-link>
             </li>
             <!--Find Event link - only shows if user is logged in-->
-            <li v-if="$store.state.userRole">
+            <li v-if="$store.state.role">
               <router-link to="/findevents">
                 <span
                   style="position: relative; top: 6px"
@@ -93,7 +93,7 @@
               </router-link>
             </li>
             <!--Find Service link - only shows if user is logged in-->
-            <li v-if="$store.state.userRole">
+            <li v-if="$store.state.role">
               <router-link to="/findservice">
                 <span
                   style="position: relative; top: 6px"
@@ -113,7 +113,7 @@
         class="justify-end items-center h-24 flex"
         style="background: linear-gradient(250deg, #c8102e 70%, #efecec 50.6%)"
       >
-        <h1 class="mr-20 text-3xl text-white"> {{ organizationName }}</h1>
+        <h1 class="mr-20 text-3xl text-white"> {{ orgName }}</h1>
       </section>
       <!--Content of Views-->
       <div>
@@ -133,20 +133,6 @@
 
 </template>
 
-<script setup>
-import { onMounted } from 'vue'
-import { mapActions, useStore } from 'vuex'
-
-//when this is mounted, the "fetchOrganizations" action from /store/index.js is called to read data from /data/db.json
-onMounted(() => {
-  const store = useStore()
-  store.dispatch('fetchOrganizations')
-})
-</script>
-
-
-
-
 <script>
 import { mapState, mapActions } from 'vuex'
 import modalComponent from './components/modalComponent.vue'
@@ -165,10 +151,10 @@ export default {
   },
   computed: {
     ...mapState({
-      //sets the userRole state as either "viewer" or "editor" when the user logs in
-      userRole: state => state.userRole || null,
+      //sets the role state as either "viewer" or "editor" when the user logs in
+      role: state => state.role || null,
       // sets the organizationName state as the name of the organization when user logs in
-      organizationName: state => state.organizationName || ''
+      orgName: state => state.orgName || null
     })
   },
   methods: {
@@ -177,7 +163,7 @@ export default {
       this.logoutModal = true
     },
     // method called when Logout modal component emits a 'close' event - this will calls the "logOut" action from /store/index.js, then push the user back to login view
-    ...mapActions(['logOut']),
+    // ...mapActions(['logOut']),
     logoutPush() {
       this.logoutModal = false
       this.$nextTick(() => {

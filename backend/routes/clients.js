@@ -7,11 +7,27 @@ const { clients } = require('../models/models');
 
 // checked
 // Get all clients
-router.get('/test', authMiddleWare, async (req, res) => {
-  const testorg = req.user.org;
+router.get('/all', async (req, res) => {
   try {
-    const Clients = await clients.find({ org: testorg });
+    const Clients = await clients.find({});
     res.json(Clients);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
+
+// Get all clients for org
+router.get('/org', authMiddleWare, async (req, res) => {
+  const org = req.user.org;
+  try {
+    clients
+      .find({ orgs: org}, (error, data) => {
+        if (error) {
+          return next(error);
+        } else {
+          return res.json(data)
+        }
+      });
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
