@@ -1,0 +1,516 @@
+<template>
+      <main>
+      <!--Header-->
+      <h1
+        class="font-bold text-4xl text-red-700 tracking-widest text-center mt-10"
+      >
+        Update Client
+      </h1>
+      <div class="px-10 py-20">
+        <!-- grid container -->
+        <div
+          class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-x-6 gap-y-10"
+        >
+          <h2 class="text-2xl font-bold">Personal Details</h2>
+          <!-- First Name input field -->
+          <div class="flex flex-col">
+            <label class="block">
+              <span class="text-gray-700">First Name</span>
+              <span style="color: #ff0000">*</span>
+              <input
+                type="text"
+                class="w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
+                placeholder
+                v-model="client.firstName"
+              />
+              <!--Shows errors, if any-->
+              <!-- <span class="text-black" v-if="v$.client.firstName.$error">
+                <p
+                  class="text-red-700"
+                  v-for="error of v$.client.firstName.$errors"
+                  :key="error.$uid"
+                >
+                  {{ error.$message }}!
+                </p>
+              </span> -->
+            </label>
+          </div>
+
+          <!-- Middle name input field -->
+          <div class="flex flex-col">
+            <label class="block">
+              <span class="text-gray-700">Middle Name</span>
+              <input
+                type="text"
+                class="w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
+                placeholder
+                v-model="client.middleName"
+              />
+            </label>
+          </div>
+
+          <!-- Last Name input field -->
+          <div class="flex flex-col">
+            <label class="block">
+              <span class="text-gray-700">Last Name</span>
+              <span style="color: #ff0000">*</span>
+              <input
+                type="text"
+                class="w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
+                placeholder
+                v-model="client.lastName"
+              />
+              <!--Shows errors, if any-->
+              <!-- <span class="text-black" v-if="v$.client.lastName.$error">
+                <p
+                  class="text-red-700"
+                  v-for="error of v$.client.lastName.$errors"
+                  :key="error.$uid"
+                >
+                  {{ error.$message }}!
+                </p>
+              </span> -->
+            </label>
+          </div>
+          <div></div>
+          <!-- Email input field -->
+          <div class="flex flex-col">
+            <label class="block">
+              <span class="text-gray-700">Email</span>
+              <input
+                type="email"
+                class="w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
+                v-model="client.email"
+              />
+              <!--Shows errors, if any-->
+              <!-- <span class="text-black" v-if="v$.client.email.$error">
+                <p
+                  class="text-red-700"
+                  v-for="error of v$.client.email.$errors"
+                  :key="error.$uid"
+                >
+                  {{ error.$message }}!
+                </p>
+              </span> -->
+            </label>
+          </div>
+          <!-- Phone number input field -->
+          <div class="flex flex-col">
+            <label class="block">
+              <span class="text-gray-700">Phone Number</span>
+              <span style="color: #ff0000">*</span>
+              <input
+                type="text"
+                class="w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
+                pattern="[0-9]{3}[0-9]{3}[0-9]{4}"
+                v-model="client.phoneNumber.primary"
+              />
+              <!--Shows errors, if any-->
+              <!-- <span
+                class="text-black"
+                v-if="v$.client.phone.$error"
+              >
+                <p
+                  class="text-red-700"
+                  v-for="error of v$.client.phone.$errors"
+                  :key="error.$uid"
+                >
+                  {{ error.$message }}!
+                </p>
+              </span> -->
+            </label>
+          </div>
+          <!-- Alternative phone number input field -->
+          <div class="flex flex-col">
+            <label class="block">
+              <span class="text-gray-700">Alternative Phone Number</span>
+              <input
+                type="text"
+                class="w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
+                pattern="[0-9]{3}[0-9]{3}[0-9]{4}"
+                v-model="client.phoneNumber.alternate"
+              />
+            </label>
+          </div>
+        </div>
+
+        <!-- grid container -->
+        <div
+          class="mt-10 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-x-6 gap-y-10"
+        >
+          <h2 class="text-2xl font-bold">Address Details</h2>
+          <!-- Address 1 input field -->
+          <div class="flex flex-col">
+            <label class="block">
+              <span class="text-gray-700">Address Line 1</span>
+              <input
+                type="text"
+                class="w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
+                v-model="client.address.line1"
+              />
+            </label>
+          </div>
+          <!-- Address 2 input field -->
+          <div class="flex flex-col">
+            <label class="block">
+              <span class="text-gray-700">Address Line 2</span>
+              <input
+                type="text"
+                class="w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
+                v-model="client.address.line2"
+              />
+            </label>
+          </div>
+          <!-- City input field -->
+          <div class="flex flex-col">
+            <label class="block">
+              <span class="text-gray-700">City</span>
+              <span style="color: #ff0000">*</span>
+              <input
+                type="text"
+                class="w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
+                v-model="client.address.city"
+              />
+              <!--Shows errors, if any-->
+              <!-- <span
+                class="text-black"
+                v-if="v$.client.city.$error"
+              >
+                <p
+                  class="text-red-700"
+                  v-for="error of v$.client.city.$errors"
+                  :key="error.$uid"
+                >
+                  {{ error.$message }}!
+                </p>
+              </span> -->
+            </label>
+          </div>
+          <div></div>
+          <!-- County input field -->
+          <div class="flex flex-col">
+            <label class="block">
+              <span class="text-gray-700">County</span>
+              <input
+                type="text"
+                class="w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
+                v-model="client.address.county"
+              />
+            </label>
+          </div>
+          <!-- Zip code input field -->
+          <div class="flex flex-col">
+            <label class="block">
+              <span class="text-gray-700">Zip Code</span>
+              <input
+                type="text"
+                class="w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
+                v-model="client.address.zip"
+              />
+            </label>
+          </div>
+          <div></div>
+        </div>
+
+        <!-- grid container -->
+        <div
+          class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-x-6 gap-y-10"
+        >
+        <!--Update Client submit button-->
+          <div class="flex justify-between mt-10 mr-20">
+            <button
+              @click="submitUpdateClient"
+              type="submit"
+              class="bg-green-700 text-white rounded"
+            >
+              Update Client
+            </button>
+          </div>
+          <!--Delete Client button-->
+          <div class="flex justify-between mt-10 mr-20">
+            <button
+              @click="submitDeleteClient"
+              type="submit"
+              class="bg-red-700 text-white rounded"
+            >
+              Delete Client
+            </button>
+          </div>
+          <!--Go back button-->
+          <div class="flex justify-between mt-10 mr-20">
+            <button
+              type="reset"
+              class="border border-red-700 bg-white text-red-700 rounded"
+              @click="$router.back()"
+            >
+              Go back
+            </button>
+          </div>
+        </div>
+
+        <hr class="mt-10 mb-10" />
+
+        <!-- Client Event Information -->
+        <div
+          class="mt-10 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-x-6 gap-y-10"
+        >
+        <h2 class="text-2xl font-bold">Events for Client</h2>
+        <div class="flex flex-col col-span-2">
+            <table class="min-w-full shadow-md rounded">
+                <thead class="bg-gray-50 text-xl">
+                    <tr>
+                    <th class="p-4 text-left">Event Name</th>
+                    <th class="p-4 text-left">Date</th>
+                    <th class="p-4"></th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-300">
+                    <tr
+                    @click="editEvent(event._id)"
+                    v-for="event in clientEvents"
+                    :key="event._id"
+                    class="cursor-pointer hoverRow"
+                    :class="{ 'hoverId': hoverId === event._id }"
+                    @mouseenter="hoverId = event._id"
+                    @mouseleave="hoverId = null"
+                    >
+                    <td class="p-2 text-left">{{ event.name }}</td>
+                    <td class="p-2 text-left">{{ formatDate(event.date) }}</td>
+                    <td class="p-2 text-right">
+                        <span class="remove-btn-wrapper">
+                        <span class="remove-btn text-gray-400 cursor-pointer" @click.stop="removeClientFromEvent(client._id, event._id)" v-if="hoverId === event._id">X</span>
+                        </span>
+                    </td>
+                    </tr>
+                </tbody>
+            </table>
+
+        </div>
+
+          <div class="flex flex-col">
+            <!--MultiSelect to add client to events-->
+            <VueMultiselect
+              class="w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 cursor-pointer"
+              v-model="eventsSelected"
+              :options="eventsFiltered"
+              :custom-label="nameWithDate"
+              :multiple="true"
+              :close-on-select="true"
+              placeholder="Select Events to be added"
+              label="date"
+              track-by="name"
+            />
+            <div class="flex justify-between">
+              <!--button to add client to events-->
+              <button
+                @click="addToEvent"
+                type="submit"
+                class="mt-5 bg-red-700 text-white rounded"
+                :disabled="eventsSelected.length === 0"
+              >
+                Add Client to Selected Events
+              </button>
+            </div>
+          </div>
+        </div>        
+      </div>
+    </main>
+    <p>client: {{ client }}</p>
+    <br>
+    <p>eventsFiltered: {{ eventsFiltered }}</p>
+</template>
+
+<script>
+//import functionalities
+import useVuelidate from '@vuelidate/core'
+import { required, email, alpha, numeric } from '@vuelidate/validators'
+import VueMultiselect from 'vue-multiselect'
+import { DateTime } from 'luxon'
+import { mapState, mapMutations } from 'vuex'
+import modalComponent from '../components/modalComponent.vue'
+import { getClientById, getClientEvents, getNonClientEvents, registerAttendee, deregisterAttendee, updateClient } from '../../api/api'
+
+export default {
+    //accept client ID as data from parent components, either "FineClient.vue" or "EventDetails.vue"
+    props: ['id'],
+    components: { 
+        VueMultiselect,
+    },
+    setup() {
+        //setup vuelidate
+        return { v$: useVuelidate({ $autoDirty: true }) }
+    },
+    data() {
+        return {
+            // events that the client is not registered in - to be shown in the multiselect
+            eventsFiltered: [],
+            // events that user selects from multiselect list
+            eventsSelected: [],
+            //variable to hold the events that the selected client is associated with
+            clientEvents: [],
+            //variable to hold client information  
+            client: {
+                _id: null,
+                firstName: null,
+                middleName: null,
+                lastName: null,
+                email: null,
+                phoneNumber: {
+                    primary: null,
+                    alternate: null
+                },
+                address: {
+                    line1: null,
+                    line2: null,
+                    city: null,
+                    county: null,
+                    zip: null
+                },
+                orgs: []
+            },
+            // variable stores the ID of the row that the mouse is currently hovering over (to highlight the row red)
+            hoverId: null,
+            showButton: false
+        }
+    },
+
+    mounted() {
+        this.loadData();
+    },
+
+    methods: {
+        async loadData() {
+            try {
+                const [clientResponse, clientEventsResponse, nonClientEventsResponse] = await Promise.all([
+                    getClientById(this.$route.params.id),
+                    getClientEvents(this.$route.params.id),
+                    getNonClientEvents(this.$route.params.id),
+                ]);
+
+                console.log('clientResponse:', clientResponse)
+                console.log('clientEventsResponse:', clientEventsResponse)
+                console.log('nonClientEventsResponse:', nonClientEventsResponse)
+
+                this.client = clientResponse;
+                this.clientEvents = clientEventsResponse;
+                this.eventsFiltered = nonClientEventsResponse;
+
+                // // fill eventsFiltered with all events not associated with client, to show in Multiselect
+                // this.eventsFiltered = this.events.filter(event => !event.attendees.includes(this.$route.params.id));
+
+                // // fill clientEvents with all events associated with client, to show in table and to make PUT request with changed events
+                // this.clientEvents = this.events.filter(event => event.attendees.includes(this.$route.params.id));
+
+
+            } catch (error) {
+                console.log('error loading data:', error)
+            }
+        },
+
+        formatDate(date) {
+            const isoDate = new Date(date);
+            const year = isoDate.getUTCFullYear();
+            const month = String(isoDate.getUTCMonth() + 1).padStart(2, '0');
+            const day = String(isoDate.getUTCDate()).padStart(2, '0');
+            return `${month}/${day}/${year}`;
+        },
+
+        //custom label for multiselect
+        nameWithDate({ name, date }) {
+            return `${name} (${this.formatDate(date)})`
+        },
+
+        async removeClientFromEvent(clientId, eventId) {
+            try {
+                const response = await deregisterAttendee(eventId, clientId);
+                console.log('removeClientFromEvent response', response);
+            } catch (error) {
+                console.log(error);
+            }
+
+            try {
+                const clientEventsResponse = await getClientEvents(this.$route.params.id);
+                const nonClientEventsResponse = await getNonClientEvents(this.$route.params.id);
+                this.clientEvents = clientEventsResponse;
+                this.eventsFiltered = nonClientEventsResponse;
+            } catch (error) {
+                console.log(error);
+            }
+        },
+
+
+        async addToEvent() {
+            try {
+                const client = this.client._id;
+                const events = this.eventsSelected.map((event) => event._id);
+                const promises = [];
+
+                for (const eventId of events) {
+                    promises.push(registerAttendee(eventId, client));
+                }
+
+                Promise.all(promises)
+                    .then(async () => {
+                        try {
+                            this.clientEvents = await getClientEvents(this.$route.params.id);
+                            this.eventsFiltered = await getNonClientEvents(this.$route.params.id);
+                            this.eventsSelected = [];
+                        } catch (error) {
+                            console.log(error);
+                        }
+                    })
+                    .catch((error) => {
+                        console.log(error);
+                    });
+            } catch (error) {
+                console.log(error);
+            }
+
+        },
+
+        async submitUpdateClient() {
+            try {
+                const response = await updateClient(this.$route.params.id, this.client);
+                if (response.success) {
+                        console.log(response.message);
+                        this.$router.back()
+                    } else {
+                        console.log('Client update failed');
+                    }
+            } catch (error) {
+                console.log('error updating client', error)
+            }
+        }
+
+
+
+    }
+
+}
+</script>
+
+<!--Style for multiselect-->
+<style src="vue-multiselect/dist/vue-multiselect.css"></style>
+
+
+<style scoped>
+  .hoverRow {
+    background-color: transparent;
+    transition: background-color 0.3s ease-in-out;
+  }
+  
+  .hoverId {
+    background-color: rgba(255, 0, 0, 0.1);
+  }
+  
+  .remove-btn-wrapper {
+    display: inline-block;
+    position: relative;
+  }
+  
+
+.remove-btn:hover {
+  color: black;
+}
+
+</style>

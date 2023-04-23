@@ -66,9 +66,9 @@ export default {
   data() {
     return {
       //variable to hold username
-      username: 'viewer1',
+      username: 'editor1',
       //variable to hold password
-      password: 'viewer1',
+      password: 'editor1',
       //variable that determines if the "forProfessor" component appears 
       showLoginInfo: false,
       //variable that determines if the modal component that shows login success appears

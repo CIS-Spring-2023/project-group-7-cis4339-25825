@@ -24,6 +24,21 @@ router.get('/all', (req, res, next) => {
     .limit(10);
 });
 
+// checked
+// GET all events for org
+router.get('/all/org', authMiddleWare, (req, res, next) => {
+  const org = req.user.org;  
+  events
+    .find({ org: org }, { _id: 1, name: 1, date: 1, attendees: 1 }, (error, data) => {
+      if (error) {
+        return next(error);
+      } else {
+        console.log('data:', data);
+        return res.json(data);
+      }
+    })
+});
+
 
 // checked
 // GET 10 most recent events for org
@@ -97,6 +112,18 @@ router.get('/client/:id', authMiddleWare, (req, res, next) => {
       res.json(data);
     }
   });
+});
+
+// checked
+// GET events for which a client is not signed up
+router.get('/client/:id/not-registered', authMiddleWare, async (req, res, next) => {
+  const org = req.user.org;
+  try {
+    const eventsNotRegistered = await events.find({ attendees: { $nin: [req.params.id] }, org: org });
+    res.json(eventsNotRegistered);
+  } catch (error) {
+    next(error);
+  }
 });
 
 // checked
@@ -188,6 +215,7 @@ router.put('/update/:id', authMiddleWare, (req, res, next) => {
     }
   });
 });
+
 
 // checked
 // PUT add attendee to event

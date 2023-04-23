@@ -49,7 +49,7 @@ const routes = [
     path: '/updateclient/:id',
     name: 'updateclient',
     props: true,
-    component: () => import('../Views/UpdateClient.vue'),
+    component: () => import('../Views/NewUpdateClient.vue'),
     //if page is accessed without logging in, this routes to 404 Not Found page
     beforeEnter: (to, from, next) => {
       if (!store.state.role) {

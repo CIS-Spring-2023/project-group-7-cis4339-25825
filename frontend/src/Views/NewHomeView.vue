@@ -262,6 +262,19 @@ export default {
         const day = String(isoDate.getUTCDate()).padStart(2, '0');
         return `${month}/${day}/${year}`;
     },
+
+    // method called when user clicks on an event row in the list of events - can only be called when user is logged in
+    editEvent(eventID) {
+      //if user is an editor, this will push to "EventDetails.vue" with the event ID as a parameter. There, the user can view and edit the event information.
+      if (this.role === 'editor') {
+        this.$router.push({ name: 'eventdetails', params: { id: eventID } })
+      }
+      //if user is a viewer, this will push to "ViewEvent.vue" with the event ID as a parameter. There, the user can only view the event information, not edit.
+      else if (this.role === 'viewer') {
+        this.$router.push({ name: 'viewevent', params: { id: eventID } })
+      }
+    }
+
   },
 }
 </script>

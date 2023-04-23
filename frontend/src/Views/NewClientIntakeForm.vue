@@ -303,7 +303,7 @@ export default {
             }
 
             // Usage:
-            const isValidEmail = validateEmail('john.doe@example.com');
+            const isValidEmail = validateEmail(this.client.email);
             console.log(isValidEmail); // true or false
             if (isValidEmail) {
                 try {

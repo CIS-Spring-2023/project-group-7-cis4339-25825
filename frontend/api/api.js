@@ -78,6 +78,18 @@ export const getAllRecentEvents = async () => {
   }
 };
 
+// GET all events for org
+export const getAllOrgEvents = async () => {
+  try {
+    const response = await apiClient.get('/events/all/org');
+    return response.data;
+  } catch (error) {
+    console.log('getOrgRecentEvents error', error);
+    throw (error);
+  }
+};
+
+
 // GET 10 most recent events for org
 export const getOrgRecentEvents = async () => {
     try {
@@ -121,10 +133,6 @@ export const getOrgRecentEvents = async () => {
       throw (error)
    }
   };
-
-
-
-
   
   // GET events for which a client is signed up
   export const getClientEvents = async (id) => {
@@ -136,6 +144,18 @@ export const getOrgRecentEvents = async () => {
       throw (error);
     }
   };
+
+// GET events for which a client is not signed up
+export const getNonClientEvents = async (id) => {
+  try {
+    const response = await apiClient.get(`/events/client/${id}/not-registered`);
+    return response.data
+  } catch (error) {
+    console.log('getNonClientEvents API call error', error);
+    throw (error);
+  }
+};
+
 
 
 // GET all attendees for an event
@@ -194,39 +214,43 @@ export const getEventsByServiceId = async (id) => {
   };
   
   // PUT add attendee to event
-  export const registerAttendee = async (eventId, clientId, token) => {
-    const response = await axios.put(
-      `/api/events/register`,
-      {},
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-        params: {
-          event: eventId,
-          client: clientId,
-        },
-      }
-    );
-    return response.data;
+  export const registerAttendee = async (eventId, clientId) => {
+    try {
+      const response = await apiClient.put(
+        `/events/register`,
+        {},
+        {
+          params: {
+            event: eventId,
+            client: clientId,
+          }
+        }
+      );
+      return response.data;
+    } catch (error) {
+      console.log('registerAttendee API call error', error);
+      throw (error)
+    }
   };
   
   // PUT remove attendee from event
-  export const deregisterAttendee = async (eventId, clientId, token) => {
-    const response = await axios.put(
-      `/api/events/deregister`,
-      {},
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-        params: {
-          event: eventId,
-          client: clientId,
-        },
-      }
-    );
-    return response.data;
+  export const deregisterAttendee = async (eventId, clientId) => {
+    try {
+      const response = await apiClient.put(
+        `/events/deregister`,
+        {},
+        {
+          params: {
+            event: eventId,
+            client: clientId,
+          },
+        }
+      );
+      return response.data;
+    } catch (error) {
+      console.log('deregisterAttendee API call error', error);
+      throw (error)
+    }
   };
   
   // GET events for which a service is assigned
@@ -371,13 +395,13 @@ export const searchClients = async (query) => {
   };
   
   // PUT update client
-  export const updateClient = async (id, updatedClient, token) => {
-    const response = await axios.put(`/api/clients/update/${id}`, updatedClient, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
-    return response.data;
+  export const updateClient = async (id, updatedClient) => {
+    try {
+      const response = await apiClient.put(`/clients/update/${id}`, updatedClient);
+      return response.data
+    } catch (error) {
+      console.log('updateClient API call error',error)
+    }
   };
   
   // PUT add existing client to org
