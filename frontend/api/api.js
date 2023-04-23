@@ -90,13 +90,14 @@ export const getOrgRecentEvents = async () => {
   };
   
   // GET single event by ID
-  export const getEventById = async (id, token) => {
-    const response = await axios.get(`/api/events/id/${id}`, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
-    return response.data;
+  export const getEventById = async (id) => {
+    try {
+      const response = await apiClient.get(`/events/id/${id}`);
+      return response.data;
+    } catch (error) {
+      console.log('getEventById API call error:', error);
+      throw (error);
+    }
   };
   
   // GET events based on search query
@@ -135,6 +136,19 @@ export const getOrgRecentEvents = async () => {
       throw (error);
     }
   };
+
+
+// GET all attendees for an event
+export const getEventAttendees = async (id) => {
+  try {
+    const response = await apiClient.get(`/events/attendees/${id}`);
+    return response.data;
+  } catch (error) {
+    console.log('getEventAttendees API call error', error);
+    throw error;
+  }
+};
+
   
   // GET org event attendance for the past two months
   export const getOrgEventAttendance = async (token) => {

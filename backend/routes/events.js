@@ -4,7 +4,7 @@ const router = express.Router();
 const authMiddleWare = require('../auth/authMiddleWare');
 
 // importing data model schemas
-const { events } = require('../models/models');
+const { events, clients } = require('../models/models');
 
 // checked
 // GET 10 most recent events for all orgs
@@ -98,6 +98,30 @@ router.get('/client/:id', authMiddleWare, (req, res, next) => {
     }
   });
 });
+
+// checked
+// GET all attendees for an event
+router.get('/attendees/:id', authMiddleWare, (req, res, next) => {
+  const eventId = req.params.id;
+  events.findById(eventId, (error, event) => {
+    console.log('event found')
+    if (error) {
+      return next(error);
+    } else {
+      console.log('event.attendees', event.attendees)
+      const attendeeIds = event.attendees.map(attendee => attendee.toString());
+      console.log('attendeeIds', attendeeIds)
+      clients.find({_id: {$in: attendeeIds}}, (error, clients) => {
+        if (error) {
+          return next(error);
+        } else {
+          res.json(clients);
+        }
+      });
+    }
+  });
+});
+
 
 // checked
 // GET org event attendance for the past two months

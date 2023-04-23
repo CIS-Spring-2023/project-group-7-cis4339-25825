@@ -95,7 +95,7 @@
             </thead>
             <tbody class="divide-y divide-gray-300">
               <tr
-                @click="editEvent(event.id)"
+                @click="editEvent(event._id)"
                 v-for="event in events"
                 :key="event._id"
                 class="cursor-pointer"
@@ -171,7 +171,7 @@ export default {
                 if (this.eventDate) {
                     try {
                         const eventDate = new Date(this.eventDate);
-                        const formattedDate = eventDate.toISOString().substr(0, 10);
+                        const formattedDate = eventDate.toISOString().substring(0, 10);
                         const query = {
                             searchBy: 'date',
                             eventDate: formattedDate
@@ -192,6 +192,17 @@ export default {
             const month = String(isoDate.getUTCMonth() + 1).padStart(2, '0');
             const day = String(isoDate.getUTCDate()).padStart(2, '0');
             return `${month}/${day}/${year}`;
+        },
+
+        editEvent(eventID) {
+          //if the user is an editor, this will push them to "EventDetails.vue" with the event ID as a parameter, where they can view and edit the event information.
+          if (this.role === 'editor') {
+            this.$router.push({ name: 'eventdetails', params: { id: eventID } })
+          }
+          //if the user is an editor, this will push them to "ViewEvent.vue" with the event ID as a parameter, where they can only view the event information.
+          else if (this.role === 'viewer') {
+            this.$router.push({ name: 'viewevent', params: { id: eventID } })
+          }
         },
 
 
