@@ -170,6 +170,11 @@ export default {
             return `${month}/${day}/${year}`;
         },
 
+        //method called when user clicks on an event row in "List of Events". It pushes the user to "ViewEvent.vue" with the event ID as a parameter so that the user may view the event information, not edit.
+        goToEvent(eventID) {
+            this.$router.push({ name: 'viewevent', params: { id: eventID } })
+        },
+
     },
 }
 </script>

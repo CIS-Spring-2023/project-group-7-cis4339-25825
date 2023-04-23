@@ -285,6 +285,11 @@ export default {
                 console.log('error loading data:', error)
             }
         },
+
+        //method called when user clicks on a client row in "List of Attendees" section. It pushes the user to "ViewClient.vue" with the client ID as a parameter so they may view the selected client, not edit.
+        goToClient(clientID) {
+          this.$router.push({ name: 'viewclient', params: { id: clientID } })
+        },
     },
 }
 </script>

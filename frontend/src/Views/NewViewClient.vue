@@ -300,6 +300,12 @@ export default {
             const day = String(isoDate.getUTCDate()).padStart(2, '0');
             return `${month}/${day}/${year}`;
         },
+
+        //method called when user clicks on an event row in "Events for Client"
+        goToEvent(eventID) {
+          //push user to "ViewEvent.vue" with the event ID as a parameter, where the user may view the edit information, not edit
+          this.$router.push({ name: 'viewevent', params: { id: eventID } })
+        },
     },
 }
 </script>
