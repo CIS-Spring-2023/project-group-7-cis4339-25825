@@ -122,6 +122,25 @@ router.get('/attendees/:id', authMiddleWare, (req, res, next) => {
   });
 });
 
+// checked
+// GET all events for a given service
+router.get('/service/:id', authMiddleWare, async (req, res, next) => {
+  const org = req.user.org;
+  const serviceId = req.params.id;
+  try {
+    const eventsWithService = await events
+      .find({ services: { $in: [serviceId] }, org: org })
+      .select({ _id: 1, name: 1, date: 1, address: {line1: 1} })
+      .lean();
+    res.json(eventsWithService);
+  } catch (error) {
+    next(error);
+  }
+});
+
+
+
+
 
 // checked
 // GET org event attendance for the past two months

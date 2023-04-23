@@ -204,7 +204,7 @@ const routes = [
     path: '/viewservice/:id',
     name: 'viewservice',
     props: true,
-    component: () => import('../Views/ViewService.vue'),
+    component: () => import('../Views/NewViewService.vue'),
     //if page is accessed without logging in, this routes to 404 Not Found page
     beforeEnter: (to, from, next) => {
       if (!store.state.role || !store.state.role === 'viewer') {

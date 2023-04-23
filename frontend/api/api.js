@@ -149,6 +149,18 @@ export const getEventAttendees = async (id) => {
   }
 };
 
+// GET all events for a given service
+export const getEventsByServiceId = async (id) => {
+  try {
+    const response = await apiClient.get(`/events/service/${id}`);
+    return response.data;
+  } catch (error) {
+    console.log('getEventsByServiceId API call error', error);
+    throw (error);
+  }
+};
+
+
   
   // GET org event attendance for the past two months
   export const getOrgEventAttendance = async (token) => {
@@ -425,13 +437,14 @@ export const getActiveServices = async () => {
 };
   
   // GET single service by ID
-  export const getServiceById = async (id, token) => {
-    const response = await axios.get(`/api/services/id/${id}`, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
-    return response.data;
+  export const getServiceById = async (id) => {
+    try {
+      const response = await apiClient.get(`/services/id/${id}`);
+      return response.data
+    } catch (error) {
+      console.log('getServiceById API call error', error);
+      throw (error);
+    }
   };
   
   // GET services based on search query
