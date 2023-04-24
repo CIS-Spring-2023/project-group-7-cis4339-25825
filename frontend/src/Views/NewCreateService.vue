@@ -25,16 +25,9 @@
                   class="w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
                   v-model="service.name"
                 />
-                <!--Show errors, if any-->
-                <!-- <span class="text-black" v-if="v$.service.name.$error">
-                  <p
-                    class="text-red-700"
-                    v-for="error of v$.service.name.$errors"
-                    :key="error.$uid"
-                  >
-                    {{ error.$message }}!
-                  </p>
-                </span> -->
+                <span v-if="v$.service.name.$error" class="text-red-500">
+                  Service Name is required
+                </span>
               </label>
             </div>
   
@@ -82,14 +75,11 @@
 
 <script>
 import useVuelidate from '@vuelidate/core'
+import { required } from '@vuelidate/validators'
 import { mapState } from 'vuex'
 import { createService } from '../../api/api'
 
 export default {
-    setup() {
-        //setup vuelidate
-        return { v$: useVuelidate({ $autoDirty: true }) }
-    },
 
     data() {
         return {
@@ -107,19 +97,40 @@ export default {
         ...mapState(['role'])
     },
 
+    setup() {
+      // Register Vuelidate
+      const v$ = useVuelidate();
+      return { v$ };
+    },
+
+    validations() {
+      return {
+        service: {
+          name: { required },
+        }
+      }
+    },
+
     methods: {
         async handleSubmitForm() {
-            try {
-                const response = await createService(this.service);
-                if (response.success) {
-                        console.log(response.message);
-                        this.$router.push('/findservice')
-                    } else {
-                        console.log('Event creation failed');
-                    }
-            } catch (error) {
-                console.log('Error creating new service:', error)
-            }
+          // Trigger validation
+          this.v$.$validate();
+
+          if (this.v$.$error) {
+            // Form is invalid, do not proceed
+            return;
+          }
+          try {
+              const response = await createService(this.service);
+              if (response.success) {
+                      console.log(response.message);
+                      this.$router.push('/findservice')
+                  } else {
+                      console.log('Event creation failed');
+                  }
+          } catch (error) {
+              console.log('Error creating new service:', error)
+          }
         }
     }
 

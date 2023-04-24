@@ -55,7 +55,7 @@ router.get('/search', authMiddleWare, (req, res, next) => {
   const dbQuery = { org: org };
   switch (req.query.searchBy) {
     case 'name':
-      dbQuery.name = { $regex: `^${req.query.name}`, $options: 'i' };
+      dbQuery.name = { $regex: `${req.query.name}`, $options: 'i' };
       break;
     case 'description':
       dbQuery.description = { $regex: `${req.query.description}`, $options: 'i' };

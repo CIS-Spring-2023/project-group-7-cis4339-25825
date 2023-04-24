@@ -23,17 +23,10 @@
                 placeholder
                 v-model="client.firstName"
               />
-              <!--Shows errors, if any-->
-              <!-- <span class="text-black" v-if="v$.client.firstName.$error">
-                <p
-                  class="text-red-700"
-                  v-for="error of v$.client.firstName.$errors"
-                  :key="error.$uid"
-                >
-                  {{ error.$message }}!
-                </p>
-              </span> -->
             </label>
+            <span v-if="v$.client.firstName.$error" class="text-red-500">
+                First Name is required
+            </span>
           </div>
 
           <!-- Middle name input field -->
@@ -60,17 +53,10 @@
                 placeholder
                 v-model="client.lastName"
               />
-              <!--Shows errors, if any-->
-              <!-- <span class="text-black" v-if="v$.client.lastName.$error">
-                <p
-                  class="text-red-700"
-                  v-for="error of v$.client.lastName.$errors"
-                  :key="error.$uid"
-                >
-                  {{ error.$message }}!
-                </p>
-              </span> -->
             </label>
+            <span v-if="v$.client.lastName.$error" class="text-red-500">
+                Last Name is required
+            </span>
           </div>
           <div></div>
           <!-- Email input field -->
@@ -82,17 +68,10 @@
                 class="w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
                 v-model="client.email"
               />
-              <!--Shows errors, if any-->
-              <!-- <span class="text-black" v-if="v$.client.email.$error">
-                <p
-                  class="text-red-700"
-                  v-for="error of v$.client.email.$errors"
-                  :key="error.$uid"
-                >
-                  {{ error.$message }}!
-                </p>
-              </span> -->
             </label>
+            <span v-if="v$.client.email.$error" class="text-red-500">
+                Valid Email is required
+            </span>
           </div>
           <!-- Phone number input field -->
           <div class="flex flex-col">
@@ -102,23 +81,19 @@
               <input
                 type="text"
                 class="w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
-                pattern="[0-9]{3}[0-9]{3}[0-9]{4}"
+                pattern="^[0-9]{3}[0-9]{3}[0-9]{4}$"
                 v-model="client.phoneNumber.primary"
               />
-              <!--Shows errors, if any-->
-              <!-- <span
-                class="text-black"
-                v-if="v$.client.phone.$error"
-              >
-                <p
-                  class="text-red-700"
-                  v-for="error of v$.client.phone.$errors"
-                  :key="error.$uid"
-                >
-                  {{ error.$message }}!
-                </p>
-              </span> -->
             </label>
+            <span v-if="v$.client.phoneNumber.primary.$error" class="text-red-500">
+                <span v-if="v$.client.phoneNumber.primary.required.$invalid">Phone Number is required</span>
+                <span v-else-if="!v$.client.phoneNumber.primary.required.$invalid && v$.client.phoneNumber.primary.numeric.$invalid">
+                  Phone Number must contain only digits
+                </span>
+                <span v-else-if="!v$.client.phoneNumber.primary.required.$invalid && !v$.client.phoneNumber.primary.numeric.$invalid && (v$.client.phoneNumber.primary.minLength.$invalid || v$.client.phoneNumber.primary.maxLength.$invalid)">
+                  Phone Number must be exactly 10 digits
+                </span>
+              </span>
           </div>
           <!-- Alternative phone number input field -->
           <div class="flex flex-col">
@@ -171,20 +146,10 @@
                 class="w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
                 v-model="client.address.city"
               />
-              <!--Shows errors, if any-->
-              <!-- <span
-                class="text-black"
-                v-if="v$.client.city.$error"
-              >
-                <p
-                  class="text-red-700"
-                  v-for="error of v$.client.city.$errors"
-                  :key="error.$uid"
-                >
-                  {{ error.$message }}!
-                </p>
-              </span> -->
             </label>
+            <span v-if="v$.client.address.city.$error" class="text-red-500">
+                City is required
+            </span>
           </div>
           <div></div>
           <!-- County input field -->
@@ -323,11 +288,8 @@
 <script>
 //import functionalities
 import useVuelidate from '@vuelidate/core'
-import { required, email, alpha, numeric } from '@vuelidate/validators'
+import { required, email, numeric, minLength, maxLength } from '@vuelidate/validators'
 import VueMultiselect from 'vue-multiselect'
-import { DateTime } from 'luxon'
-import { mapState, mapMutations } from 'vuex'
-import modalComponent from '../components/modalComponent.vue'
 import { getClientById, getClientEvents, getNonClientEvents, registerAttendee, deregisterAttendee, updateClient, deregisterClient } from '../../api/api'
 
 export default {
@@ -335,10 +297,6 @@ export default {
     props: ['id'],
     components: { 
         VueMultiselect,
-    },
-    setup() {
-        //setup vuelidate
-        return { v$: useVuelidate({ $autoDirty: true }) }
     },
     data() {
         return {
@@ -372,6 +330,33 @@ export default {
             hoverId: null,
             showButton: false
         }
+    },
+
+    setup() {
+      // Register Vuelidate
+      const v$ = useVuelidate();
+      return { v$ };
+    },
+
+    validations() {
+      return {
+        client: {
+          firstName: { required },
+          lastName: { required },
+          email: { required, email },
+          phoneNumber: {
+            primary: {
+              required,
+              numeric,
+              minLength: minLength(10),
+              maxLength: maxLength(10),
+            },
+          },
+          address: {
+            city: { required },
+          },
+        },
+      };
     },
 
     mounted() {
@@ -469,17 +454,25 @@ export default {
         },
 
         async submitUpdateClient() {
-            try {
-                const response = await updateClient(this.$route.params.id, this.client);
-                if (response.success) {
-                        console.log(response.message);
-                        this.$router.back()
-                    } else {
-                        console.log('Client update failed');
-                    }
-            } catch (error) {
-                console.log('error updating client', error)
-            }
+          // Trigger validation
+          this.v$.$validate();
+
+          if (this.v$.$error) {
+            // Form is invalid, do not proceed
+            return;
+          }
+
+          try {
+              const response = await updateClient(this.$route.params.id, this.client);
+              if (response.success) {
+                      console.log(response.message);
+                      this.$router.back()
+                  } else {
+                      console.log('Client update failed');
+                  }
+          } catch (error) {
+              console.log('error updating client', error)
+          }
         },
 
         async submitDeleteClient() {

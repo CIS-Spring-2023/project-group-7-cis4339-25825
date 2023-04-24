@@ -23,16 +23,9 @@
                 class="w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
                 v-model="event.name"
               />
-              <!--Show errors, if any-->
-              <!-- <span class="text-black" v-if="v$.event.name.$error">
-                <p
-                  class="text-red-700"
-                  v-for="error of v$.event.name.$errors"
-                  :key="error.$uid"
-                >
-                  {{ error.$message }}!
-                </p>
-              </span> -->
+              <span v-if="v$.event.name.$error" class="text-red-500">
+                Event Name is required
+              </span>
             </label>
           </div>
 
@@ -46,16 +39,14 @@
                 class="w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
                 v-model="event.date"
               />
-              <!--Show errors, if any-->
-              <!-- <span class="text-black" v-if="v$.event.date.$error">
-                <p
-                  class="text-red-700"
-                  v-for="error of v$.event.date.$errors"
-                  :key="error.$uid"
-                >
-                  {{ error.$message }}!
-                </p>
-              </span> -->
+              <span v-if="v$.event.date.$error" class="text-red-500">
+                <span v-if="v$.event.date.required.$invalid">
+                  Event Date is required
+                </span>
+                <span v-else-if="!v$.event.date.required.$invalid && v$.event.date.validDate.$invalid">
+                  Event Date must be a valid date
+                </span>
+              </span>
             </label>
           </div>
 
@@ -253,6 +244,8 @@
 </template>
 
 <script>
+import useVuelidate from '@vuelidate/core'
+import { required } from '@vuelidate/validators'
 import { getEventById, getEventAttendees, getActiveServices, updateEvent, deleteEventById } from '../../api/api'
 
 export default {
@@ -284,6 +277,29 @@ export default {
         }
     },
 
+    setup() {
+      // Register Vuelidate
+      const v$ = useVuelidate();
+      return { v$ };
+    },
+
+    validations() {
+      const validDate = (value) => {
+        const date = new Date(value)
+        return !isNaN(date)
+      }
+
+      return {
+        event: {
+          name: { required },
+          date: {
+            required,
+            validDate
+          },
+        }
+      }
+    },
+
     mounted() {
         this.loadData();
     },
@@ -309,17 +325,24 @@ export default {
         },
 
         async handleEventUpdate() {
-            try {
-                const response = await updateEvent(this.$route.params.id, this.event);
-                if (response.success) {
-                    console.log(response.message);
-                    this.$router.back()
-                } else {
-                    console.log('Event update failed');
-                }
-            } catch (error) {
-                console.log('error updating event', error)
-            }
+          // Trigger validation
+          this.v$.$validate();
+
+          if (this.v$.$error) {
+            // Form is invalid, do not proceed
+            return;
+          }
+          try {
+              const response = await updateEvent(this.$route.params.id, this.event);
+              if (response.success) {
+                  console.log(response.message);
+                  this.$router.back()
+              } else {
+                  console.log('Event update failed');
+              }
+          } catch (error) {
+              console.log('error updating event', error)
+          }
         },
 
         async submitDeleteEvent() {

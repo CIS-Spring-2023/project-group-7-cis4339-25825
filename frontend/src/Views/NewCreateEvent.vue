@@ -28,17 +28,10 @@
                   class="w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
                   v-model="event.name"
                 />
-                <!-- Show errors, if any -->
-                <!-- <span class="text-black" v-if="v$.event.name.$error">
-                  <p
-                    class="text-red-700"
-                    v-for="error of v$.event.name.$errors"
-                    :key="error.$uid"
-                  >
-                    {{ error.$message }}!
-                  </p>
-                </span> -->
               </label>
+              <span v-if="v$.event.name.$error" class="text-red-500">
+                Event Name is required
+              </span>
             </div>
   
             <!-- Date input field -->
@@ -51,17 +44,18 @@
                   v-model="event.date"
                   type="date"
                 />
-                <!-- Show errors, if any -->
-                <!-- <span class="text-black" v-if="v$.event.date.$error">
-                  <p
-                    class="text-red-700"
-                    v-for="error of v$.event.date.$errors"
-                    :key="error.$uid"
-                  >
-                    {{ error.$message }}!
-                  </p>
-                </span> -->
               </label>
+              <span v-if="v$.event.date.$error" class="text-red-500">
+                <span v-if="v$.event.date.required.$invalid">
+                  Event Date is required
+                </span>
+                <span v-else-if="!v$.event.date.required.$invalid && v$.event.date.validDate.$invalid">
+                  Event Date must be a valid date
+                </span>
+                <span v-else-if="!v$.event.date.required.$invalid && !v$.event.date.validDate.$invalid && v$.event.date.notBeforeToday.$invalid">
+                  New Event Date cannot be in the past.
+                </span>
+              </span>
             </div>
   
             <div></div>
@@ -180,15 +174,11 @@
 
 <script>
 import useVuelidate from '@vuelidate/core'
+import { required } from '@vuelidate/validators'
 import { mapState } from 'vuex'
 import { getActiveServices, createEvent } from '../../api/api'
 
 export default {
-    setup() {
-        //setup vuelidate
-        return { v$: useVuelidate({ $autoDirty: true }) }
-    },
-
     data() {
         return {
             event: {
@@ -208,8 +198,38 @@ export default {
                 services: []
             },
             //variable to assign service IDs to event (user clicks checkboxes to add services to event)
-            activeServices: []
+            activeServices: [],
         }
+    },
+
+    setup() {
+      // Register Vuelidate
+      const v$ = useVuelidate();
+      return { v$ };
+    },
+
+    validations() {
+      const validDate = (value) => {
+        const date = new Date(value)
+        return !isNaN(date)
+      }
+
+      const notBeforeToday = (value) => {
+        const date = new Date(value)
+        const today = new Date()
+
+        return date >= today
+      }
+      return {
+        event: {
+          name: { required },
+          date: {
+            required,
+            validDate,
+            notBeforeToday
+          },
+        }
+      }
     },
 
     computed: {
@@ -231,6 +251,14 @@ export default {
             }
         },
         async handleSubmitForm() {
+          // Trigger validation
+          this.v$.$validate();
+
+          if (this.v$.$error) {
+            // Form is invalid, do not proceed
+            return;
+          }
+
             try {
                 const response = await createEvent(this.event);
                 if (response.success) {

@@ -25,17 +25,10 @@
                   class="w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
                   v-model="client.firstName"
                 />
-                <!--Errors will show, if any-->
-                <!-- <span class="text-black" v-if="v$.client.firstName.$error">
-                  <p
-                    class="text-red-700"
-                    v-for="error of v$.client.firstName.$errors"
-                    :key="error.$uid"
-                  >
-                    {{ error.$message }}!
-                  </p>
-                </span> -->
               </label>
+              <span v-if="v$.client.firstName.$error" class="text-red-500">
+                First Name is required
+              </span>
             </div>
   
             <!--Middle Name Input Field-->
@@ -62,17 +55,10 @@
                   placeholder
                   v-model="client.lastName"
                 />
-                <!--Errors will show, if any-->
-                <!-- <span class="text-black" v-if="v$.client.lastName.$error">
-                  <p
-                    class="text-red-700"
-                    v-for="error of v$.client.lastName.$errors"
-                    :key="error.$uid"
-                  >
-                    {{ error.$message }}!
-                  </p>
-                </span> -->
               </label>
+              <span v-if="v$.client.lastName.$error" class="text-red-500">
+                Last Name is required
+              </span>
             </div>
   
             <div></div>
@@ -85,17 +71,10 @@
                   class="w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
                   v-model="client.email"
                 />
-                <!--Errors will show, if any-->
-                <!-- <span class="text-black" v-if="v$.client.email.$error">
-                  <p
-                    class="text-red-700"
-                    v-for="error of v$.client.email.$errors"
-                    :key="error.$uid"
-                  >
-                    {{ error.$message }}!
-                  </p>
-                </span> -->
               </label>
+              <span v-if="v$.client.email.$error" class="text-red-500">
+                Valid Email is required
+              </span>
             </div>
             <!-- Phone Number Input Field -->
             <div class="flex flex-col">
@@ -108,20 +87,18 @@
                   pattern="[0-9]{3}[0-9]{3}[0-9]{4}"
                   v-model="client.phoneNumber.primary"
                 />
-                <!--Errors will show, if any-->
-                <!-- <span
-                  class="text-black"
-                  v-if="v$.client.phoneNumber.primary.$error"
-                >
-                  <p
-                    class="text-red-700"
-                    v-for="error of v$.client.phoneNumber.primary.$errors"
-                    :key="error.$uid"
-                  >
-                    {{ error.$message }}!
-                  </p>
-                </span> -->
               </label>
+              <span v-if="v$.client.phoneNumber.primary.$error" class="text-red-500">
+                <span v-if="v$.client.phoneNumber.primary.required.$invalid">
+                  Phone Number is required
+                </span>
+                <span v-else-if="!v$.client.phoneNumber.primary.required.$invalid && v$.client.phoneNumber.primary.numeric.$invalid">
+                  Phone Number must contain only digits
+                </span>
+                <span v-else-if="!v$.client.phoneNumber.primary.required.$invalid && !v$.client.phoneNumber.primary.numeric.$invalid && (v$.client.phoneNumber.primary.minLength.$invalid || v$.client.phoneNumber.primary.maxLength.$invalid)">
+                  Phone Number must be exactly 10 digits
+                </span>
+              </span>
             </div>
             <!-- Alternative Phone Number Input Field -->
             <div class="flex flex-col">
@@ -174,17 +151,10 @@
                   class="w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
                   v-model="client.address.city"
                 />
-                <!--Errors will show, if any-->
-                <!-- <span class="text-black" v-if="v$.client.address.city.$error">
-                  <p
-                    class="text-red-700"
-                    v-for="error of v$.client.address.city.$errors"
-                    :key="error.$uid"
-                  >
-                    {{ error.$message }}!
-                  </p>
-                </span> -->
               </label>
+              <span v-if="v$.client.address.city.$error" class="text-red-500">
+                City is required
+              </span>
             </div>
             <div></div>
             <!-- County Input Field -->
@@ -219,41 +189,22 @@
           </div>
         </form>
       </div>
-
-      <!--Modal component that appears if phone number is already registered-->
-      <div v-if="showClientRegisteredModal" >
-        <modalComponent @close="clientAlreadyRegisteredPush">
-          <template v-slot:clientRegisteredSlot>
-            Client Phone # Already Registered
-            <p>Please try again</p>
-          </template>
-        </modalComponent>
-      </div>
-      <!--Modal component that appears when client is created-->
-      <div v-if="showClientAddedModal">
-        <modalComponent @close="clientAddedPush">
-          <template v-slot:clientAddedSlot>
-            Client Added!
-            <p>Redirecting...</p>
-          </template>
-        </modalComponent>
-      </div>
     </main>
     <p>role: {{ role }}</p>
+    <br>
 </template>
 
 <script>
 //import functionalities
 import useVuelidate from '@vuelidate/core'
-import { required, email, alpha, numeric } from '@vuelidate/validators'
+import { required, email, numeric, minLength, maxLength } from '@vuelidate/validators'
 import { mapState } from 'vuex'
-import modalComponent from '../components/modalComponent.vue'
 import { createClient } from '../../api/api'
 
 export default {
     // allow modal component
     components: {
-        modalComponent
+        
     },
     data() {
         return {
@@ -288,38 +239,53 @@ export default {
     },
 
     setup() {
-        return { v$: useVuelidate({ $autoDirty: true }) }
+      // Register Vuelidate
+      const v$ = useVuelidate();
+      return { v$ };
     },
 
-    mounted() {
-        
+    validations() {
+      return {
+        client: {
+          firstName: { required },
+          lastName: { required },
+          email: { required, email },
+          phoneNumber: {
+            primary: {
+              required,
+              numeric,
+              minLength: minLength(10),
+              maxLength: maxLength(10),
+            },
+          },
+          address: {
+            city: { required },
+          },
+        },
+      };
     },
 
     methods: {
         async registerClient() {
-            const validateEmail = (email) => {
-            const re = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
-            return re.test(String(email).toLowerCase());
-            }
+          // Trigger validation
+          this.v$.$validate();
 
-            // Usage:
-            const isValidEmail = validateEmail(this.client.email);
-            console.log(isValidEmail); // true or false
-            if (isValidEmail) {
-                try {
-                    const response = await createClient(this.client);
-                    if (response.success) {
-                        console.log(response.message);
-                        this.$router.push('/findclient')
-                    } else {
-                        console.log('Client creation failed');
-                    }
-                } catch (error) {
-                    console.log('Error registering client', error)
-                }
-            } else if (!isValidEmail) {
-                console.log('not a valid email')
-            }
+          if (this.v$.$error) {
+            // Form is invalid, do not proceed
+            return;
+          }
+
+          try {
+              const response = await createClient(this.client);
+              if (response.success) {
+                  console.log(response.message);
+                  this.$router.push('/findclient')
+              } else {
+                  console.log('Client creation failed');
+              }
+          } catch (error) {
+              console.log('Error registering client', error)
+          }
         }
     }
 }
