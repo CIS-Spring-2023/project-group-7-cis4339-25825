@@ -3,7 +3,7 @@ const router = express.Router();
 const authMiddleWare = require('../auth/authMiddleWare');
 
 // importing data model schemas
-const { clients } = require('../models/models');
+const { clients, events } = require('../models/models');
 
 // checked
 // Get all clients
@@ -174,21 +174,29 @@ router.put('/register/:id', authMiddleWare, (req, res, next) => {
 });
 
 // checked
-// PUT remove existing client from org
-router.put('/deregister/:id', authMiddleWare, (req, res, next) => {
+// PUT remove existing client from org and all events under that org
+router.put('/deregister/:id', authMiddleWare, async (req, res, next) => {
   const org = req.user.org;
-  clients.findByIdAndUpdate(
-    req.params.id,
-    { $pull: { orgs: org } },
-    (error, data) => {
-      if (error) {
-        console.log(error);
-        return next(error);
-      } else {
-        res.send('Client deregistered with org');
-      }
-    }
-  );
+  try {
+    // Remove the client from the org's client list
+    const client = await clients.findByIdAndUpdate(
+      req.params.id,
+      { $pull: { orgs: org } }
+    ).exec();
+
+    // Remove the client from all events under the same org
+    await events.updateMany(
+      { org: org },
+      { $pull: { attendees: client._id } }
+    ).exec();
+
+    // res.send('Client deregistered with org and removed from events');
+    const message = { success: true, message: "Client deregistered with org and events successfully" };
+    res.status(201).json(message);
+  } catch (error) {
+    console.log(error);
+    return next(error);
+  }
 });
 
 // checked
@@ -200,7 +208,9 @@ router.delete('/:id', authMiddleWare, (req, res, next) => {
     } else if (!data) {
       res.status(400).send('Client not found');
     } else {
-      res.send('Client deleted');
+      // res.send('Client deleted');
+      const message = { success: true, message: "Client deleted successfully" };
+      res.status(201).json(message);
     }
   });
 });

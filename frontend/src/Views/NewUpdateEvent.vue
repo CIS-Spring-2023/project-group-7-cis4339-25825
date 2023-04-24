@@ -236,7 +236,7 @@
                   <td class="p-2 text-left">
                     {{ client.firstName + ' ' + client.lastName }}
                   </td>
-                  <td class="p-2 text-left">{{ client.city }}</td>
+                  <td class="p-2 text-left">{{ client.address.city }}</td>
                   <td class="p-2 text-left">
                     {{ client.phoneNumber.primary }}
                   </td>
@@ -312,11 +312,11 @@ export default {
             try {
                 const response = await updateEvent(this.$route.params.id, this.event);
                 if (response.success) {
-                        console.log(response.message);
-                        this.$router.back()
-                    } else {
-                        console.log('Event update failed');
-                    }
+                    console.log(response.message);
+                    this.$router.back()
+                } else {
+                    console.log('Event update failed');
+                }
             } catch (error) {
                 console.log('error updating event', error)
             }

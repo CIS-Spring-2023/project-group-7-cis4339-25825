@@ -328,7 +328,7 @@ import VueMultiselect from 'vue-multiselect'
 import { DateTime } from 'luxon'
 import { mapState, mapMutations } from 'vuex'
 import modalComponent from '../components/modalComponent.vue'
-import { getClientById, getClientEvents, getNonClientEvents, registerAttendee, deregisterAttendee, updateClient } from '../../api/api'
+import { getClientById, getClientEvents, getNonClientEvents, registerAttendee, deregisterAttendee, updateClient, deregisterClient } from '../../api/api'
 
 export default {
     //accept client ID as data from parent components, either "FineClient.vue" or "EventDetails.vue"
@@ -480,6 +480,20 @@ export default {
             } catch (error) {
                 console.log('error updating client', error)
             }
+        },
+
+        async submitDeleteClient() {
+          try {
+            const response = await deregisterClient(this.$route.params.id);
+            if (response.success) {
+                console.log(response.message);
+                this.$router.back();
+            } else {
+                console.log('Client delete failed');
+            }
+          } catch (error) {
+            console.log('error deleting client', error);
+          }
         },
 
         //method called when user clicks an event row in the list of "Events for Client". It pushes the user to "EventDetails.vue" with the event ID as a parameter to view and update the event.

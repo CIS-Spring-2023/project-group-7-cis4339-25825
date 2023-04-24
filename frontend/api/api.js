@@ -415,14 +415,15 @@ export const searchClients = async (query) => {
     return response.data;
   };
   
-  // PUT remove existing client from org
-  export const deregisterClient = async (id, token) => {
-    const response = await axios.put(`/api/clients/deregister/${id}`, {}, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
-    return response.data;
+  // PUT remove existing client from org and all events under that org
+  export const deregisterClient = async (id) => {
+    try {
+      const response = await apiClient.put(`/clients/deregister/${id}`);
+      return response.data;
+    } catch (error) {
+      console.log('deregisterClient API call error', error);
+      throw (error);
+    }
   };
   
   // DELETE client by ID
