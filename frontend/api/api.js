@@ -291,6 +291,19 @@ export const removeServiceFromEvent = async (id, serviceId, token) => {
     );
     return response.data;
   };
+
+  // when service is inactive, remove service from all events
+  export const removeServiceFromOrgEvents = async (id) => {
+    try {
+      const response = await apiClient.put(`/events/remove-service-all/${id}`);
+      return response.data;
+    } catch (error) {
+      console.log('removeServiceFromOrgEvents API call error', error);
+      throw (error);
+    }
+  };
+  
+
   
   // DELETE event by ID
   export const deleteEventById = async (id) => {

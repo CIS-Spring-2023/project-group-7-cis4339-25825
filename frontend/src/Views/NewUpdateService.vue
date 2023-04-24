@@ -135,7 +135,7 @@
 </template>
 
 <script>
-import { getServiceById, getEventsByServiceId, updateService } from '../../api/api'
+import { getServiceById, getEventsByServiceId, updateService, removeServiceFromOrgEvents } from '../../api/api'
 
 export default {
     props: ['id'],
@@ -193,13 +193,28 @@ export default {
             try {
                 const response = await updateService(this.$route.params.id, this.service);
                 if (response.success) {
-                        console.log(response.message);
-                        this.$router.back()
-                    } else {
-                        console.log('Service update failed');
-                    }
+                    console.log(response.message);
+                } else {
+                    console.log('Service update failed');
+                }
             } catch (error) {
                 console.log('error updating service', error)
+            }
+
+            if (this.service.active) {
+              this.$router.back()
+            } else {
+              try {
+                const response = await removeServiceFromOrgEvents(this.$route.params.id);
+                if (response.success) {
+                    console.log(response.message);
+                    this.$router.back()
+                } else {
+                    console.log('Remove service from events failed');
+                }
+              } catch (error) {
+                console.log('error removing service from events', error)
+              }
             }
         },
 

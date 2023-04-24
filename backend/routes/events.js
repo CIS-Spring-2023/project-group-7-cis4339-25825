@@ -317,6 +317,28 @@ router.put('/remove-service/:id', authMiddleWare, (req, res, next) => {
 });
 
 // checked
+// when service is inactive, remove service from all events
+router.put('/remove-service-all/:id', authMiddleWare, (req, res, next) => {
+  const org = req.user.org;
+  const serviceId = req.params.id;
+  events.updateMany(
+    { org: org, services: serviceId },
+    { $pull: { services: serviceId } }
+  )
+  .then(() => {
+    const message = { success: true, message: "Service removed from all events in the org" };
+    res.status(200).json(message);
+  })
+  .catch(error => {
+    console.log(error);
+    return next(error);
+  });
+});
+
+
+
+
+// checked
 // hard DELETE event by ID, as per project specifications
 router.delete('/:id', authMiddleWare, (req, res, next) => {
   const org = req.user.org;
