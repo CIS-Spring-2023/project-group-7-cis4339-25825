@@ -115,7 +115,7 @@ export default {
             }
 
             console.log('Login Success!')
-            this.$router.push('/dashboard')
+            this.$router.push('/dashboard?success=true')
         } catch (error) {
             console.error('Error logging in:', error);
             this.showLoginFailed = true
@@ -158,7 +158,7 @@ export default {
         //call the "initializeUser" action from /store/index.js which assigns the user's organization data as states
         await this.initializeUser({ organization: this.organization, user: this.user }) 
         //push the user to the dashboard   
-        this.$router.push('/dashboard')
+        this.$router.push('/dashboard?success=true')
       },
     //when modal component that displays login failure emits a 'close' event, this method is called
     loginFail() {

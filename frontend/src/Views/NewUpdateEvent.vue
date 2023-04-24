@@ -345,7 +345,7 @@ export default {
               const response = await updateEvent(this.$route.params.id, this.event);
               if (response.success) {
                   console.log(response.message);
-                  this.$router.back()
+                  this.$router.push('/findevents?update=true')
               } else {
                   console.log('Event update failed');
               }
@@ -359,7 +359,7 @@ export default {
             const response = await deleteEventById(this.$route.params.id);
             if (response.success) {
                 console.log(response.message);
-                this.$router.back()
+                this.$router.push('/findevents?delete=true')
             } else {
                 console.log('Event delete failed');
             }

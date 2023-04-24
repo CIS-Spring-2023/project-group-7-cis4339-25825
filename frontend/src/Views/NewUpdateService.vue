@@ -210,13 +210,13 @@ export default {
             }
 
             if (this.service.active) {
-              this.$router.back()
+              this.$router.push('/findservice?update=true')
             } else {
               try {
                 const response = await removeServiceFromOrgEvents(this.$route.params.id);
                 if (response.success) {
                     console.log(response.message);
-                    this.$router.back()
+                    this.$router.push('/findservice?update=true')
                 } else {
                     console.log('Remove service from events failed');
                 }

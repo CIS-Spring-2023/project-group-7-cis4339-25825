@@ -123,12 +123,20 @@
     <div>
       <LoadingModal v-if="isLoading"></LoadingModal>
     </div>
+
+    <Transition name="bounce">
+        <SuccessModal v-if="successModal" @close="closeSuccessModal" :title="title" :message="message" />
+    </Transition>
   </main>
 </template>
 
 <script>
 //import functionalities
 import LoadingModal from '../components/LoadingModal.vue'
+import SuccessModal from '../components/SuccessModal.vue'
+import UpdateModal from '../components/UpdateModal.vue'
+import DeleteModal from '../components/DeleteModal.vue'
+
 import AttendanceChart from '../components/barChart.vue'
 import clientChart from '../components/pieChart.vue'
 import { mapState } from 'vuex'
@@ -138,7 +146,10 @@ export default {
     components: {
         AttendanceChart,
         clientChart,
-        LoadingModal
+        LoadingModal,
+        SuccessModal,
+        UpdateModal,
+        DeleteModal
     },
     data() {
         return {
@@ -155,6 +166,9 @@ export default {
           recentEvents: null,
           clients: null,
           isLoading: true,
+          successModal: false,
+          title: "",
+          message: ""
         }
   },
   computed: {
@@ -170,8 +184,14 @@ export default {
   mounted() {
     if (this.role) {
       // The 'role' state is not set, do something here
-      console.log('Dashboard mounted with role')
       this.loadOrgData();
+      const query = new URLSearchParams(this.$route.query);
+      if (query.get('success') === 'true') {
+          console.log('success is true')
+          this.successModal = true;
+          this.title = "Login Success!"
+          this.message = "Welcome, " + this.username;
+      }
     } else {
         console.log('Dashboard mounted with no role')
         this.loadAllData();
@@ -281,7 +301,13 @@ export default {
       else if (this.role === 'viewer') {
         this.$router.push({ name: 'viewevent', params: { id: eventID } })
       }
-    }
+    },
+
+    closeSuccessModal() {
+        this.successModal = false;
+        this.title = '';
+        this.message = '';
+    },
 
   },
 }

@@ -94,6 +94,7 @@ export default {
                 description: null,
                 active: true,
             },
+            isLoading: false
         }
     },
 
@@ -129,7 +130,7 @@ export default {
               const response = await createService(this.service);
               if (response.success) {
                       console.log(response.message);
-                      this.$router.push('/findservice')
+                      this.$router.push('/findservice?success=true')
                   } else {
                       console.log('Event creation failed');
                   }

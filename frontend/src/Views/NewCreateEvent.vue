@@ -272,7 +272,7 @@ export default {
                 const response = await createEvent(this.event);
                 if (response.success) {
                         console.log(response.message);
-                        this.$router.push('/findevents')
+                        this.$router.push('/findevents?success=true')
                     } else {
                         console.log('Event creation failed');
                     }

@@ -465,7 +465,7 @@ export default {
               const response = await updateClient(this.$route.params.id, this.client);
               if (response.success) {
                       console.log(response.message);
-                      this.$router.back()
+                      this.$router.push('/findclient?update=true')
                   } else {
                       console.log('Client update failed');
                   }
@@ -479,7 +479,7 @@ export default {
             const response = await deregisterClient(this.$route.params.id);
             if (response.success) {
                 console.log(response.message);
-                this.$router.back();
+                this.$router.push('/findclient?delete=true')
             } else {
                 console.log('Client delete failed');
             }

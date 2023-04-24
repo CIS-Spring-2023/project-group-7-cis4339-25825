@@ -132,6 +132,19 @@
       <div>
         <LoadingModal v-if="isLoading"></LoadingModal>
       </div>
+
+      <Transition name="bounce">
+          <SuccessModal v-if="successModal" @close="closeSuccessModal" :title="title" :message="message" />
+      </Transition>
+
+      <Transition name="bounce">
+          <UpdateModal v-if="updateModal" @close="closeUpdateModal" :title="title" :message="message" />
+      </Transition>
+
+    <Transition name="bounce">
+        <DeleteModal v-if="deleteModal" @close="closeDeleteModal" :title="title" :message="message" />
+    </Transition>
+
     </main>
 </template>
 
@@ -139,10 +152,16 @@
 import { mapState } from 'vuex'
 import { getOrgRecentClients, searchClients } from '../../api/api'
 import LoadingModal from '../components/LoadingModal.vue'
+import SuccessModal from '../components/SuccessModal.vue'
+import UpdateModal from '../components/UpdateModal.vue'
+import DeleteModal from '../components/DeleteModal.vue'
 
 export default {
   components: {
       LoadingModal,
+      SuccessModal,
+      UpdateModal,
+      DeleteModal
   },
     data() {
         return {
@@ -156,6 +175,11 @@ export default {
             // variable stores the ID of the row that the mouse is currently hovering over (to highlight the row red)
             hoverId: null,
             isLoading: false,
+            successModal: false,
+            updateModal: false,
+            deleteModal: false,
+            title: "",
+            message: ""
         }
     },
     computed: {
@@ -181,6 +205,25 @@ export default {
                 console.log('loadData error', error)
             }
             this.isLoading = false;
+            const query = new URLSearchParams(this.$route.query);
+            if (query.get('success') === 'true') {
+                console.log('success is true')
+                this.successModal = true;
+                this.title = "Success!"
+                this.message = "Client successfully created"
+            }
+            if (query.get('update') === 'true') {
+                console.log('update is true')
+                this.updateModal = true;
+                this.title = "Updated!"
+                this.message = "Client successfully updated."
+            }
+            if (query.get('delete') === 'true') {
+                console.log('delete is true')
+                this.deleteModal = true;
+                this.title = "Deleted!"
+                this.message = "Client successfully deleted."
+            }
         },
         async handleSubmitForm() {
             if (this.searchBy === 'Client Name') {
@@ -224,7 +267,25 @@ export default {
           else if (this.role === 'viewer') {
             this.$router.push({name: 'viewclient', params: { id: clientId } })
           }
-        }
+        },
+
+        closeSuccessModal() {
+            this.successModal = false;
+            this.title = '';
+            this.message = '';
+        },
+
+        closeUpdateModal() {
+            this.updateModal = false;
+            this.title = '';
+            this.message = '';
+        },
+        
+        closeDeleteModal() {
+            this.deleteModal = false;
+            this.title = '';
+            this.message = '';
+        },
     
 
     },

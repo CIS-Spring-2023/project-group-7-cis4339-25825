@@ -282,7 +282,7 @@ export default {
               const response = await createClient(this.client);
               if (response.success) {
                   console.log(response.message);
-                  this.$router.push('/findclient')
+                  this.$router.push('/findclient?success=true')
               } else {
                   console.log('Client creation failed');
               }
