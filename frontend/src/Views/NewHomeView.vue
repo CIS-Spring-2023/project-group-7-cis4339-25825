@@ -120,13 +120,15 @@
         </div>
       </div>
     </div>
+    <div>
+      <LoadingModal v-if="isLoading"></LoadingModal>
+    </div>
   </main>
-  <p>userRole: {{ userRole }}</p>
 </template>
 
 <script>
 //import functionalities
-import { DateTime } from 'luxon'
+import LoadingModal from '../components/LoadingModal.vue'
 import AttendanceChart from '../components/barChart.vue'
 import clientChart from '../components/pieChart.vue'
 import { mapState } from 'vuex'
@@ -135,22 +137,24 @@ import { getAllRecentEvents, getAllClients, getOrgRecentEvents, getOrgClients } 
 export default {
     components: {
         AttendanceChart,
-        clientChart
+        clientChart,
+        LoadingModal
     },
     data() {
         return {
-        //variable to hold labels for bar chart - this will be passed as a prop to the AttendanceChart component
-        labels: null,
-        //variable to hold data for bar chart - this will be passed as a prop to the AttendanceChart component
-        chartData: null,
-        //variable to hold labels for pie chart - this will be passed as a prop to the clientChart component
-        pieLabels: null,
-        //variable to hold data for pie chart - this will be passed as a prop to the clientChart component
-        pieChartData: null,
-        // variable stores the ID of the row that the mouse is currently hovering over (to highlight the row red)
-        hoverId: null,
-        recentEvents: null,
-        clients: null
+          //variable to hold labels for bar chart - this will be passed as a prop to the AttendanceChart component
+          labels: null,
+          //variable to hold data for bar chart - this will be passed as a prop to the AttendanceChart component
+          chartData: null,
+          //variable to hold labels for pie chart - this will be passed as a prop to the clientChart component
+          pieLabels: null,
+          //variable to hold data for pie chart - this will be passed as a prop to the clientChart component
+          pieChartData: null,
+          // variable stores the ID of the row that the mouse is currently hovering over (to highlight the row red)
+          hoverId: null,
+          recentEvents: null,
+          clients: null,
+          isLoading: true,
         }
   },
   computed: {
@@ -176,6 +180,7 @@ export default {
 
   methods: {
     async loadOrgData() {
+      this.isLoading = true;
         try {
             const [eventsResponse, clientsResponse] = await Promise.all([
                 getOrgRecentEvents(),
@@ -193,8 +198,10 @@ export default {
         } catch (error) {
             console.log('loadOrgData error', error)
         }
+        this.isLoading = false;
     },
     async loadAllData() {
+      this.isLoading = true;
         try {
             const [eventsResponse, clientsResponse] = await Promise.all([
                 getAllRecentEvents(),
@@ -212,6 +219,7 @@ export default {
         } catch (error) {
             console.log('loadAllData error:', error)
         }
+        this.isLoading = false;
     },
     getChartData() {
       const labels = [];

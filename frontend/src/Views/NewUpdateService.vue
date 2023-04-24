@@ -129,16 +129,21 @@
           </table>
         </div>
       </div>
+      <div>
+        <LoadingModal v-if="isLoading"></LoadingModal>
+      </div>
     </main>
-    <p>service: {{ service }}</p>
-    <p>events: {{ events }}</p>
 </template>
 
 <script>
 import { getServiceById, getEventsByServiceId, updateService, removeServiceFromOrgEvents } from '../../api/api'
+import LoadingModal from '../components/LoadingModal.vue'
 
 export default {
     props: ['id'],
+    components: {
+        LoadingModal,
+    },
     data() {
         return {
             //variable to store service information
@@ -152,6 +157,7 @@ export default {
             events: [],
             // variable stores the ID of the row that the mouse is currently hovering over (to highlight the row red)
             hoverId: null,
+            isLoading: false,
         }
     },
 
@@ -161,7 +167,7 @@ export default {
 
     methods: {
         async loadData() {
-            console.log('loadData called')
+          this.isLoading = true;
             try {
                 const [serviceResponse, eventsResponse] = await Promise.all([
                     getServiceById(this.$route.params.id),
@@ -179,6 +185,7 @@ export default {
             } catch (error) {
                 console.log('error loading data', error);
             }
+          this.isLoading = false;
         },
 
         formatDate(date) {
@@ -190,6 +197,7 @@ export default {
         },
 
         async handleSubmitForm() {
+          this.isLoading = true;
             try {
                 const response = await updateService(this.$route.params.id, this.service);
                 if (response.success) {
@@ -216,6 +224,7 @@ export default {
                 console.log('error removing service from events', error)
               }
             }
+            this.isLoading = false;
         },
 
         //method called when user clicks on an event row in "List of Events". It pushes the user to "ViewEvent.vue" with the event ID as a parameter so that the user may view the event information, not edit.

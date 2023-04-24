@@ -68,9 +68,10 @@
           </div>
         </form>
       </div>
+      <div>
+        <LoadingModal v-if="isLoading"></LoadingModal>
+      </div>
     </main>
-    <p>role: {{ role }}</p>
-    <p>service: {{ service }}</p>
 </template>
 
 <script>
@@ -78,9 +79,12 @@ import useVuelidate from '@vuelidate/core'
 import { required } from '@vuelidate/validators'
 import { mapState } from 'vuex'
 import { createService } from '../../api/api'
+import LoadingModal from '../components/LoadingModal.vue'
 
 export default {
-
+  components: {
+      LoadingModal,
+  },
     data() {
         return {
             //variable to hold new service information
@@ -120,6 +124,7 @@ export default {
             // Form is invalid, do not proceed
             return;
           }
+          this.isLoading = true;
           try {
               const response = await createService(this.service);
               if (response.success) {
@@ -131,6 +136,7 @@ export default {
           } catch (error) {
               console.log('Error creating new service:', error)
           }
+          this.isLoading = false;
         }
     }
 

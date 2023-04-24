@@ -45,6 +45,9 @@
         </template>
       </modalComponent>
     </div>
+    <div>
+      <LoadingModal v-if="isLoading"></LoadingModal>
+    </div>
 </template>
 
 <script>
@@ -55,13 +58,15 @@ import forProfessor from '../components/forProfessor.vue'
 import modalComponent from '../components/modalComponent.vue'
 import { loginUser } from '../../api/api'
 import jwt_decode from 'jwt-decode';
+import LoadingModal from '../components/LoadingModal.vue'
 
 
 export default {
   //allow components
   components: {
     forProfessor,
-    modalComponent
+    modalComponent,
+    LoadingModal
   },
   data() {
     return {
@@ -78,13 +83,15 @@ export default {
       //variable to hold user's organization data
       organization: null,
       //variable to hold user's information
-      user: null
+      user: null,
+      isLoading: false,
     }
   },
   methods: {
     ...mapActions(['fetchUserData']),
     async newlogin() {
         console.log('login submitted');
+        this.isLoading = true;
         try {
             const token = await loginUser(this.username, this.password);
             console.log('token:', token);
@@ -113,6 +120,7 @@ export default {
             console.error('Error logging in:', error);
             this.showLoginFailed = true
         }
+        this.isLoading = false;
     },
 
 

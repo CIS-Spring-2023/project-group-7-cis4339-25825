@@ -166,10 +166,10 @@
           </div>
         </form>
       </div>
+      <div>
+        <LoadingModal v-if="isLoading"></LoadingModal>
+      </div>
     </main>
-    <p>role: {{ role }}</p>
-    <p>event: {{ event }}</p>
-    <p>event.services: {{ event.services }}</p>
 </template>
 
 <script>
@@ -177,8 +177,12 @@ import useVuelidate from '@vuelidate/core'
 import { required } from '@vuelidate/validators'
 import { mapState } from 'vuex'
 import { getActiveServices, createEvent } from '../../api/api'
+import LoadingModal from '../components/LoadingModal.vue'
 
 export default {
+  components: {
+      LoadingModal,
+  },
     data() {
         return {
             event: {
@@ -199,6 +203,7 @@ export default {
             },
             //variable to assign service IDs to event (user clicks checkboxes to add services to event)
             activeServices: [],
+            isLoading: false,
         }
     },
 
@@ -243,12 +248,14 @@ export default {
 
     methods: {
         async loadData() {
+          this.isLoading = true;
             try {
                 const response = await getActiveServices();
                 this.activeServices = response
             } catch (error) {
                 console.log('error fetching active services:', error)
             }
+            this.isLoading = false;
         },
         async handleSubmitForm() {
           // Trigger validation
@@ -258,6 +265,8 @@ export default {
             // Form is invalid, do not proceed
             return;
           }
+
+          this.isLoading = true;
 
             try {
                 const response = await createEvent(this.event);
@@ -270,6 +279,8 @@ export default {
             } catch (error) {
                 console.log('error creating new event:', error)
             }
+
+            this.isLoading = false;
         }
     },
 

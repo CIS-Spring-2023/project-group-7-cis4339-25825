@@ -66,6 +66,7 @@
             <div class="flex flex-col">
               <label class="block">
                 <span class="text-gray-700">Email</span>
+                <span style="color: #ff0000">*</span>
                 <input
                   type="email"
                   class="w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
@@ -189,8 +190,10 @@
           </div>
         </form>
       </div>
+      <div>
+        <LoadingModal v-if="isLoading"></LoadingModal>
+      </div>
     </main>
-    <p>role: {{ role }}</p>
     <br>
 </template>
 
@@ -200,11 +203,12 @@ import useVuelidate from '@vuelidate/core'
 import { required, email, numeric, minLength, maxLength } from '@vuelidate/validators'
 import { mapState } from 'vuex'
 import { createClient } from '../../api/api'
+import LoadingModal from '../components/LoadingModal.vue'
 
 export default {
     // allow modal component
     components: {
-        
+        LoadingModal
     },
     data() {
         return {
@@ -227,9 +231,7 @@ export default {
                     zip: null
                 },
             },
-            //variables that determines if modal components appears
-            showClientRegisteredModal: false,
-            showClientAddedModal: false
+            isLoading: false,
         }
     },
 
@@ -275,6 +277,7 @@ export default {
             return;
           }
 
+          this.isLoading = true;
           try {
               const response = await createClient(this.client);
               if (response.success) {
@@ -286,6 +289,7 @@ export default {
           } catch (error) {
               console.log('Error registering client', error)
           }
+          this.isLoading = false;
         }
     }
 }

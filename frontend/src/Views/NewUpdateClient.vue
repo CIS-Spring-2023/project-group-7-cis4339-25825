@@ -279,10 +279,10 @@
           </div>
         </div>        
       </div>
+      <div>
+        <LoadingModal v-if="isLoading"></LoadingModal>
+      </div>
     </main>
-    <p>client: {{ client }}</p>
-    <br>
-    <p>eventsFiltered: {{ eventsFiltered }}</p>
 </template>
 
 <script>
@@ -291,12 +291,14 @@ import useVuelidate from '@vuelidate/core'
 import { required, email, numeric, minLength, maxLength } from '@vuelidate/validators'
 import VueMultiselect from 'vue-multiselect'
 import { getClientById, getClientEvents, getNonClientEvents, registerAttendee, deregisterAttendee, updateClient, deregisterClient } from '../../api/api'
+import LoadingModal from '../components/LoadingModal.vue'
 
 export default {
     //accept client ID as data from parent components, either "FineClient.vue" or "EventDetails.vue"
     props: ['id'],
     components: { 
         VueMultiselect,
+        LoadingModal
     },
     data() {
         return {
@@ -328,7 +330,8 @@ export default {
             },
             // variable stores the ID of the row that the mouse is currently hovering over (to highlight the row red)
             hoverId: null,
-            showButton: false
+            showButton: false,
+            isLoading: false,
         }
     },
 
@@ -365,6 +368,7 @@ export default {
 
     methods: {
         async loadData() {
+          this.isLoading = true;
             try {
                 const [clientResponse, clientEventsResponse, nonClientEventsResponse] = await Promise.all([
                     getClientById(this.$route.params.id),
@@ -380,16 +384,11 @@ export default {
                 this.clientEvents = clientEventsResponse;
                 this.eventsFiltered = nonClientEventsResponse;
 
-                // // fill eventsFiltered with all events not associated with client, to show in Multiselect
-                // this.eventsFiltered = this.events.filter(event => !event.attendees.includes(this.$route.params.id));
-
-                // // fill clientEvents with all events associated with client, to show in table and to make PUT request with changed events
-                // this.clientEvents = this.events.filter(event => event.attendees.includes(this.$route.params.id));
-
 
             } catch (error) {
                 console.log('error loading data:', error)
             }
+            this.isLoading = false;
         },
 
         formatDate(date) {

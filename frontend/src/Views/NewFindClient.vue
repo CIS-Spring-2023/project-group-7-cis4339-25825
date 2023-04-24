@@ -129,15 +129,21 @@
           </table>
         </div>
       </div>
+      <div>
+        <LoadingModal v-if="isLoading"></LoadingModal>
+      </div>
     </main>
-    <p>role: {{ role }}</p>
 </template>
 
 <script>
 import { mapState } from 'vuex'
 import { getOrgRecentClients, searchClients } from '../../api/api'
+import LoadingModal from '../components/LoadingModal.vue'
 
 export default {
+  components: {
+      LoadingModal,
+  },
     data() {
         return {
             //variable to store all clients and their information for the organization
@@ -149,6 +155,7 @@ export default {
             phoneNumber: '',
             // variable stores the ID of the row that the mouse is currently hovering over (to highlight the row red)
             hoverId: null,
+            isLoading: false,
         }
     },
     computed: {
@@ -166,12 +173,14 @@ export default {
             this.lastName = ''
             this.phoneNumber = ''
             console.log('loadData called')
+            this.isLoading = true;
             try {
                 const response = await getOrgRecentClients();
                 this.clients = response;
             } catch (error) {
                 console.log('loadData error', error)
             }
+            this.isLoading = false;
         },
         async handleSubmitForm() {
             if (this.searchBy === 'Client Name') {
@@ -200,7 +209,7 @@ export default {
                         this.clients = response;
                     } catch (error) {
                         console.error('Error searching clients:', error)
-                    }
+                    }                    
                 }
             }
         },

@@ -112,15 +112,21 @@
           </table>
         </div>
       </div>
+      <div>
+        <LoadingModal v-if="isLoading"></LoadingModal>
+      </div>
     </main>
-    <p>role: {{ role }}</p>
 </template>
 
 <script>
 import { mapState } from 'vuex'
 import { getOrgRecentServices, searchServices } from '../../api/api'
+import LoadingModal from '../components/LoadingModal.vue'
 
 export default {
+  components: {
+      LoadingModal,
+  },
     data() {
         return {
             //variable to hold the services for the organization
@@ -131,6 +137,7 @@ export default {
             description: null,
             // variable stores the ID of the row that the mouse is currently hovering over (to highlight the row red)
             hoverId: null,
+            isLoading: false,
         }
     },
 
@@ -150,12 +157,14 @@ export default {
                 this.name = ''
                 this.description = ''
                 console.log('loadData called')
+                this.isLoading = true;
                 try {
                     const response = await getOrgRecentServices();
                     this.services = response;
                 } catch (error) {
                     console.log('loadData error', error)
                 }
+                this.isLoading = false;
             },
 
             async handleSubmitForm() {

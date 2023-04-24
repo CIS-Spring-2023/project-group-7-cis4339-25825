@@ -237,19 +237,25 @@
           </div>
         </div>
       </div>
+      <div>
+        <LoadingModal v-if="isLoading"></LoadingModal>
+      </div>
 
 
     </main>
-    <p>event: {{ event }}</p>
 </template>
 
 <script>
 import useVuelidate from '@vuelidate/core'
 import { required } from '@vuelidate/validators'
 import { getEventById, getEventAttendees, getActiveServices, updateEvent, deleteEventById } from '../../api/api'
+import LoadingModal from '../components/LoadingModal.vue'
 
 export default {
     props: ['id'],
+    components: {
+      LoadingModal,
+    },
     data() {
         return {
             //variable to hold clients for selected event
@@ -274,6 +280,7 @@ export default {
             },
             // variable stores the ID of the row that the mouse is currently hovering over (to highlight the row red)
             hoverId: null,
+            isLoading: false,
         }
     },
 
@@ -306,6 +313,7 @@ export default {
 
     methods: {
         async loadData() {
+          this.isLoading = true;
             try {
                 const [eventResponse, clientsResponse, servicesResponse] = await Promise.all([
                     getEventById(this.$route.params.id),
@@ -322,6 +330,7 @@ export default {
             } catch (error) {
                 console.log('error loading data', error)
             }
+          this.isLoading = false;
         },
 
         async handleEventUpdate() {
