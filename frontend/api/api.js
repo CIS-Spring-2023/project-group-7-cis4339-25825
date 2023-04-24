@@ -204,13 +204,14 @@ export const getEventsByServiceId = async (id) => {
   };
   
   // PUT update event
-  export const updateEvent = async (id, eventData, token) => {
-    const response = await axios.put(`/api/events/update/${id}`, eventData, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
-    return response.data;
+  export const updateEvent = async (id, eventData) => {
+    try {
+      const response = await apiClient.put(`/events/update/${id}`, eventData);
+      return response.data;
+    } catch (error) {
+      console.log('updateEvent API call error', error);
+      throw (error);
+    }
   };
   
   // PUT add attendee to event

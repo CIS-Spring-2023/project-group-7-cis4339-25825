@@ -480,7 +480,12 @@ export default {
             } catch (error) {
                 console.log('error updating client', error)
             }
-        }
+        },
+
+        //method called when user clicks an event row in the list of "Events for Client". It pushes the user to "EventDetails.vue" with the event ID as a parameter to view and update the event.
+        editEvent(eventID) {
+          this.$router.push({ name: 'eventdetails', params: { id: eventID } })
+        },
 
 
 

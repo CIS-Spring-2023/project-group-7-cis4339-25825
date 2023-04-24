@@ -211,7 +211,9 @@ router.put('/update/:id', authMiddleWare, (req, res, next) => {
     if (error) {
       return next(error);
     } else {
-      res.json(data);
+      // res.json(data);
+      const message = { success: true, message: "Event updated successfully" };
+      res.status(201).json(message);
     }
   });
 });
