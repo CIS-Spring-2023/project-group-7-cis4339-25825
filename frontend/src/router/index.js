@@ -187,7 +187,7 @@ const routes = [
     path: '/servicedetails/:id',
     name: 'servicedetails',
     props: true,
-    component: () => import('../Views/ServiceDetails.vue'),
+    component: () => import('../Views/NewUpdateService.vue'),
     //if page is accessed without logging in, this routes to 404 Not Found page
     beforeEnter: (to, from, next) => {
       if (!store.state.role) {

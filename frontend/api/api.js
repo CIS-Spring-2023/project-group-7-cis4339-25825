@@ -504,13 +504,14 @@ export const getActiveServices = async () => {
   };
   
   // PUT update service
-  export const updateService = async (id, updatedService, token) => {
-    const response = await axios.put(`/api/services/update/${id}`, updatedService, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
-    return response.data;
+  export const updateService = async (id, updatedService) => {
+    try {
+      const response = await apiClient.put(`/services/update/${id}`, updatedService);
+      return response.data;
+    } catch (error) {
+      console.log('updateService API call error', error);
+      throw (error);
+    }
   };
   
   // DELETE service by ID

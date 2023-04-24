@@ -92,12 +92,14 @@ router.post('/', authMiddleWare, (req, res, next) => {
 // checked
 // PUT update service
 router.put('/update/:id', authMiddleWare, (req, res, next) => {
-  const org = req.user.org;
+  // const org = req.user.org;
   services.findByIdAndUpdate(req.params.id, req.body, (error, data) => {
     if (error) {
       return next(error);
     } else {
-      res.json(data);
+      // res.json(data);
+      const message = { success: true, message: "Service updated successfully" };
+      res.status(201).json(message);
     }
   });
 });
