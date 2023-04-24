@@ -326,7 +326,9 @@ router.delete('/:id', authMiddleWare, (req, res, next) => {
     } else if (!data) {
       res.status(400).send('Event not found');
     } else {
-      res.send('Event deleted');
+      // res.send('Event deleted');
+      const message = { success: true, message: "Event deleted successfully" };
+      res.status(201).json(message);
     }
   });
 });

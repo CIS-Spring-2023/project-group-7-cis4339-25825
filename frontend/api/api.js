@@ -293,13 +293,14 @@ export const removeServiceFromEvent = async (id, serviceId, token) => {
   };
   
   // DELETE event by ID
-  export const deleteEventById = async (id, token) => {
-    const response = await axios.delete(`/api/events/${id}`, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
-    return response.data;
+  export const deleteEventById = async (id) => {
+    try {
+      const response = await apiClient.delete(`/events/${id}`);
+      return response.data;
+    } catch (error) {
+      console.log('deleteEventById API call error', error);
+      throw (error);
+    }
   };
   
 

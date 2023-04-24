@@ -253,7 +253,7 @@
 </template>
 
 <script>
-import { getEventById, getEventAttendees, getActiveServices, updateEvent } from '../../api/api'
+import { getEventById, getEventAttendees, getActiveServices, updateEvent, deleteEventById } from '../../api/api'
 
 export default {
     props: ['id'],
@@ -320,6 +320,20 @@ export default {
             } catch (error) {
                 console.log('error updating event', error)
             }
+        },
+
+        async submitDeleteEvent() {
+          try {
+            const response = await deleteEventById(this.$route.params.id);
+            if (response.success) {
+                console.log(response.message);
+                this.$router.back()
+            } else {
+                console.log('Event delete failed');
+            }
+          } catch (error) {
+            console.log('error deleting event:', error)
+          }
         },
 
         editClient(clientID) {
