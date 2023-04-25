@@ -5,10 +5,10 @@
         role="alert"
         v-if="isVisible"
       >
-        <h4 class="text-xl font-semibold mb-2 text-blue-900">{{ title }}</h4>
-        <p class="text-lg font-semibold text-blue-900">{{ message }}</p>
+        <h4 class="text-xl font-quicksand font-semibold mb-2 text-blue-900">{{ title }}</h4>
+        <p class="text-lg font-quicksand font-semibold text-blue-900">{{ message }}</p>
         <button
-          class="absolute top-2 right-2 focus:outline-none text-2xl"
+          class="absolute top-2 right-2 focus:outline-none text-3xl"
           aria-label="Close"
           @click="closeModal"
         >

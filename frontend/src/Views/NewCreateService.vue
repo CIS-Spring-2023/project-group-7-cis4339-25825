@@ -24,6 +24,7 @@
                   type="text"
                   class="w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
                   v-model="service.name"
+                  :disabled="confirmModal"
                 />
                 <span v-if="v$.service.name.$error" class="text-red-500">
                   Service Name is required
@@ -35,7 +36,7 @@
             <div class="flex flex-col">
             <label>
               <span class="text-gray-700">Description:</span>
-              <textarea class="w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50" v-model="service.description"></textarea>
+              <textarea class="w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50" v-model="service.description" :disabled="confirmModal"></textarea>
             </label>
             </div>
   
@@ -48,6 +49,7 @@
                       class="rounded border-gray-300 text-indigo-600 shadow-sm focus:border-indigo-300 focus:ring focus:ring-offset-0 focus:ring-indigo-200 focus:ring-opacity-50"
                       checked
                       v-model="service.active"
+                      :disabled="confirmModal"
                       >
               </label>
   
@@ -71,6 +73,10 @@
       <div>
         <LoadingModal v-if="isLoading"></LoadingModal>
       </div>
+
+      <Transition name="bounce">
+          <ConfirmModal v-if="confirmModal" @close="closeConfirmModal" :title="title" :message="message"/>
+      </Transition>
     </main>
 </template>
 
@@ -80,10 +86,12 @@ import { required } from '@vuelidate/validators'
 import { mapState } from 'vuex'
 import { createService } from '../../api/api'
 import LoadingModal from '../components/LoadingModal.vue'
+import ConfirmModal from '../components/ConfirmModal.vue'
 
 export default {
   components: {
       LoadingModal,
+      ConfirmModal
   },
     data() {
         return {
@@ -94,7 +102,8 @@ export default {
                 description: null,
                 active: true,
             },
-            isLoading: false
+            isLoading: false,
+            confirmModal: false,
         }
     },
 
@@ -125,6 +134,24 @@ export default {
             // Form is invalid, do not proceed
             return;
           }
+
+          // Submit form
+          this.confirmModal = true
+          this.title = 'Please Confirm Creation'
+          this.message = 'Are you sure you want to create this service?'
+        },
+
+        closeConfirmModal(value) {
+            this.confirmModal = false
+            this.title = ''
+            this.message = ''
+            console.log(value)
+            if (value === 'yes') {
+                this.registerService();
+            }
+        },
+
+        async registerService() {
           this.isLoading = true;
           try {
               const response = await createService(this.service);

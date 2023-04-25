@@ -127,6 +127,8 @@
     <Transition name="bounce">
         <SuccessModal v-if="successModal" @close="closeSuccessModal" :title="title" :message="message" />
     </Transition>
+
+
   </main>
 </template>
 
@@ -134,9 +136,6 @@
 //import functionalities
 import LoadingModal from '../components/LoadingModal.vue'
 import SuccessModal from '../components/SuccessModal.vue'
-import UpdateModal from '../components/UpdateModal.vue'
-import DeleteModal from '../components/DeleteModal.vue'
-
 import AttendanceChart from '../components/barChart.vue'
 import clientChart from '../components/pieChart.vue'
 import { mapState } from 'vuex'
@@ -148,8 +147,6 @@ export default {
         clientChart,
         LoadingModal,
         SuccessModal,
-        UpdateModal,
-        DeleteModal
     },
     data() {
         return {
@@ -183,7 +180,6 @@ export default {
 
   mounted() {
     if (this.role) {
-      // The 'role' state is not set, do something here
       this.loadOrgData();
       const query = new URLSearchParams(this.$route.query);
       if (query.get('success') === 'true') {
@@ -305,9 +301,10 @@ export default {
 
     closeSuccessModal() {
         this.successModal = false;
-        this.title = '';
-        this.message = '';
+        // this.title = '';
+        // this.message = '';
     },
+
 
   },
 }

@@ -187,7 +187,7 @@
             <button
               type="reset"
               class="border border-red-700 bg-white text-red-700 rounded"
-              @click="$router.back()"
+              @click="goBack"
             >
               Go back
             </button>
@@ -370,6 +370,15 @@ export default {
 
         editClient(clientID) {
           this.$router.push({ name: 'updateclient', params: { id: clientID } })
+        },
+
+        goBack() {
+          const mainParam = this.$route.query.main;
+          if (mainParam === 'true') {
+            this.$router.push('/findevents')
+          } else {
+            this.$router.back()
+          }
         },
 
 

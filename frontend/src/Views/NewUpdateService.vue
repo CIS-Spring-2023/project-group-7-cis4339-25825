@@ -83,7 +83,7 @@
               <button
                 type="reset"
                 class="border border-red-700 bg-white text-red-700 rounded"
-                @click="$router.back()"
+                @click="goBack"
               >
                 Go back
               </button>
@@ -230,6 +230,15 @@ export default {
         //method called when user clicks on an event row in "List of Events". It pushes the user to "ViewEvent.vue" with the event ID as a parameter so that the user may view the event information, not edit.
         editEvent(eventID) {
             this.$router.push({ name: 'eventdetails', params: { id: eventID } })
+        },
+
+        goBack() {
+          const mainParam = this.$route.query.main;
+          if (mainParam === 'true') {
+            this.$router.push('/findservice')
+          } else {
+            this.$router.back()
+          }
         },
     }
 }

@@ -231,7 +231,7 @@ export default {
             editService(serviceID) {
               //if user has the role "editor", they will be pushed to "ServiceDetails.vue" with the service ID as a parameter, where they may view and edit the selected service.
               if (this.role === 'editor') {
-                this.$router.push({ name: 'servicedetails', params: { id: serviceID } })
+                this.$router.push({ name: 'servicedetails', params: { id: serviceID }, query: { main: true } })
               }
               //if user has the role "viewer", they will be pushed to "ViewService.vue" with the service ID as a parameter, where they may only view the service information, not edit.
               else if (this.role === 'viewer') {

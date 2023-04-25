@@ -9,7 +9,7 @@
       <div class="px-10 py-20">
         <!-- form field -->
         <!-- @submit.prevent stops the submit event from reloading the page-->
-        <form @submit.prevent="registerClient">
+        <form @submit.prevent="submitForm">
           <!-- grid container -->
           <div
             class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-x-6 gap-y-10"
@@ -24,6 +24,7 @@
                   type="text"
                   class="w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
                   v-model="client.firstName"
+                  :disabled="confirmModal"
                 />
               </label>
               <span v-if="v$.client.firstName.$error" class="text-red-500">
@@ -40,6 +41,7 @@
                   class="w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
                   placeholder
                   v-model="client.middleName"
+                  :disabled="confirmModal"
                 />
               </label>
             </div>
@@ -54,6 +56,7 @@
                   class="w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
                   placeholder
                   v-model="client.lastName"
+                  :disabled="confirmModal"
                 />
               </label>
               <span v-if="v$.client.lastName.$error" class="text-red-500">
@@ -71,6 +74,7 @@
                   type="email"
                   class="w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
                   v-model="client.email"
+                  :disabled="confirmModal"
                 />
               </label>
               <span v-if="v$.client.email.$error" class="text-red-500">
@@ -87,6 +91,7 @@
                   class="w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
                   pattern="[0-9]{3}[0-9]{3}[0-9]{4}"
                   v-model="client.phoneNumber.primary"
+                  :disabled="confirmModal"
                 />
               </label>
               <span v-if="v$.client.phoneNumber.primary.$error" class="text-red-500">
@@ -110,6 +115,7 @@
                   class="w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
                   pattern="[0-9]{3}[0-9]{3}[0-9]{4}"
                   v-model="client.phoneNumber.alternate"
+                  :disabled="confirmModal"
                 />
               </label>
             </div>
@@ -193,6 +199,10 @@
       <div>
         <LoadingModal v-if="isLoading"></LoadingModal>
       </div>
+
+      <Transition name="bounce">
+          <ConfirmModal v-if="confirmModal" @close="closeConfirmModal" :title="title" :message="message"/>
+      </Transition>
     </main>
     <br>
 </template>
@@ -204,11 +214,13 @@ import { required, email, numeric, minLength, maxLength } from '@vuelidate/valid
 import { mapState } from 'vuex'
 import { createClient } from '../../api/api'
 import LoadingModal from '../components/LoadingModal.vue'
+import ConfirmModal from '../components/ConfirmModal.vue'
 
 export default {
     // allow modal component
     components: {
-        LoadingModal
+        LoadingModal,
+        ConfirmModal
     },
     data() {
         return {
@@ -232,6 +244,7 @@ export default {
                 },
             },
             isLoading: false,
+            confirmModal: false
         }
     },
 
@@ -268,7 +281,7 @@ export default {
     },
 
     methods: {
-        async registerClient() {
+        submitForm() {
           // Trigger validation
           this.v$.$validate();
 
@@ -276,7 +289,23 @@ export default {
             // Form is invalid, do not proceed
             return;
           }
+          // Submit form
+          this.confirmModal = true
+          this.title = 'Please Confirm Creation'
+          this.message = 'Are you sure you want to create this client?'
+        },
 
+        closeConfirmModal(value) {
+            this.confirmModal = false
+            this.title = ''
+            this.message = ''
+            console.log(value)
+            if (value === 'yes') {
+                this.registerClient();
+            }
+        },
+
+        async registerClient() {
           this.isLoading = true;
           try {
               const response = await createClient(this.client);
@@ -290,7 +319,7 @@ export default {
               console.log('Error registering client', error)
           }
           this.isLoading = false;
-        }
+        },
     }
 }
 </script>

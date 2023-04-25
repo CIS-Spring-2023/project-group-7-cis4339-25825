@@ -261,7 +261,7 @@ export default {
         editClient(clientId) {
           //if the user is an editor, they will be pushed to "UpdateClient.vue" with the client ID as a parameter. This will allow them to edit the selected client.
           if (this.role === 'editor') {
-            this.$router.push({ name: 'updateclient', params: { id: clientId } })
+            this.$router.push({ name: 'updateclient', params: { id: clientId }, query: { main: true } })
           }
           //if the user is a viewer, they will be pushed to "ViewClient.vue" with the client ID as a parameter. This will only allow them to view the selected client's information, not edit.
           else if (this.role === 'viewer') {

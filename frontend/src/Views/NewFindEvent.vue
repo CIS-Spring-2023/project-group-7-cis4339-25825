@@ -250,7 +250,7 @@ export default {
         editEvent(eventID) {
           //if the user is an editor, this will push them to "EventDetails.vue" with the event ID as a parameter, where they can view and edit the event information.
           if (this.role === 'editor') {
-            this.$router.push({ name: 'eventdetails', params: { id: eventID } })
+            this.$router.push({ name: 'eventdetails', params: { id: eventID }, query: { main: true } })
           }
           //if the user is an editor, this will push them to "ViewEvent.vue" with the event ID as a parameter, where they can only view the event information.
           else if (this.role === 'viewer') {

@@ -27,6 +27,7 @@
                   type="text"
                   class="w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
                   v-model="event.name"
+                  :disabled="confirmModal"
                 />
               </label>
               <span v-if="v$.event.name.$error" class="text-red-500">
@@ -43,6 +44,7 @@
                   class="w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
                   v-model="event.date"
                   type="date"
+                  :disabled="confirmModal"
                 />
               </label>
               <span v-if="v$.event.date.$error" class="text-red-500">
@@ -67,6 +69,7 @@
                 <textarea
                   class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
                   rows="2"
+                  :disabled="confirmModal"
                 ></textarea>
               </label>
             </div>
@@ -82,7 +85,8 @@
                     <li v-for="service in activeServices" :key="service._id">
                         <input type="checkbox" name="service.name" :id="service._id" :value="service._id" v-model="event.services"
                         class="rounded border-gray-300 text-indigo-600 shadow-sm focus:border-indigo-300 focus:ring focus:ring-offset-0 focus:ring-indigo-200 focus:ring-opacity-50"
-                        notchecked>
+                        notchecked
+                        :disabled="confirmModal">
                         <label class="inline-flex items-center">{{ service.name }}</label>
                     </li>
                 </ul>
@@ -104,6 +108,7 @@
                   class="w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
                   placeholder
                   v-model="event.address.line1"
+                  :disabled="confirmModal"
                 />
               </label>
             </div>
@@ -116,6 +121,7 @@
                   class="w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
                   placeholder
                   v-model="event.address.line2"
+                  :disabled="confirmModal"
                 />
               </label>
             </div>
@@ -128,6 +134,7 @@
                   class="w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
                   placeholder
                   v-model="event.address.city"
+                  :disabled="confirmModal"
                 />
               </label>
             </div>
@@ -141,6 +148,7 @@
                   class="w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
                   placeholder
                   v-model="event.address.county"
+                  :disabled="confirmModal"
                 />
               </label>
             </div>
@@ -153,6 +161,7 @@
                   class="w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
                   placeholder
                   v-model="event.address.zip"
+                  :disabled="confirmModal"
                 />
               </label>
             </div>
@@ -169,6 +178,10 @@
       <div>
         <LoadingModal v-if="isLoading"></LoadingModal>
       </div>
+
+      <Transition name="bounce">
+          <ConfirmModal v-if="confirmModal" @close="closeConfirmModal" :title="title" :message="message"/>
+      </Transition>
     </main>
 </template>
 
@@ -178,10 +191,12 @@ import { required } from '@vuelidate/validators'
 import { mapState } from 'vuex'
 import { getActiveServices, createEvent } from '../../api/api'
 import LoadingModal from '../components/LoadingModal.vue'
+import ConfirmModal from '../components/ConfirmModal.vue'
 
 export default {
   components: {
       LoadingModal,
+      ConfirmModal,
   },
     data() {
         return {
@@ -204,6 +219,7 @@ export default {
             //variable to assign service IDs to event (user clicks checkboxes to add services to event)
             activeServices: [],
             isLoading: false,
+            confirmModal: false
         }
     },
 
@@ -220,11 +236,13 @@ export default {
       }
 
       const notBeforeToday = (value) => {
-        const date = new Date(value)
+        console.log('value', value)
         const today = new Date()
+        console.log('today', today)
 
-        return date >= today
+        return value >= today.toISOString().split('T')[0]
       }
+
       return {
         event: {
           name: { required },
@@ -257,7 +275,19 @@ export default {
             }
             this.isLoading = false;
         },
-        async handleSubmitForm() {
+
+        closeConfirmModal(value) {
+            this.confirmModal = false
+            this.title = ''
+            this.message = ''
+            console.log(value)
+            if (value === 'yes') {
+                this.registerEvent();
+            }
+        },
+
+
+        handleSubmitForm() {
           // Trigger validation
           this.v$.$validate();
 
@@ -266,6 +296,13 @@ export default {
             return;
           }
 
+          // Submit form
+          this.confirmModal = true
+          this.title = 'Please Confirm Creation'
+          this.message = 'Are you sure you want to create this event?'
+        },
+
+        async registerEvent() {
           this.isLoading = true;
 
             try {
@@ -283,8 +320,6 @@ export default {
             this.isLoading = false;
         }
     },
-
-
 }
 </script>
 

@@ -206,7 +206,7 @@
             <button
               type="reset"
               class="border border-red-700 bg-white text-red-700 rounded"
-              @click="$router.back()"
+              @click="goBack"
             >
               Go back
             </button>
@@ -491,6 +491,15 @@ export default {
         //method called when user clicks an event row in the list of "Events for Client". It pushes the user to "EventDetails.vue" with the event ID as a parameter to view and update the event.
         editEvent(eventID) {
           this.$router.push({ name: 'eventdetails', params: { id: eventID } })
+        },
+
+        goBack() {
+          const mainParam = this.$route.query.main;
+          if (mainParam === 'true') {
+            this.$router.push('/findclient')
+          } else {
+            this.$router.back()
+          }
         },
 
 
