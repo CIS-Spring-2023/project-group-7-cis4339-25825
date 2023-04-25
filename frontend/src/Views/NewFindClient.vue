@@ -175,6 +175,7 @@ export default {
             // variable stores the ID of the row that the mouse is currently hovering over (to highlight the row red)
             hoverId: null,
             isLoading: false,
+            alreadyMounted: false,
             successModal: false,
             updateModal: false,
             deleteModal: false,
@@ -205,24 +206,28 @@ export default {
                 console.log('loadData error', error)
             }
             this.isLoading = false;
-            const query = new URLSearchParams(this.$route.query);
-            if (query.get('success') === 'true') {
-                console.log('success is true')
-                this.successModal = true;
-                this.title = "Success!"
-                this.message = "Client successfully created"
-            }
-            if (query.get('update') === 'true') {
-                console.log('update is true')
-                this.updateModal = true;
-                this.title = "Updated!"
-                this.message = "Client successfully updated."
-            }
-            if (query.get('delete') === 'true') {
-                console.log('delete is true')
-                this.deleteModal = true;
-                this.title = "Deleted!"
-                this.message = "Client successfully deleted."
+
+            if (!this.alreadyMounted) {
+              const query = new URLSearchParams(this.$route.query);
+              if (query.get('success') === 'true') {
+                  console.log('success is true')
+                  this.successModal = true;
+                  this.title = "Success!"
+                  this.message = "Client successfully created"
+              }
+              if (query.get('update') === 'true') {
+                  console.log('update is true')
+                  this.updateModal = true;
+                  this.title = "Updated!"
+                  this.message = "Client successfully updated."
+              }
+              if (query.get('delete') === 'true') {
+                  console.log('delete is true')
+                  this.deleteModal = true;
+                  this.title = "Deleted!"
+                  this.message = "Client successfully deleted."
+              }
+              this.alreadyMounted = true;
             }
         },
         async handleSubmitForm() {

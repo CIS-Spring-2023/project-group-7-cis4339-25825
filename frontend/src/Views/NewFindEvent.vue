@@ -156,6 +156,7 @@ export default {
             // variable stores the ID of the row that the mouse is currently hovering over (to highlight the row red)
             hoverId: null,
             isLoading: false,
+            alreadyMounted: false,
             successModal: false,
             updateModal: false,
             deleteModal: false,
@@ -185,25 +186,30 @@ export default {
                 console.log('loadData error', error)
             }
             this.isLoading = false;
-            const query = new URLSearchParams(this.$route.query);
-            if (query.get('success') === 'true') {
-                console.log('success is true')
-                this.successModal = true;
-                this.title = "Success!"
-                this.message = "Event successfully created"
+
+            if (!this.alreadyMounted) {
+              const query = new URLSearchParams(this.$route.query);
+              if (query.get('success') === 'true') {
+                  console.log('success is true')
+                  this.successModal = true;
+                  this.title = "Success!"
+                  this.message = "Event successfully created"
+              }
+              if (query.get('update') === 'true') {
+                  console.log('update is true')
+                  this.updateModal = true;
+                  this.title = "Updated!"
+                  this.message = "Event successfully updated."
+              }
+              if (query.get('delete') === 'true') {
+                  console.log('delete is true')
+                  this.deleteModal = true;
+                  this.title = "Deleted!"
+                  this.message = "Event successfully deleted."
+              }
+              this.alreadyMounted = true;
             }
-            if (query.get('update') === 'true') {
-                console.log('update is true')
-                this.updateModal = true;
-                this.title = "Updated!"
-                this.message = "Event successfully updated."
-            }
-            if (query.get('delete') === 'true') {
-                console.log('delete is true')
-                this.deleteModal = true;
-                this.title = "Deleted!"
-                this.message = "Event successfully deleted."
-            }
+
         },
 
         async handleSubmitForm() {

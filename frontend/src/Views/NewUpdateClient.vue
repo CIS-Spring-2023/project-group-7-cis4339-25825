@@ -22,6 +22,7 @@
                 class="w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
                 placeholder
                 v-model="client.firstName"
+                :disabled="confirmModal"
               />
             </label>
             <span v-if="v$.client.firstName.$error" class="text-red-500">
@@ -38,6 +39,7 @@
                 class="w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
                 placeholder
                 v-model="client.middleName"
+                :disabled="confirmModal"
               />
             </label>
           </div>
@@ -52,6 +54,7 @@
                 class="w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
                 placeholder
                 v-model="client.lastName"
+                :disabled="confirmModal"
               />
             </label>
             <span v-if="v$.client.lastName.$error" class="text-red-500">
@@ -67,6 +70,7 @@
                 type="email"
                 class="w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
                 v-model="client.email"
+                :disabled="confirmModal"
               />
             </label>
             <span v-if="v$.client.email.$error" class="text-red-500">
@@ -83,6 +87,7 @@
                 class="w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
                 pattern="^[0-9]{3}[0-9]{3}[0-9]{4}$"
                 v-model="client.phoneNumber.primary"
+                :disabled="confirmModal"
               />
             </label>
             <span v-if="v$.client.phoneNumber.primary.$error" class="text-red-500">
@@ -104,6 +109,7 @@
                 class="w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
                 pattern="[0-9]{3}[0-9]{3}[0-9]{4}"
                 v-model="client.phoneNumber.alternate"
+                :disabled="confirmModal"
               />
             </label>
           </div>
@@ -122,6 +128,7 @@
                 type="text"
                 class="w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
                 v-model="client.address.line1"
+                :disabled="confirmModal"
               />
             </label>
           </div>
@@ -133,6 +140,7 @@
                 type="text"
                 class="w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
                 v-model="client.address.line2"
+                :disabled="confirmModal"
               />
             </label>
           </div>
@@ -145,6 +153,7 @@
                 type="text"
                 class="w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
                 v-model="client.address.city"
+                :disabled="confirmModal"
               />
             </label>
             <span v-if="v$.client.address.city.$error" class="text-red-500">
@@ -160,6 +169,7 @@
                 type="text"
                 class="w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
                 v-model="client.address.county"
+                :disabled="confirmModal"
               />
             </label>
           </div>
@@ -171,6 +181,7 @@
                 type="text"
                 class="w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
                 v-model="client.address.zip"
+                :disabled="confirmModal"
               />
             </label>
           </div>
@@ -184,9 +195,10 @@
         <!--Update Client submit button-->
           <div class="flex justify-between mt-10 mr-20">
             <button
-              @click="submitUpdateClient"
+              @click="submitUpdateClientRequest"
               type="submit"
               class="bg-green-700 text-white rounded"
+              :disabled="confirmModal"
             >
               Update Client
             </button>
@@ -194,9 +206,10 @@
           <!--Delete Client button-->
           <div class="flex justify-between mt-10 mr-20">
             <button
-              @click="submitDeleteClient"
+              @click="submitDeleteClientRequest"
               type="submit"
               class="bg-red-700 text-white rounded"
+              :disabled="confirmModal"
             >
               Delete Client
             </button>
@@ -207,6 +220,7 @@
               type="reset"
               class="border border-red-700 bg-white text-red-700 rounded"
               @click="goBack"
+              :disabled="confirmModal"
             >
               Go back
             </button>
@@ -238,6 +252,7 @@
                     :class="{ 'hoverId': hoverId === event._id }"
                     @mouseenter="hoverId = event._id"
                     @mouseleave="hoverId = null"
+                    :disabled="confirmModal"
                     >
                     <td class="p-2 text-left">{{ event.name }}</td>
                     <td class="p-2 text-left">{{ formatDate(event.date) }}</td>
@@ -264,6 +279,7 @@
               placeholder="Select Events to be added"
               label="date"
               track-by="name"
+              :disabled="confirmModal"
             />
             <div class="flex justify-between">
               <!--button to add client to events-->
@@ -282,6 +298,10 @@
       <div>
         <LoadingModal v-if="isLoading"></LoadingModal>
       </div>
+
+      <Transition name="bounce">
+          <ConfirmModal v-if="confirmModal" @close="closeConfirmModal" :title="title" :message="message"/>
+      </Transition>
     </main>
 </template>
 
@@ -292,13 +312,15 @@ import { required, email, numeric, minLength, maxLength } from '@vuelidate/valid
 import VueMultiselect from 'vue-multiselect'
 import { getClientById, getClientEvents, getNonClientEvents, registerAttendee, deregisterAttendee, updateClient, deregisterClient } from '../../api/api'
 import LoadingModal from '../components/LoadingModal.vue'
+import ConfirmModal from '../components/ConfirmModal.vue'
 
 export default {
     //accept client ID as data from parent components, either "FineClient.vue" or "EventDetails.vue"
     props: ['id'],
     components: { 
         VueMultiselect,
-        LoadingModal
+        LoadingModal,
+        ConfirmModal
     },
     data() {
         return {
@@ -332,6 +354,7 @@ export default {
             hoverId: null,
             showButton: false,
             isLoading: false,
+            confirmModal: false
         }
     },
 
@@ -452,7 +475,7 @@ export default {
 
         },
 
-        async submitUpdateClient() {
+        submitUpdateClientRequest() {
           // Trigger validation
           this.v$.$validate();
 
@@ -460,7 +483,39 @@ export default {
             // Form is invalid, do not proceed
             return;
           }
+          // Submit form
+          this.confirmModal = true
+          this.title = 'Please Confirm Update'
+          this.message = 'Are you sure you want to update this client?'
+        },
 
+        submitDeleteClientRequest() {
+          // Submit form
+          this.confirmModal = true
+          this.title = 'Please Confirm Delete'
+          this.message = 'Are you sure you want to delete this client?'
+        },
+
+        closeConfirmModal(value) {
+            this.confirmModal = false
+            console.log(value)
+            if (value === 'yes') {
+              if (this.title === 'Please Confirm Update') {                    
+                    this.title = '';
+                    this.message = '';
+                    this.submitUpdateClient();
+                }
+                else if (this.title === 'Please Confirm Delete') {
+                    this.title = '';
+                    this.message = '';
+                    this.submitDeleteClient();
+                }
+            }
+        },
+
+        async submitUpdateClient() {
+          this.title = ''
+          this.message = ''
           try {
               const response = await updateClient(this.$route.params.id, this.client);
               if (response.success) {
@@ -475,6 +530,8 @@ export default {
         },
 
         async submitDeleteClient() {
+          this.title = ''
+          this.message = ''
           try {
             const response = await deregisterClient(this.$route.params.id);
             if (response.success) {

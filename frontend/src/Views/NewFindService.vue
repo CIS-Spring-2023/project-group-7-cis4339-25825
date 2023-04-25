@@ -150,6 +150,7 @@ export default {
             // variable stores the ID of the row that the mouse is currently hovering over (to highlight the row red)
             hoverId: null,
             isLoading: false,
+            alreadyMounted: false,
             successModal: false,
             updateModal: false,
             title: "",
@@ -181,19 +182,24 @@ export default {
                     console.log('loadData error', error)
                 }
                 this.isLoading = false;
-                const query = new URLSearchParams(this.$route.query);
-                if (query.get('success') === 'true') {
-                    console.log('success is true')
-                    this.successModal = true;
-                    this.title = "Success!"
-                    this.message = "Service successfully created"
+
+                if (!this.alreadyMounted) {
+                  const query = new URLSearchParams(this.$route.query);
+                  if (query.get('success') === 'true') {
+                      console.log('success is true')
+                      this.successModal = true;
+                      this.title = "Success!"
+                      this.message = "Service successfully created"
+                  }
+                  if (query.get('update') === 'true') {
+                      console.log('update is true')
+                      this.updateModal = true;
+                      this.title = "Updated!"
+                      this.message = "Service successfully updated."
+                  }
+                  this.alreadyMounted = true;
                 }
-                if (query.get('update') === 'true') {
-                    console.log('update is true')
-                    this.updateModal = true;
-                    this.title = "Updated!"
-                    this.message = "Service successfully updated."
-                }
+
             },
 
             async handleSubmitForm() {
