@@ -232,8 +232,6 @@
         </div>        
       </div>
     </main>
-    <p>client: {{ client }}</p>
-    <p>events: {{ events }}</p>
 </template>
 
 <script>

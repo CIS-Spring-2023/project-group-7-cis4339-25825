@@ -9,7 +9,7 @@
       <div class="px-10 py-20">
         <!--Form-->
         <!-- @submit.prevent stops the submit event from reloading the page-->
-        <form @submit.prevent="handleSubmitForm">
+        <form @submit.prevent="submitEventUpdateRequest">
           <!-- grid container -->
           <div
             class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-x-6 gap-y-10"
@@ -24,25 +24,19 @@
                   type="text"
                   class="w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
                   v-model="service.name"
+                  :disabled="confirmModal"
                 />
-                <!--Shows errors, if any-->
-                <!-- <span class="text-black" v-if="v$.service.name.$error">
-                  <p
-                    class="text-red-700"
-                    v-for="error of v$.service.name.$errors"
-                    :key="error.$uid"
-                  >
-                    {{ error.$message }}!
-                  </p>
-                </span> -->
               </label>
+              <span v-if="v$.service.name.$error" class="text-red-500">
+                  Service Name is required
+              </span>
             </div>
   
             <!-- Description input field -->
             <div class="flex flex-col">
             <label>
               <span class="text-gray-700">Description:</span>
-              <textarea class="w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50" v-model="service.description"></textarea>
+              <textarea class="w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50" v-model="service.description" :disabled="confirmModal"></textarea>
             </label>
             </div>
   
@@ -55,6 +49,7 @@
                       class="rounded border-gray-300 text-indigo-600 shadow-sm focus:border-indigo-300 focus:ring focus:ring-offset-0 focus:ring-indigo-200 focus:ring-opacity-50"
                       checked
                       v-model="service.active"
+                      :disabled="confirmModal"
                       >
               </label>
   
@@ -70,9 +65,9 @@
             <div class="flex justify-between mt-10 mr-20">
                 <div class="flex justify-between mt-10 mr-25">
                     <button
-                        @click="handleUpdateService"
                         type="submit"
                         class="bg-green-700 text-white rounded"
+                        :disabled="confirmModal"
                     >
                         Update Service
                 </button>
@@ -84,6 +79,7 @@
                 type="reset"
                 class="border border-red-700 bg-white text-red-700 rounded"
                 @click="goBack"
+                :disabled="confirmModal"
               >
                 Go back
               </button>
@@ -132,17 +128,25 @@
       <div>
         <LoadingModal v-if="isLoading"></LoadingModal>
       </div>
+
+      <Transition name="bounce">
+          <ConfirmModal v-if="confirmModal" @close="closeConfirmModal" :title="title" :message="message"/>
+      </Transition>
     </main>
 </template>
 
 <script>
+import useVuelidate from '@vuelidate/core'
+import { required } from '@vuelidate/validators'
 import { getServiceById, getEventsByServiceId, updateService, removeServiceFromOrgEvents } from '../../api/api'
 import LoadingModal from '../components/LoadingModal.vue'
+import ConfirmModal from '../components/ConfirmModal.vue'
 
 export default {
     props: ['id'],
     components: {
         LoadingModal,
+        ConfirmModal
     },
     data() {
         return {
@@ -158,7 +162,22 @@ export default {
             // variable stores the ID of the row that the mouse is currently hovering over (to highlight the row red)
             hoverId: null,
             isLoading: false,
+            confirmModal: false
         }
+    },
+
+    setup() {
+      // Register Vuelidate
+      const v$ = useVuelidate();
+      return { v$ };
+    },
+
+    validations() {
+      return {
+        service: {
+          name: { required },
+        },
+      };
     },
 
     mounted() {
@@ -196,7 +215,29 @@ export default {
             return `${month}/${day}/${year}`;
         },
 
-        async handleSubmitForm() {
+        submitEventUpdateRequest() {
+          // Trigger validation
+          this.v$.$validate();
+
+          if (this.v$.$error) {
+            // Form is invalid, do not proceed
+            return;
+          }
+          // Submit form
+          this.confirmModal = true
+          this.title = 'Please Confirm Update'
+          this.message = 'Are you sure you want to update this service?'
+        },
+
+        closeConfirmModal(value) {
+            this.confirmModal = false
+            console.log(value)
+            if (value === 'yes') {
+              this.submitEventUpdate();
+            }
+        },
+
+        async submitEventUpdate() {
           this.isLoading = true;
             try {
                 const response = await updateService(this.$route.params.id, this.service);

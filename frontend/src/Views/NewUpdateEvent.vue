@@ -22,6 +22,7 @@
                 type="text"
                 class="w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
                 v-model="event.name"
+                :disabled="confirmModal"
               />
               <span v-if="v$.event.name.$error" class="text-red-500">
                 Event Name is required
@@ -38,6 +39,7 @@
                 type="date"
                 class="w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
                 v-model="event.date"
+                :disabled="confirmModal"
               />
               <span v-if="v$.event.date.$error" class="text-red-500">
                 <span v-if="v$.event.date.required.$invalid">
@@ -60,6 +62,7 @@
                 class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
                 rows="2"
                 v-model="event.description"
+                :disabled="confirmModal"
               ></textarea>
             </label>
           </div>
@@ -69,25 +72,74 @@
           <div></div>
           <!-- Services Offered at Event checkboxes -->
           <div class="flex flex-col grid-cols-3">
-            <label>Services Offered at Event</label>
-              <div>
-                <ul v-if="services.length">
-                  <li v-for="service in services" :key="service._id">
+            <label class="text-lg font-semibold mb-2">Services Offered at Event</label>
+            <div>
+              <ul v-if="services.length" class="space-y-2">
+                <li v-for="service in services" :key="service._id" :data-service-id="service._id" class="rounded-lg border border-gray-300 p-2 hover:bg-gray-100 transition-colors relative">
+                  <label class="block w-full h-full">
                     <input
                       type="checkbox"
                       :id="service._id"
                       :value="service._id"
                       :checked="event.services.includes(service._id)"
                       v-model="event.services"
-                      class="rounded border-gray-300 text-indigo-600 shadow-sm focus:border-indigo-300 focus:ring focus:ring-offset-0 focus:ring-indigo-200 focus:ring-opacity-50"
+                      class="rounded border-gray-300 text-indigo-600 shadow-sm focus:border-indigo-300 focus:ring focus:ring-offset-0 focus:ring-indigo-200 focus:ring-opacity-50 mr-2"
+                      :disabled="confirmModal"
                     >
-                    <label :for="service.name">{{ service.name }}</label>
-                  </li>
-                </ul>
-                <!--If there are no active services for the user's organization, this will appear instead of list of checkboxes-->
-                <p v-else>No Active Services Available</p>
-              </div>
+                    <span class="font-medium">{{ service.name }}</span>
+                  </label>
+                  <div
+                    class="absolute top-1/2 right-2 transform -translate-y-1/2 cursor-pointer"
+                    @click.stop="toggleDetails(service._id)"
+                  >
+                    <svg
+                      v-if="!descriptionOpenStates[service._id]"
+                      class="h-4 w-4 text-gray-600"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth="2"
+                        d="M19 9l-7 7-7-7"
+                      />
+                    </svg>
+                    <svg
+                      v-else
+                      class="h-4 w-4 text-gray-600"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth="2"
+                        d="M5 15l7-7 7 7"
+                      />
+                    </svg>
+                  </div>
+                  <transition name="slide-fade">
+                    <p
+                      v-show="descriptionOpenStates[service._id]"
+                      class="text-sm text-gray-600 mt-2 pr-8"
+                    >
+                      {{ service.description }}
+                    </p>
+                  </transition>
+                </li>
+              </ul>
+              <!--If there are no active services for the user's organization, this will appear instead of list of checkboxes-->
+              <p v-else class="text-gray-600">No Active Services Available</p>
+            </div>
           </div>
+
+
+
+
+
         </div>
 
         <!-- grid container -->
@@ -104,6 +156,7 @@
                 class="w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
                 placeholder
                 v-model="event.address.line1"
+                :disabled="confirmModal"
               />
             </label>
           </div>
@@ -116,6 +169,7 @@
                 class="w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
                 placeholder
                 v-model="event.address.line2"
+                :disabled="confirmModal"
               />
             </label>
           </div>
@@ -128,6 +182,7 @@
                 class="w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
                 placeholder
                 v-model="event.address.city"
+                :disabled="confirmModal"
               />
             </label>
           </div>
@@ -141,6 +196,7 @@
                 class="w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
                 placeholder
                 v-model="event.address.county"
+                :disabled="confirmModal"
               />
             </label>
           </div>
@@ -153,6 +209,7 @@
                 class="w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
                 placeholder
                 v-model="event.address.zip"
+                :disabled="confirmModal"
               />
             </label>
           </div>
@@ -165,9 +222,10 @@
         <!--Update Event button-->
           <div class="flex justify-between mt-10 mr-20">
             <button
-              @click="handleEventUpdate"
+              @click="submitEventUpdateRequest"
               type="submit"
               class="bg-green-700 text-white rounded"
+              :disabled="confirmModal"
             >
               Update Event
             </button>
@@ -175,9 +233,10 @@
           <!--Delete Event button-->
           <div class="flex justify-between mt-10 mr-20">
             <button
-              @click="submitDeleteEvent"
+              @click="submitDeleteEventRequest"
               type="submit"
               class="bg-red-700 text-white rounded"
+              :disabled="confirmModal"
             >
               Delete Event
             </button>
@@ -188,6 +247,7 @@
               type="reset"
               class="border border-red-700 bg-white text-red-700 rounded"
               @click="goBack"
+              :disabled="confirmModal"
             >
               Go back
             </button>
@@ -241,6 +301,11 @@
         <LoadingModal v-if="isLoading"></LoadingModal>
       </div>
 
+      <Transition name="bounce">
+          <ConfirmModal v-if="confirmModal" @close="closeConfirmModal" :title="title" :message="message"/>
+      </Transition>
+
+      <p>services: {{ services }}</p>
 
     </main>
 </template>
@@ -250,11 +315,13 @@ import useVuelidate from '@vuelidate/core'
 import { required } from '@vuelidate/validators'
 import { getEventById, getEventAttendees, getActiveServices, updateEvent, deleteEventById } from '../../api/api'
 import LoadingModal from '../components/LoadingModal.vue'
+import ConfirmModal from '../components/ConfirmModal.vue'
 
 export default {
     props: ['id'],
     components: {
       LoadingModal,
+      ConfirmModal
     },
     data() {
         return {
@@ -281,6 +348,8 @@ export default {
             // variable stores the ID of the row that the mouse is currently hovering over (to highlight the row red)
             hoverId: null,
             isLoading: false,
+            confirmModal: false,            
+            openDescriptions: [],
         }
     },
 
@@ -306,6 +375,16 @@ export default {
         }
       }
     },
+
+    computed: {
+      descriptionOpenStates() {
+        return this.services.reduce((acc, service) => {
+          acc[service._id] = this.openDescriptions.includes(service._id);
+          return acc;
+        }, {});
+      },
+    },
+
 
     mounted() {
         this.loadData();
@@ -333,7 +412,7 @@ export default {
           this.isLoading = false;
         },
 
-        async handleEventUpdate() {
+        submitEventUpdateRequest() {
           // Trigger validation
           this.v$.$validate();
 
@@ -341,6 +420,37 @@ export default {
             // Form is invalid, do not proceed
             return;
           }
+          // Submit form
+          this.confirmModal = true
+          this.title = 'Please Confirm Update'
+          this.message = 'Are you sure you want to update this event?'
+        },
+
+        submitDeleteEventRequest() {
+          // Submit form
+          this.confirmModal = true
+          this.title = 'Please Confirm Delete'
+          this.message = 'Are you sure you want to delete this event?'
+        },
+
+        closeConfirmModal(value) {
+            this.confirmModal = false
+            console.log(value)
+            if (value === 'yes') {
+              if (this.title === 'Please Confirm Update') {                    
+                    this.title = '';
+                    this.message = '';
+                    this.submitEventUpdate();
+                }
+                else if (this.title === 'Please Confirm Delete') {
+                    this.title = '';
+                    this.message = '';
+                    this.submitDeleteEvent();
+                }
+            }
+        },
+
+        async submitEventUpdate() {
           try {
               const response = await updateEvent(this.$route.params.id, this.event);
               if (response.success) {
@@ -381,11 +491,20 @@ export default {
           }
         },
 
+        toggleDetails(serviceId) {
+          console.log('toggleDetails called')
+          if (this.openDescriptions.includes(serviceId)) {
+            this.openDescriptions = this.openDescriptions.filter(id => id !== serviceId);
+          } else {
+            this.openDescriptions.push(serviceId);
+          }
+        },
+
+
 
     }
 }
 </script>
-
 
 <style scoped>
   .hoverRow {
@@ -393,4 +512,25 @@ export default {
     transition: background-color 0.3s ease-in-out;
   }
 
+  .arrow-container {
+    position: absolute;
+    top: 50%;
+    right: 0;
+    transform: translateY(-50%);
+  }
+
+  .slide-fade-enter-active,
+  .slide-fade-leave-active {
+    transition: all 0.3s ease;
+  }
+  .slide-fade-enter-from,
+  .slide-fade-leave-to {
+    opacity: 0;
+    transform: translateY(-1rem);
+  }
+  .slide-fade-enter-to,
+  .slide-fade-leave-from {
+    opacity: 1;
+    transform: translateY(0);
+  }
 </style>

@@ -226,8 +226,6 @@
         </div>
       </div>
     </main>
-    <p>event: {{ event }}</p>
-    <p>services: {{ services }}</p>
 </template>
 
 <script>

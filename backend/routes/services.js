@@ -24,7 +24,7 @@ router.get('/', authMiddleWare, (req, res, next) => {
 router.get('/active', authMiddleWare, (req, res, next) => {
   const org = req.user.org;
   services
-    .find({ org: org, active: true }, { _id: 1, name: 1 }, (error, data) => {
+    .find({ org: org, active: true }, { _id: 1, name: 1, description: 1 }, (error, data) => {
       if (error) {
         return next(error);
       } else {

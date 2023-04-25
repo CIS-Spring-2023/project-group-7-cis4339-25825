@@ -251,14 +251,13 @@
                     class="cursor-pointer hoverRow"
                     :class="{ 'hoverId': hoverId === event._id }"
                     @mouseenter="hoverId = event._id"
-                    @mouseleave="hoverId = null"
-                    :disabled="confirmModal"
+                    @mouseleave="hoverId = null"                    
                     >
                     <td class="p-2 text-left">{{ event.name }}</td>
                     <td class="p-2 text-left">{{ formatDate(event.date) }}</td>
                     <td class="p-2 text-right">
                         <span class="remove-btn-wrapper">
-                        <span class="remove-btn text-gray-400 cursor-pointer" @click.stop="removeClientFromEvent(client._id, event._id)" v-if="hoverId === event._id">X</span>
+                        <span class="remove-btn text-gray-400 cursor-pointer" @click.stop="removeClientFromEventRequest(client._id, event._id)" v-if="hoverId === event._id">X</span>
                         </span>
                     </td>
                     </tr>
@@ -287,7 +286,7 @@
                 @click="addToEvent"
                 type="submit"
                 class="mt-5 bg-red-700 text-white rounded"
-                :disabled="eventsSelected.length === 0"
+                :disabled="eventsSelected.length === 0 || confirmModal"
               >
                 Add Client to Selected Events
               </button>
@@ -354,7 +353,9 @@ export default {
             hoverId: null,
             showButton: false,
             isLoading: false,
-            confirmModal: false
+            confirmModal: false,
+            removeClientId: null,
+            removeEventId: null
         }
     },
 
@@ -427,8 +428,19 @@ export default {
             return `${name} (${this.formatDate(date)})`
         },
 
+        removeClientFromEventRequest(clientId, eventId) {
+          // Submit form
+          this.confirmModal = true
+          this.title = 'Please Confirm Removal'
+          this.message = 'Are you sure you want to remove ' + this.client.firstName + ' ' + this.client.lastName + ' from this event?'
+          this.removeClientId = clientId
+          this.removeEventId = eventId
+        },
+
         async removeClientFromEvent(clientId, eventId) {
-            try {
+          this.removeClientId = null;
+          this.removeEventId = null;
+          try {
                 const response = await deregisterAttendee(eventId, clientId);
                 console.log('removeClientFromEvent response', response);
             } catch (error) {
@@ -444,7 +456,6 @@ export default {
                 console.log(error);
             }
         },
-
 
         async addToEvent() {
             try {
@@ -509,6 +520,10 @@ export default {
                     this.title = '';
                     this.message = '';
                     this.submitDeleteClient();
+                } else if (this.title === 'Please Confirm Removal') {
+                  this.title = '';
+                  this.message = '';
+                  this.removeClientFromEvent(this.removeClientId, this.removeEventId);
                 }
             }
         },

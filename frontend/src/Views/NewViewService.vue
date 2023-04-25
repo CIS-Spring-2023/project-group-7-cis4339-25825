@@ -112,8 +112,6 @@
         </div>
       </div>
     </main>
-    <p>service: {{ service }}</p>
-    <p>events: {{ events }}</p>
 </template>
 
 <script>

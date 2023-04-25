@@ -77,21 +77,71 @@
             <div></div>
             <div></div>
             <div></div>
-            <!-- Services Offered checboxes -->
-            <div class="flex flex-col grid-cols-3">
-              <label>Services Offered at Event</label>
-              <div>
-                <ul>
-                    <li v-for="service in activeServices" :key="service._id">
-                        <input type="checkbox" name="service.name" :id="service._id" :value="service._id" v-model="event.services"
-                        class="rounded border-gray-300 text-indigo-600 shadow-sm focus:border-indigo-300 focus:ring focus:ring-offset-0 focus:ring-indigo-200 focus:ring-opacity-50"
-                        notchecked
-                        :disabled="confirmModal">
-                        <label class="inline-flex items-center">{{ service.name }}</label>
-                    </li>
-                </ul>
-              </div>
+          <!-- Services Offered at Event checkboxes -->
+          <div class="flex flex-col grid-cols-3">
+            <label class="text-lg font-semibold mb-2">Services Offered at Event</label>
+            <div>
+              <ul v-if="activeServices.length" class="space-y-2">
+                <li v-for="service in activeServices" :key="service._id" :data-service-id="service._id" class="rounded-lg border border-gray-300 p-2 hover:bg-gray-100 transition-colors relative">
+                  <label class="block w-full h-full">
+                    <input
+                      type="checkbox"
+                      :id="service._id"
+                      :value="service._id"
+                      :checked="event.services.includes(service._id)"
+                      v-model="event.services"
+                      class="rounded border-gray-300 text-indigo-600 shadow-sm focus:border-indigo-300 focus:ring focus:ring-offset-0 focus:ring-indigo-200 focus:ring-opacity-50 mr-2"
+                      :disabled="confirmModal"
+                    >
+                    <span class="font-medium">{{ service.name }}</span>
+                  </label>
+                  <div
+                    class="absolute top-1/2 right-2 transform -translate-y-1/2 cursor-pointer"
+                    @click.stop="toggleDetails(service._id)"
+                  >
+                    <svg
+                      v-if="!descriptionOpenStates[service._id]"
+                      class="h-4 w-4 text-gray-600"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth="2"
+                        d="M19 9l-7 7-7-7"
+                      />
+                    </svg>
+                    <svg
+                      v-else
+                      class="h-4 w-4 text-gray-600"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth="2"
+                        d="M5 15l7-7 7 7"
+                      />
+                    </svg>
+                  </div>
+                  <transition name="slide-fade">
+                    <p
+                      v-show="descriptionOpenStates[service._id]"
+                      class="text-sm text-gray-600 mt-2 pr-8"
+                    >
+                      {{ service.description }}
+                    </p>
+                  </transition>
+                </li>
+              </ul>
+              <!--If there are no active services for the user's organization, this will appear instead of list of checkboxes-->
+              <p v-else class="text-gray-600">No Active Services Available</p>
             </div>
+          </div>
           </div>
   
           <!-- grid container -->
@@ -219,7 +269,8 @@ export default {
             //variable to assign service IDs to event (user clicks checkboxes to add services to event)
             activeServices: [],
             isLoading: false,
-            confirmModal: false
+            confirmModal: false,
+            openDescriptions: [],
         }
     },
 
@@ -256,8 +307,15 @@ export default {
     },
 
     computed: {
-        //computed states so they can be referenced in code
-        ...mapState(['role'])
+      //computed states so they can be referenced in code
+      ...mapState(['role']),
+
+      descriptionOpenStates() {
+        return this.activeServices.reduce((acc, service) => {
+          acc[service._id] = this.openDescriptions.includes(service._id);
+          return acc;
+        }, {});
+      },
     },
 
     mounted() {
@@ -318,11 +376,41 @@ export default {
             }
 
             this.isLoading = false;
-        }
+        },
+
+
+        toggleDetails(serviceId) {
+          console.log('toggleDetails called')
+          if (this.openDescriptions.includes(serviceId)) {
+            this.openDescriptions = this.openDescriptions.filter(id => id !== serviceId);
+          } else {
+            this.openDescriptions.push(serviceId);
+          }
+        },
     },
 }
 </script>
 
-<style>
+<style scoped>
+.arrow-container {
+    position: absolute;
+    top: 50%;
+    right: 0;
+    transform: translateY(-50%);
+  }
 
+  .slide-fade-enter-active,
+  .slide-fade-leave-active {
+    transition: all 0.3s ease;
+  }
+  .slide-fade-enter-from,
+  .slide-fade-leave-to {
+    opacity: 0;
+    transform: translateY(-1rem);
+  }
+  .slide-fade-enter-to,
+  .slide-fade-leave-from {
+    opacity: 1;
+    transform: translateY(0);
+  }
 </style>
