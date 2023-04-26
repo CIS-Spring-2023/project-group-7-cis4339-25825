@@ -303,9 +303,7 @@
 
       <Transition name="bounce">
           <ConfirmModal v-if="confirmModal" @close="closeConfirmModal" :title="title" :message="message"/>
-      </Transition>
-
-      <p>services: {{ services }}</p>
+      </Transition>      
 
     </main>
 </template>

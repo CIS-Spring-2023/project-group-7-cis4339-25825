@@ -231,15 +231,21 @@
           </div>
         </div>        
       </div>
+      <div>
+        <LoadingModal v-if="isLoading"></LoadingModal>
+      </div>
     </main>
 </template>
 
 <script>
-
+import LoadingModal from '../components/LoadingModal.vue'
 import { getClientById, getClientEvents } from '../../api/api'
 
 export default {
     props: ['id'],
+    components: {
+      LoadingModal,
+    },
     data() {
         return {
             //variable to hold all events that the client is associated with
@@ -266,6 +272,7 @@ export default {
             },
             // variable stores the ID of the row that the mouse is currently hovering over (to highlight the row red)
             hoverId: null,
+            isLoading: false,
         }
     },
 
@@ -275,6 +282,7 @@ export default {
 
     methods: {
         async loadData() {
+          this.isLoading = true;
             try {
                 const [clientResponse, eventsResponse] = await Promise.all([
                     getClientById(this.$route.params.id),
@@ -289,6 +297,7 @@ export default {
             } catch (error) {
                 console.log('error loading data:', error)
             }
+          this.isLoading = false;
         },
 
         formatDate(date) {

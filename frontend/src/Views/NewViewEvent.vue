@@ -63,28 +63,71 @@
           <div></div>
           <div></div>
           <div></div>
-            <!-- Services checkboxes -->
-            <div class="flex flex-col grid-cols-3">
-            <label>Services Offered at Event</label>
+          <!-- Services Offered at Event checkboxes -->
+          <div class="flex flex-col grid-cols-3">
+            <label class="text-lg font-semibold mb-2">Services Offered at Event</label>
             <div>
-                <ul v-if="services.length">
-                <li v-for="service in services" :key="service._id">
+              <ul v-if="services.length" class="space-y-2">
+                <li v-for="service in services" :key="service._id" :data-service-id="service._id" class="rounded-lg border border-gray-300 p-2 hover:bg-gray-100 transition-colors relative">
+                  <label class="block w-full h-full">
                     <input
-                    type="checkbox"
-                    :id="service._id"
-                    :value="service._id"
-                    :checked="event.services.includes(service._id)"
-                    class="rounded border-gray-300 text-indigo-600 shadow-sm focus:border-indigo-300 focus:ring focus:ring-offset-0 focus:ring-indigo-200 focus:ring-opacity-50"
-                    style="color: gray; font-style: italic;"
-                    disabled
+                      type="checkbox"
+                      :id="service._id"
+                      :value="service._id"
+                      :checked="event.services.includes(service._id)"
+                      v-model="event.services"
+                      class="rounded border-gray-300 text-indigo-600 shadow-sm focus:border-indigo-300 focus:ring focus:ring-offset-0 focus:ring-indigo-200 focus:ring-opacity-50 mr-2"
+                      :disabled="true"
                     >
-                    <label :for="service.name">{{ service.name }}</label>
+                    <span class="font-medium">{{ service.name }}</span>
+                  </label>
+                  <div
+                    class="absolute top-1/2 right-2 transform -translate-y-1/2 cursor-pointer"
+                    @click.stop="toggleDetails(service._id)"
+                  >
+                    <svg
+                      v-if="!descriptionOpenStates[service._id]"
+                      class="h-4 w-4 text-gray-600"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth="2"
+                        d="M19 9l-7 7-7-7"
+                      />
+                    </svg>
+                    <svg
+                      v-else
+                      class="h-4 w-4 text-gray-600"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth="2"
+                        d="M5 15l7-7 7 7"
+                      />
+                    </svg>
+                  </div>
+                  <transition name="slide-fade">
+                    <p
+                      v-show="descriptionOpenStates[service._id]"
+                      class="text-sm text-gray-600 mt-2 pr-8"
+                    >
+                      {{ service.description }}
+                    </p>
+                  </transition>
                 </li>
-                </ul>
-                <!--If there are no active services for the user's organization, this will appear instead of list of checkboxes-->
-                <p v-else>No Active Services Available</p>
+              </ul>
+              <!--If there are no active services for the user's organization, this will appear instead of list of checkboxes-->
+              <p v-else class="text-gray-600">No Active Services Available</p>
             </div>
-            </div>
+          </div>
 
         </div>
 
@@ -175,7 +218,7 @@
             <button
               type="reset"
               class="border border-red-700 bg-white text-red-700 rounded"
-              @click="$router.back()"
+              @click="goBack"
             >
               Go back
             </button>
@@ -225,15 +268,22 @@
           </div>
         </div>
       </div>
+      <div>
+        <LoadingModal v-if="isLoading"></LoadingModal>
+      </div>
     </main>
 </template>
 
 <script>
 import { mapState } from 'vuex'
 import { getEventById, getEventAttendees, getActiveServices } from '../../api/api'
+import LoadingModal from '../components/LoadingModal.vue'
 
 export default {
     props: ['id'],
+    components: {
+      LoadingModal,
+    },
     data() {
         return {
             //variable to hold clients for selected event
@@ -258,7 +308,18 @@ export default {
             },
             // variable stores the ID of the row that the mouse is currently hovering over (to highlight the row red)
             hoverId: null,
+            openDescriptions: [],
+            isLoading: false,
         }
+    },
+
+    computed: {
+      descriptionOpenStates() {
+        return this.services.reduce((acc, service) => {
+          acc[service._id] = this.openDescriptions.includes(service._id);
+          return acc;
+        }, {});
+      },
     },
 
     mounted() {
@@ -267,6 +328,7 @@ export default {
 
     methods: {
         async loadData() {
+          this.isLoading = true;
             try {
                 const [eventResponse, clientsResponse, servicesResponse] = await Promise.all([
                     getEventById(this.$route.params.id),
@@ -282,11 +344,30 @@ export default {
             } catch (error) {
                 console.log('error loading data:', error)
             }
+          this.isLoading = false;
         },
 
         //method called when user clicks on a client row in "List of Attendees" section. It pushes the user to "ViewClient.vue" with the client ID as a parameter so they may view the selected client, not edit.
         goToClient(clientID) {
           this.$router.push({ name: 'viewclient', params: { id: clientID } })
+        },
+
+        toggleDetails(serviceId) {
+          console.log('toggleDetails called')
+          if (this.openDescriptions.includes(serviceId)) {
+            this.openDescriptions = this.openDescriptions.filter(id => id !== serviceId);
+          } else {
+            this.openDescriptions.push(serviceId);
+          }
+        },
+
+        goBack() {
+          const mainParam = this.$route.query.main;
+          if (mainParam === 'true') {
+            this.$router.push('/findevents')
+          } else {
+            this.$router.back()
+          }
         },
     },
 }
@@ -296,5 +377,42 @@ export default {
   .hoverRow {
     background-color: rgba(255, 0, 0, 0.1);
     transition: background-color 0.3s ease-in-out;
+  }
+
+/* Style for disabled checkboxes */
+input[type="checkbox"]:disabled {
+  color: #a0aec0; /* Text color */
+  border-color: #e2e8f0; /* Border color */
+  background-color: #edf2f7; /* Background color */
+}
+
+/* Style for checked checkboxes */
+input[type="checkbox"]:checked {
+  color: #fff; /* Text color */
+  border-color: #4299e1; /* Border color */
+  background-color: #4299e1; /* Background color */
+}
+
+  
+  .arrow-container {
+    position: absolute;
+    top: 50%;
+    right: 0;
+    transform: translateY(-50%);
+  }
+
+  .slide-fade-enter-active,
+  .slide-fade-leave-active {
+    transition: all 0.3s ease;
+  }
+  .slide-fade-enter-from,
+  .slide-fade-leave-to {
+    opacity: 0;
+    transform: translateY(-1rem);
+  }
+  .slide-fade-enter-to,
+  .slide-fade-leave-from {
+    opacity: 1;
+    transform: translateY(0);
   }
 </style>

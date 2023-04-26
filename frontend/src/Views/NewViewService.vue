@@ -111,14 +111,21 @@
           </table>
         </div>
       </div>
+      <div>
+        <LoadingModal v-if="isLoading"></LoadingModal>
+      </div>
     </main>
 </template>
 
 <script>
+import LoadingModal from '../components/LoadingModal.vue'
 import { getServiceById, getEventsByServiceId } from '../../api/api'
 
 export default {
     props: ['id'],
+    components: {
+      LoadingModal,
+    },
     data() {
         return {
             //variable to store service information
@@ -132,6 +139,7 @@ export default {
             events: [],
             // variable stores the ID of the row that the mouse is currently hovering over (to highlight the row red)
             hoverId: null,
+            isLoading: false,
         }
     },
 
@@ -141,7 +149,7 @@ export default {
 
     methods: {
         async loadData() {
-            console.log('loadData called')
+          this.isLoading = true;
             try {
                 const [serviceResponse, eventsResponse] = await Promise.all([
                     getServiceById(this.$route.params.id),
@@ -159,6 +167,7 @@ export default {
             } catch (error) {
                 console.log('error loading data', error);
             }
+          this.isLoading = false;
         },
         formatDate(date) {
             const isoDate = new Date(date);
