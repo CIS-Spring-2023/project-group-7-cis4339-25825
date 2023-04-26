@@ -46,16 +46,10 @@
                 :chart-data="chartData"
                 ></AttendanceChart>
             </div>
-            <div v-else>
-                Loading data... (set loading wheel)
-            </div>
           </div>
           <div>
             <div v-if="pieLabels && pieChartData">
                 <clientChart :label="pieLabels" :chart-data="pieChartData"/>
-            </div>
-            <div v-else>
-                Loading data... (set loading wheel)
             </div>
           </div>
         </div>

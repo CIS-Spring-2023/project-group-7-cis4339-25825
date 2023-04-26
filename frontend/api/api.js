@@ -528,6 +528,17 @@ export const getActiveServices = async () => {
       throw (error);
     }
   };
+
+// PUT deactivate service
+export const deactivateService = async (id) => {
+  try {
+    const response = await apiClient.put(`/services/deactivate/${id}`);
+    return response.data;
+  } catch (error) {
+    console.log('deactivateService API call error', error);
+    throw (error);
+  }
+};
   
   // DELETE service by ID
   export const deleteServiceById = async (id, token) => {

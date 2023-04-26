@@ -38,21 +38,6 @@
               ></textarea>
             </label>
             </div>
-            <!--Active status checkbox-->
-            <div class="flex flex-col">
-              <label>
-                  <span class="text-gray-700">Active </span>
-                  <input 
-                      type="checkbox"
-                      class="rounded border-gray-300 text-indigo-600 shadow-sm focus:border-indigo-300 focus:ring focus:ring-offset-0 focus:ring-indigo-200 focus:ring-opacity-50"
-                      checked
-                      v-model="service.active"
-                      style="color: gray; font-style: italic;"
-                      disabled
-                      >
-              </label>
-  
-            </div>
            
           </div>
   

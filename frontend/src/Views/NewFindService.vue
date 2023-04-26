@@ -123,6 +123,10 @@
       <Transition name="bounce">
           <UpdateModal v-if="updateModal" @close="closeUpdateModal" :title="title" :message="message" />
       </Transition>
+
+      <Transition name="bounce">
+          <DeleteModal v-if="deleteModal" @close="closeDeleteModal" :title="title" :message="message" />
+      </Transition>
     </main>
 </template>
 
@@ -132,12 +136,14 @@ import { getOrgRecentServices, searchServices } from '../../api/api'
 import LoadingModal from '../components/LoadingModal.vue'
 import SuccessModal from '../components/SuccessModal.vue'
 import UpdateModal from '../components/UpdateModal.vue'
+import DeleteModal from '../components/DeleteModal.vue'
 
 export default {
   components: {
       LoadingModal,
       SuccessModal,
       UpdateModal,
+      DeleteModal
   },
     data() {
         return {
@@ -153,6 +159,7 @@ export default {
             alreadyMounted: false,
             successModal: false,
             updateModal: false,
+            deleteModal: false,
             title: "",
             message: ""
         }
@@ -196,6 +203,12 @@ export default {
                       this.updateModal = true;
                       this.title = "Updated!"
                       this.message = "Service successfully updated."
+                  }
+                  if (query.get('delete') === 'true') {
+                      console.log('delete is true')
+                      this.deleteModal = true;
+                      this.title = "Deleted!"
+                      this.message = "Service successfully deleted."
                   }
                   this.alreadyMounted = true;
                 }
@@ -256,6 +269,14 @@ export default {
             this.title = '';
             this.message = '';
         },
+
+        closeDeleteModal() {
+            this.deleteModal = false;
+            this.title = '';
+            this.message = '';
+        },
+
+        
     },
 }
 </script>

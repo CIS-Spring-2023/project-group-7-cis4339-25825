@@ -96,6 +96,7 @@
                     <span class="font-medium">{{ service.name }}</span>
                   </label>
                   <div
+                    v-if="service.description"
                     class="absolute top-1/2 right-2 transform -translate-y-1/2 cursor-pointer"
                     @click.stop="toggleDetails(service._id)"
                   >

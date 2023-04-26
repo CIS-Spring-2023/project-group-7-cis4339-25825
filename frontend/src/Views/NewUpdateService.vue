@@ -9,7 +9,7 @@
       <div class="px-10 py-20">
         <!--Form-->
         <!-- @submit.prevent stops the submit event from reloading the page-->
-        <form @submit.prevent="submitEventUpdateRequest">
+        <form @submit.prevent="submitServiceUpdateRequest">
           <!-- grid container -->
           <div
             class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-x-6 gap-y-10"
@@ -39,21 +39,6 @@
               <textarea class="w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50" v-model="service.description" :disabled="confirmModal"></textarea>
             </label>
             </div>
-  
-            <div class="flex flex-col">
-              <!--Active status checkbox-->
-              <label>
-                  <span class="text-gray-700">Active </span>
-                  <input 
-                      type="checkbox"
-                      class="rounded border-gray-300 text-indigo-600 shadow-sm focus:border-indigo-300 focus:ring focus:ring-offset-0 focus:ring-indigo-200 focus:ring-opacity-50"
-                      checked
-                      v-model="service.active"
-                      :disabled="confirmModal"
-                      >
-              </label>
-  
-            </div>
            
           </div>
   
@@ -72,6 +57,17 @@
                         Update Service
                 </button>
                 </div>
+            </div>
+          <!--Delete Service button-->
+          <div class="flex justify-between mt-20 mr-20">
+            <button
+              @click="submitDeleteServiceRequest"
+              type="submit"
+              class="bg-red-700 text-white rounded"
+              :disabled="confirmModal"
+            >
+              Delete Service
+            </button>
             </div>
             <!--Go back button-->
             <div class="flex justify-between mt-20 mr-20">
@@ -138,7 +134,7 @@
 <script>
 import useVuelidate from '@vuelidate/core'
 import { required } from '@vuelidate/validators'
-import { getServiceById, getEventsByServiceId, updateService, removeServiceFromOrgEvents } from '../../api/api'
+import { getServiceById, getEventsByServiceId, updateService, removeServiceFromOrgEvents, deactivateService } from '../../api/api'
 import LoadingModal from '../components/LoadingModal.vue'
 import ConfirmModal from '../components/ConfirmModal.vue'
 
@@ -155,7 +151,6 @@ export default {
                 _id: null,
                 name: null,
                 description: null,
-                active: true
             },
             // all events that host the service
             events: [],
@@ -215,7 +210,7 @@ export default {
             return `${month}/${day}/${year}`;
         },
 
-        submitEventUpdateRequest() {
+        submitServiceUpdateRequest() {
           // Trigger validation
           this.v$.$validate();
 
@@ -233,12 +228,20 @@ export default {
             this.confirmModal = false
             console.log(value)
             if (value === 'yes') {
-              this.submitEventUpdate();
+              if (this.title === 'Please Confirm Update') {                    
+                    this.title = '';
+                    this.message = '';
+                    this.submitServiceUpdate();
+                }
+                else if (this.title === 'Please Confirm Delete') {
+                    this.title = '';
+                    this.message = '';
+                    this.submitDeleteService();
+                }
             }
         },
 
-        async submitEventUpdate() {
-          this.isLoading = true;
+        async submitServiceUpdate() {
             try {
                 const response = await updateService(this.$route.params.id, this.service);
                 if (response.success) {
@@ -249,24 +252,40 @@ export default {
             } catch (error) {
                 console.log('error updating service', error)
             }
-
-            if (this.service.active) {
-              this.$router.push('/findservice?update=true')
-            } else {
-              try {
-                const response = await removeServiceFromOrgEvents(this.$route.params.id);
-                if (response.success) {
-                    console.log(response.message);
-                    this.$router.push('/findservice?update=true')
-                } else {
-                    console.log('Remove service from events failed');
-                }
-              } catch (error) {
-                console.log('error removing service from events', error)
-              }
-            }
-            this.isLoading = false;
+            this.$router.push('/findservice?update=true')
+          
         },
+
+        submitDeleteServiceRequest() {
+          // Submit form
+          this.confirmModal = true
+          this.title = 'Please Confirm Delete'
+          this.message = 'Are you sure you want to delete this service?'
+        },
+
+        async submitDeleteService() {
+          this.isLoading = true;
+          try {
+            // Call both removeServiceFromOrgEvents and deactivateService concurrently
+            const [removeResponse, deactivateResponse] = await Promise.all([
+              removeServiceFromOrgEvents(this.$route.params.id),
+              deactivateService(this.$route.params.id)
+            ]);
+
+            // Check if both operations were successful
+            if (removeResponse.success && deactivateResponse.success) {
+              console.log(removeResponse.message);
+              console.log(deactivateResponse.message);
+              this.$router.push('/findservice?delete=true');
+            } else {
+              console.log('Remove service from events failed or deactivating service failed');
+            }
+          } catch (error) {
+            console.log('error removing service from events or deactivating service', error);
+          }
+          this.isLoading = false;
+        },
+
 
         //method called when user clicks on an event row in "List of Events". It pushes the user to "ViewEvent.vue" with the event ID as a parameter so that the user may view the event information, not edit.
         editEvent(eventID) {

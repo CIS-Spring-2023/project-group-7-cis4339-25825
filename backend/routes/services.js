@@ -9,7 +9,7 @@ const authMiddleWare = require('../auth/authMiddleWare');
 router.get('/', authMiddleWare, (req, res, next) => {
   const org = req.user.org;
   services
-    .find({ org: org }, (error, data) => {
+    .find({ org: org, active: true }, (error, data) => {
       if (error) {
         return next(error);
       } else {
@@ -52,7 +52,7 @@ router.get('/id/:id', authMiddleWare, (req, res, next) => {
 // GET entries based on search query
 router.get('/search', authMiddleWare, (req, res, next) => {
   const org = req.user.org;
-  const dbQuery = { org: org };
+  const dbQuery = { org: org, active: true };
   switch (req.query.searchBy) {
     case 'name':
       dbQuery.name = { $regex: `${req.query.name}`, $options: 'i' };
@@ -100,6 +100,19 @@ router.put('/update/:id', authMiddleWare, (req, res, next) => {
       // res.json(data);
       const message = { success: true, message: "Service updated successfully" };
       res.status(201).json(message);
+    }
+  });
+});
+
+// PUT soft delete service
+router.put('/deactivate/:id', authMiddleWare, (req, res, next) => {
+  const update = { active: false };
+  services.findByIdAndUpdate(req.params.id, update, (error, data) => {
+    if (error) {
+      return next(error);
+    } else {
+      const message = { success: true, message: "Service deactivated successfully" };
+      res.status(200).json(message);
     }
   });
 });

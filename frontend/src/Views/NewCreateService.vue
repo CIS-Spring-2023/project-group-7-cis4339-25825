@@ -39,21 +39,6 @@
               <textarea class="w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50" v-model="service.description" :disabled="confirmModal"></textarea>
             </label>
             </div>
-  
-            <!--Active Status checkbox-->
-            <div class="flex flex-col">
-              <label>
-                  <span class="text-gray-700">Active </span>
-                  <input 
-                      type="checkbox"
-                      class="rounded border-gray-300 text-indigo-600 shadow-sm focus:border-indigo-300 focus:ring focus:ring-offset-0 focus:ring-indigo-200 focus:ring-opacity-50"
-                      checked
-                      v-model="service.active"
-                      :disabled="confirmModal"
-                      >
-              </label>
-  
-            </div>
            
           </div>
   
@@ -78,6 +63,7 @@
           <ConfirmModal v-if="confirmModal" @close="closeConfirmModal" :title="title" :message="message"/>
       </Transition>
     </main>
+    <p>service: {{ service }}</p>
 </template>
 
 <script>
@@ -97,7 +83,6 @@ export default {
         return {
             //variable to hold new service information
             service: {
-                _id: null,
                 name: null,
                 description: null,
                 active: true,
