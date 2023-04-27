@@ -246,20 +246,24 @@ export default {
     const zipCodes = [];
     const counts = {};
 
+    console.log('this.clients', this.clients)
+
     // Loop through all clients to get unique zip codes and count clients with each zip code
     this.clients.forEach((client) => {
         const zipCode = client.address.zip;
 
-        if (!zipCodes.includes(zipCode)) {
-        zipCodes.push(zipCode);
-        }
+        if (zipCode !== null) {
+            if (!zipCodes.includes(zipCode)) {
+              zipCodes.push(zipCode);
+            }
 
-        if (!counts[zipCode]) {
-        counts[zipCode] = 1;
-        } else {
-        counts[zipCode]++;
-        }
-    });
+            if (!counts[zipCode]) {
+              counts[zipCode] = 1;
+            } else {
+              counts[zipCode]++;
+            }
+          }
+        });
 
     // Create arrays for the labels and data to be used in the pie chart
     const labels = [];
@@ -272,6 +276,8 @@ export default {
 
     this.pieLabels = labels;
     this.pieChartData = data;
+    console.log('pie labels', this.pieLabels)
+    console.log('pie data', this.pieChartData)
     },
 
     formatDate(date) {

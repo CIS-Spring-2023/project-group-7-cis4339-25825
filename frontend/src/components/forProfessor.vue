@@ -8,15 +8,13 @@
             <p>Hello Professor (or TA),</p>
             <p>Please login with any of these users:</p>
             <br>
-            <p>Viewers (username and password are the same)</p>
-            <p>Org 1: viewer1</p>
-            <p>Org 2: viewer2</p>
-            <p>Org 3: viewer3</p>
+            <p>Editor:</p>
+            <p>Username: editor1</p>
+            <p>Password: editor1</p>
             <br>
-            <p>Editors (username and password are the same)</p>
-            <p>Org 1: editor1</p>
-            <p>Org 2: editor2</p>
-            <p>Org 3: editor3</p>
+            <p>Viewer:</p>
+            <p>Username: viewer1</p>
+            <p>Password: viewer1</p>
         </div>
     </div>
   </div>

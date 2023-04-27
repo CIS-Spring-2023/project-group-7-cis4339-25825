@@ -62,8 +62,7 @@
       <Transition name="bounce">
           <ConfirmModal v-if="confirmModal" @close="closeConfirmModal" :title="title" :message="message"/>
       </Transition>
-    </main>
-    <p>service: {{ service }}</p>
+    </main>    
 </template>
 
 <script>

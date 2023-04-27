@@ -2,6 +2,7 @@ import axios from 'axios';
 
 const API_BASE_URL = 'http://localhost:3000'; // Replace with your backend API base URL
 
+
 const apiClient = axios.create({
   baseURL: API_BASE_URL,
   headers: {
@@ -18,6 +19,7 @@ function removeAuthHeader() {
   delete apiClient.defaults.headers.common['Authorization'];
 }
 
+// accounted
 export async function loginUser(username, password) {
   try {
     const response = await apiClient.post('/users/login', { username, password });
@@ -31,6 +33,7 @@ export async function loginUser(username, password) {
   }
 }
 
+// accounted
 export function logoutUser() {
   localStorage.removeItem('authToken');
   removeAuthHeader();
@@ -44,6 +47,7 @@ export function initializeAuthHeaderFromLocalStorage() {
   }
 }
 
+// not accounted
 export async function getUserById(userId) {
   console.log('getUserById api call')
   console.log('getUserById userId', userId)
@@ -57,6 +61,7 @@ export async function getUserById(userId) {
   }
 };
 
+// not accounted
 export async function getOrgById(orgId) {
   console.log('getOrgyId api call')
   console.log('getOrgById orgId', orgId)
@@ -66,18 +71,20 @@ export async function getOrgById(orgId) {
 };
 
 
+// accounted
 // API Calls for events
 // GET 10 most recent events for all orgs
 export const getAllRecentEvents = async () => {
   console.log('getAllRecentEvents')
   try {
-    const response = await axios.get('http://localhost:3000/events/all');
+    const response = await apiClient.get('events/all');
     return response.data;
   } catch (error) {
     throw error;
   }
 };
 
+// not accounted
 // GET all events for org
 export const getAllOrgEvents = async () => {
   try {
@@ -90,6 +97,7 @@ export const getAllOrgEvents = async () => {
 };
 
 
+//accounted
 // GET 10 most recent events for org
 export const getOrgRecentEvents = async () => {
     try {
@@ -101,6 +109,7 @@ export const getOrgRecentEvents = async () => {
     }
   };
   
+  //accounted
   // GET single event by ID
   export const getEventById = async (id) => {
     try {
@@ -112,6 +121,7 @@ export const getOrgRecentEvents = async () => {
     }
   };
   
+  //accounted
   // GET events based on search query
   export const searchEvents = async (query) => {
     try {
@@ -134,6 +144,7 @@ export const getOrgRecentEvents = async () => {
    }
   };
   
+  //accounted
   // GET events for which a client is signed up
   export const getClientEvents = async (id) => {
     try {
@@ -145,6 +156,7 @@ export const getOrgRecentEvents = async () => {
     }
   };
 
+  //accounted
 // GET events for which a client is not signed up
 export const getNonClientEvents = async (id) => {
   try {
@@ -158,6 +170,7 @@ export const getNonClientEvents = async (id) => {
 
 
 
+//accounted
 // GET all attendees for an event
 export const getEventAttendees = async (id) => {
   try {
@@ -169,6 +182,7 @@ export const getEventAttendees = async (id) => {
   }
 };
 
+//accounted
 // GET all events for a given service
 export const getEventsByServiceId = async (id) => {
   try {
@@ -181,7 +195,7 @@ export const getEventsByServiceId = async (id) => {
 };
 
 
-  
+  // not accounted
   // GET org event attendance for the past two months
   export const getOrgEventAttendance = async (token) => {
     const response = await axios.get(`/api/events/attendance`, {
@@ -191,7 +205,8 @@ export const getEventsByServiceId = async (id) => {
     });
     return response.data;
   };
-  
+
+  // accounted
   // POST new event
   export const createEvent = async (eventData) => {
     try {
@@ -202,7 +217,8 @@ export const getEventsByServiceId = async (id) => {
       throw (error);
     }
   };
-  
+
+  // accounted
   // PUT update event
   export const updateEvent = async (id, eventData) => {
     try {
@@ -213,7 +229,8 @@ export const getEventsByServiceId = async (id) => {
       throw (error);
     }
   };
-  
+
+  // accounted
   // PUT add attendee to event
   export const registerAttendee = async (eventId, clientId) => {
     try {
@@ -233,7 +250,8 @@ export const getEventsByServiceId = async (id) => {
       throw (error)
     }
   };
-  
+
+  // accounted
   // PUT remove attendee from event
   export const deregisterAttendee = async (eventId, clientId) => {
     try {
@@ -253,7 +271,8 @@ export const getEventsByServiceId = async (id) => {
       throw (error)
     }
   };
-  
+
+  // not accounted
   // GET events for which a service is assigned
   export const getServiceEvents = async (id, token) => {
     const response = await axios.get(`/api/events/service/${id}`, {
@@ -263,7 +282,8 @@ export const getEventsByServiceId = async (id) => {
     });
     return response.data;
   };
-  
+
+  // not accounted
   // PUT add service to event
   export const addServiceToEvent = async (id, serviceId, token) => {
     const response = await axios.put(
@@ -277,7 +297,8 @@ export const getEventsByServiceId = async (id) => {
     );
     return response.data;
   };
-  
+
+  // not accounted
 // PUT remove service from event
 export const removeServiceFromEvent = async (id, serviceId, token) => {
     const response = await axios.put(
@@ -292,6 +313,7 @@ export const removeServiceFromEvent = async (id, serviceId, token) => {
     return response.data;
   };
 
+  // accounted
   // when service is inactive, remove service from all events
   export const removeServiceFromOrgEvents = async (id) => {
     try {
@@ -304,7 +326,7 @@ export const removeServiceFromEvent = async (id, serviceId, token) => {
   };
   
 
-  
+  // accounted
   // DELETE event by ID
   export const deleteEventById = async (id) => {
     try {
@@ -319,17 +341,19 @@ export const removeServiceFromEvent = async (id, serviceId, token) => {
 
 // API calls for clients
 
+// accounted
 // GET all clients
 export const getAllClients = async () => {
     try {
-      const response = await axios.get('http://localhost:3000/clients/all');
+      const response = await apiClient.get('clients/all');
       return response.data;
     } catch (error) {
       console.log('getAllClients error', error)
       throw(error);
     }
   };
-  
+
+  // accounted
 // GET all clients for org
 export const getOrgClients = async () => {
   try {
@@ -342,6 +366,7 @@ export const getOrgClients = async () => {
   }
 };
 
+// accounted
   // GET 10 most recent clients for org
   export const getOrgRecentClients = async () => {
     try {
@@ -352,7 +377,8 @@ export const getOrgClients = async () => {
       throw(error);
     }
   };
-  
+
+  // accounted
   // GET single client by ID
   export const getClientById = async (id) => {
     try {
@@ -364,6 +390,7 @@ export const getOrgClients = async () => {
     }
   };
   
+  // accounted
   // GET entries based on search query
 export const searchClients = async (query) => {
   console.log('searchClients query', query)
@@ -387,7 +414,7 @@ export const searchClients = async (query) => {
   }
 };
 
-  
+// not accounted  
   // GET lookup by phone, verify org membership on frontend
   export const lookupClientByPhone = async (phoneNumber, token) => {
     const response = await axios.get(`/api/clients/lookup/${phoneNumber}`, {
@@ -397,7 +424,8 @@ export const searchClients = async (query) => {
     });
     return response.data;
   };
-  
+
+  // accounted
   // POST new client
   export const createClient = async (newClient) => {
     try {
@@ -409,6 +437,7 @@ export const searchClients = async (query) => {
     }
   };
   
+  // accounted
   // PUT update client
   export const updateClient = async (id, updatedClient) => {
     try {
@@ -418,7 +447,8 @@ export const searchClients = async (query) => {
       console.log('updateClient API call error',error)
     }
   };
-  
+
+  // not accounted
   // PUT add existing client to org
   export const registerClient = async (id, token) => {
     const response = await axios.put(`/api/clients/register/${id}`, {}, {
@@ -428,7 +458,8 @@ export const searchClients = async (query) => {
     });
     return response.data;
   };
-  
+
+  // accounted
   // PUT remove existing client from org and all events under that org
   export const deregisterClient = async (id) => {
     try {
@@ -439,7 +470,8 @@ export const searchClients = async (query) => {
       throw (error);
     }
   };
-  
+
+  // not accounted
   // DELETE client by ID
   export const deleteClientById = async (id, token) => {
     const response = await axios.delete(`/api/clients/${id}`, {
@@ -453,6 +485,7 @@ export const searchClients = async (query) => {
 
 // API calls for services
 
+// accounted
 // GET 10 most recent services for org
 export const getOrgRecentServices = async () => {
   try {
@@ -464,7 +497,7 @@ export const getOrgRecentServices = async () => {
   }
 };
 
-
+// accounted
 // GET all active services for org
 export const getActiveServices = async () => {
   try {
@@ -476,6 +509,7 @@ export const getActiveServices = async () => {
   }
 };
   
+// accounted
   // GET single service by ID
   export const getServiceById = async (id) => {
     try {
@@ -487,6 +521,7 @@ export const getActiveServices = async () => {
     }
   };
   
+  // accounted
   // GET services based on search query
   export const searchServices = async (query) => {
     try {
@@ -507,6 +542,7 @@ export const getActiveServices = async () => {
     }
   };
 
+  // accounted
   // POST new service
   export const createService = async (newService) => {
     try {
@@ -517,7 +553,8 @@ export const getActiveServices = async () => {
       throw (error);
     }
   };
-  
+
+  // accounted
   // PUT update service
   export const updateService = async (id, updatedService) => {
     try {
@@ -529,6 +566,7 @@ export const getActiveServices = async () => {
     }
   };
 
+// accounted
 // PUT deactivate service
 export const deactivateService = async (id) => {
   try {
@@ -540,6 +578,7 @@ export const deactivateService = async (id) => {
   }
 };
   
+// not accounted
   // DELETE service by ID
   export const deleteServiceById = async (id, token) => {
     const response = await axios.delete(`/api/services/${id}`, {

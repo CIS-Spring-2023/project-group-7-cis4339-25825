@@ -221,7 +221,13 @@ const routes = [
     path: '/404notfound',
     name: '404notfound',
     component: () => import('../Views/404NotFound.vue')
-  }
+  },
+  //route to error view
+  {
+    path: '/error',
+    name: 'error',
+    component: () => import('../Views/ErrorView.vue')
+  },
 ]
 //create router instance
 const router = createRouter({
