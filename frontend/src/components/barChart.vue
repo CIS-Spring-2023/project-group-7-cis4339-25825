@@ -20,7 +20,7 @@ export default {
     // chartData is the number of attendees for each event
     chartData: {
       type: Array
-    }
+    },
   },
   // called when component is mounted in the DOM
   async mounted() {    
@@ -73,7 +73,7 @@ export default {
         //resize the chart to fit the container element
         responsive: true,
         // maintains aspect ratio of chart when resized
-        maintainAspectRatio: true
+        maintainAspectRatio: true,
       }
     })
   },

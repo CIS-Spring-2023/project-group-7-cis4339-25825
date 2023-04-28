@@ -1,20 +1,17 @@
 <template>
   <main>
-        <!--Section that shows if user is logged in-->
-        <div v-if="userRole">
-      <h1
-        class="font-bold text-4xl text-red-700 tracking-widest text-center mt-10"
-      >
-        Welcome, {{ userName }}
-      </h1>
-      <br />
-      <div
-        class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-x-6 gap-y-10"
-      >
-      <!--Table showing list of events for the user's organization-->
-        <div class="ml-10"></div>
-        <div class="flex flex-col col-span-2">
-          <table class="min-w-full shadow-md rounded">
+<!--Section that shows if user is logged in-->
+<div v-if="userRole">
+  <h1 class="font-bold text-4xl text-red-700 tracking-widest text-center mt-10">
+    Welcome, {{ userName }}
+  </h1>
+  <br />
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+    <div class="col-span-1">
+      <div class="bg-white shadow-lg rounded-lg p-6">
+        <h2 class="text-2xl font-bold mb-4">Recent Events</h2>
+        <div class="mx-auto max-w-lg">
+          <table class="w-full">
             <thead class="bg-gray-50 text-xl">
               <tr class="p-4 text-left">
                 <th class="p-4 text-left">Event Name</th>
@@ -38,38 +35,46 @@
               </tr>
             </tbody>
           </table>
-          <!--Bar chart showing events and the number of attendees per event for all organizations-->
-          <div>
-            <div v-if="labels && chartData">
-                <AttendanceChart
-                :label="labels"
-                :chart-data="chartData"
-                ></AttendanceChart>
-            </div>
-          </div>
-          <div>
-            <div v-if="pieLabels && pieChartData">
-                <clientChart :label="pieLabels" :chart-data="pieChartData"/>
-            </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-span-1">
+      <div class="bg-white shadow-lg rounded-lg p-6">
+        <h2 class="text-2xl font-bold mb-4">Clients by Zip Code</h2>
+        <div class="mx-auto max-w-md">
+          <div v-if="pieLabels && pieChartData">
+            <clientChart :label="pieLabels" :chart-data="pieChartData" />
           </div>
         </div>
       </div>
     </div>
-        <!--Section that shows if user is logged out-->
-        <div v-else>
-      <h1
-        class="font-bold text-4xl text-red-700 tracking-widest text-center mt-10"
-      >
-        Welcome
-      </h1>
-      <br />
-      <div
-        class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-x-6 gap-y-10"
-      >
-      <!--List of Events for all organizations-->
-        <div class="ml-10"></div>
-        <div class="flex flex-col col-span-2">
-          <table class="min-w-full shadow-md rounded">
+    <div class="col-span-2">
+      <div class="bg-white shadow-lg rounded-lg p-6">
+        <h2 class="text-2xl font-bold mb-4">Number of Attendees by Event</h2>
+        <div class="mx-auto max-w-3xl">
+          <div v-if="labels && chartData">
+            <AttendanceChart :label="labels" :chart-data="chartData" />
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+<!--Section that shows if user is logged out-->
+<div v-else>
+  <h1 class="font-bold text-4xl text-red-700 tracking-widest text-center mt-10">
+    Welcome
+  </h1>
+  <br />
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+    <div class="col-span-1">
+      <div class="bg-white shadow-lg rounded-lg p-6">
+        <h2 class="text-2xl font-bold mb-4">Recent Events</h2>
+        <div class="mx-auto max-w-lg">
+          <table class="w-full">
             <thead class="bg-gray-50 text-xl">
               <tr class="p-4 text-left">
                 <th class="p-4 text-left">Event Name</th>
@@ -78,42 +83,51 @@
               </tr>
             </thead>
             <tbody class="divide-y divide-gray-300">
-                <tr
-                    v-for="event in recentEvents"
-                    :key="event._id"
-                    :class="{ 'hoverRow': hoverId === event._id }"
-                    @mouseenter="hoverId = event._id"
-                    @mouseleave="hoverId = null"
-                >
-                    <td class="p-2 text-left">{{ event.name }}</td>
-                    <td class="p-2 text-left">{{ formatDate(event.date) }}</td>
-                    <td class="p-2 text-left">{{ event.attendees.length }}</td>
-                </tr>
+              <tr
+                v-for="event in recentEvents"
+                :key="event._id"
+                :class="{ 'hoverRow': hoverId === event._id }"
+                @mouseenter="hoverId = event._id"
+                @mouseleave="hoverId = null"
+              >
+                <td class="p-2 text-left">{{ event.name }}</td>
+                <td class="p-2 text-left">{{ formatDate(event.date) }}</td>
+                <td class="p-2 text-left">{{ event.attendees.length }}</td>
+              </tr>
             </tbody>
           </table>
-          <!--Bar chart showing events and the number of attendees per event for all organizations-->
-          <div>
-            <div v-if="labels && chartData">
-                <AttendanceChart
-                :label="labels"
-                :chart-data="chartData"
-                ></AttendanceChart>
-            </div>
-            <div v-else>
-                Loading data... (set loading wheel)
-            </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-span-1">
+      <div class="bg-white shadow-lg rounded-lg p-6">
+        <h2 class="text-2xl font-bold mb-4">Clients by Zip Code</h2>
+        <div class="mx-auto max-w-md">
+          <div v-if="pieLabels && pieChartData">
+            <clientChart :label="pieLabels" :chart-data="pieChartData" />
           </div>
-          <div>
-            <div v-if="pieLabels && pieChartData">
-                <clientChart :label="pieLabels" :chart-data="pieChartData"/>
-            </div>
-            <div v-else>
-                Loading data... (set loading wheel)
-            </div>
+          <div v-else>
+            Loading data... (set loading wheel)
           </div>
         </div>
       </div>
     </div>
+    <div class="col-span-2">
+      <div class="bg-white shadow-lg rounded-lg p-6">
+        <h2 class="text-2xl font-bold mb-4">Number of Attendees by Event</h2>
+        <div class="mx-auto max-w-3xl">
+          <div v-if="labels && chartData">
+            <AttendanceChart :label="labels" :chart-data="chartData" />
+          </div>
+          <div v-else>
+            Loading data... (set loading wheel)
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
     <div>
       <LoadingModal v-if="isLoading"></LoadingModal>
     </div>

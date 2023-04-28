@@ -56,8 +56,7 @@
           plugins: {
             // display a title for the pie chart
             title: {
-              display: true,
-              text: 'Clients by Zip Code',
+              display: false,
             },
             // do not show a legend for the pie chart
             legend: {
