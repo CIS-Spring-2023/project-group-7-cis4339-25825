@@ -4,8 +4,11 @@ const authMiddleWare = require('../auth/authMiddleWare');
 
 // importing data model schemas
 const { clients, events } = require('../models/models');
+const { ObjectId } = require('mongodb');
+
 
 // checked
+// accounted
 // Get all clients
 router.get('/all', async (req, res) => {
   try {
@@ -16,6 +19,7 @@ router.get('/all', async (req, res) => {
   }
 });
 
+// accounted
 // Get all clients for org
 router.get('/org', authMiddleWare, async (req, res) => {
   const org = req.user.org;
@@ -34,6 +38,7 @@ router.get('/org', authMiddleWare, async (req, res) => {
 });
 
 // checked
+// accounted
 // GET 10 most recent clients for org
 router.get('/', authMiddleWare, (req, res, next) => {
   const org = req.user.org;
@@ -50,10 +55,15 @@ router.get('/', authMiddleWare, (req, res, next) => {
 });
 
 // checked
+// accounted
 // GET single client by ID
 router.get('/id/:id', authMiddleWare, (req, res, next) => {
   const org = req.user.org;
-  clients.findOne({ _id: req.params.id, orgs: org }, (error, data) => {
+  const query = {
+    _id: { $eq: ObjectId(req.params.id) },
+    orgs: { $eq: org }
+  };
+  clients.findOne(query, (error, data) => {
     if (error) {
       return next(error);
     } else if (!data) {
@@ -64,26 +74,32 @@ router.get('/id/:id', authMiddleWare, (req, res, next) => {
   });
 });
 
+
 // checked
+// accounted
 // GET entries based on search query
 // Ex: '...?firstName=Bob&lastName=&searchBy=name'
 router.get('/search', authMiddleWare, (req, res, next) => {
   const org = req.user.org;
   const dbQuery = { orgs: org };
   let queryArray = [];
+  let regexOptions = 'i';
 
   switch (req.query.searchBy) {
     case 'name':
       if (req.query.firstName) {
-        queryArray.push({ firstName: { $regex: `.*${req.query.firstName}.*`, $options: 'i' } })
+        const firstNameRegex = new RegExp(`.*${req.query.firstName}.*`, regexOptions);
+        queryArray.push({ firstName: { $regex: firstNameRegex } });
       }
       if (req.query.lastName) {
-        queryArray.push({ lastName: { $regex: `.*${req.query.lastName}.*`, $options: 'i' } })
+        const lastNameRegex = new RegExp(`.*${req.query.lastName}.*`, regexOptions);
+        queryArray.push({ lastName: { $regex: lastNameRegex } });
       }
       break;
     case 'number':
       if (req.query.phoneNumber) {
-        queryArray.push({ 'phoneNumber.primary': { $regex: `.*${req.query.phoneNumber}.*`, $options: 'i' } })
+        const phoneNumberRegex = new RegExp(`.*${req.query.phoneNumber}.*`, regexOptions);
+        queryArray.push({ 'phoneNumber.primary': { $regex: phoneNumberRegex } });
       }
       break;
     default:
@@ -99,6 +115,7 @@ router.get('/search', authMiddleWare, (req, res, next) => {
     }
   });
 });
+
 
 
 
@@ -125,6 +142,7 @@ router.get('/lookup/:phoneNumber', authMiddleWare, (req, res, next) => {
 });
 
 // checked
+// accounted
 // POST new client
 router.post('/', authMiddleWare, (req, res, next) => {
   const org = req.user.org;
@@ -142,6 +160,7 @@ router.post('/', authMiddleWare, (req, res, next) => {
 });
 
 // checked
+// accounted
 // PUT update client
 router.put('/update/:id', authMiddleWare, (req, res, next) => {
   clients.findByIdAndUpdate(req.params.id, req.body, (error, data) => {
@@ -174,6 +193,7 @@ router.put('/register/:id', authMiddleWare, (req, res, next) => {
 });
 
 // checked
+// accounted
 // PUT remove existing client from org and all events under that org
 router.put('/deregister/:id', authMiddleWare, async (req, res, next) => {
   const org = req.user.org;

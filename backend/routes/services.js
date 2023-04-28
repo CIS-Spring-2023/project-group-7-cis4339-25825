@@ -5,6 +5,7 @@ const { services } = require('../models/models');
 const authMiddleWare = require('../auth/authMiddleWare');
 
 // checked
+// accounted
 // GET 10 most recent services for org
 router.get('/', authMiddleWare, (req, res, next) => {
   const org = req.user.org;
@@ -20,6 +21,7 @@ router.get('/', authMiddleWare, (req, res, next) => {
     .limit(10);
 });
 
+// accounted
 // GET all active services from org
 router.get('/active', authMiddleWare, (req, res, next) => {
   const org = req.user.org;
@@ -34,6 +36,7 @@ router.get('/active', authMiddleWare, (req, res, next) => {
 });
 
 // checked
+// accounted
 // GET single service by ID
 router.get('/id/:id', authMiddleWare, (req, res, next) => {
   const org = req.user.org;
@@ -49,6 +52,7 @@ router.get('/id/:id', authMiddleWare, (req, res, next) => {
 });
 
 // checked
+// accounted
 // GET entries based on search query
 router.get('/search', authMiddleWare, (req, res, next) => {
   const org = req.user.org;
@@ -73,6 +77,7 @@ router.get('/search', authMiddleWare, (req, res, next) => {
 });
 
 // checked
+// accounted
 // POST new service
 router.post('/', authMiddleWare, (req, res, next) => {
   const org = req.user.org;
@@ -90,6 +95,7 @@ router.post('/', authMiddleWare, (req, res, next) => {
 });
 
 // checked
+// accounted
 // PUT update service
 router.put('/update/:id', authMiddleWare, (req, res, next) => {
   // const org = req.user.org;
@@ -104,6 +110,7 @@ router.put('/update/:id', authMiddleWare, (req, res, next) => {
   });
 });
 
+// accounted
 // PUT soft delete service
 router.put('/deactivate/:id', authMiddleWare, (req, res, next) => {
   const update = { active: false };

@@ -5,6 +5,7 @@ const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const authMiddleWare = require('../auth/authMiddleWare');
 
+// accounted
 router.post('/login', async (req, res) => {
   const { username, password } = req.body;
 
@@ -24,7 +25,7 @@ router.post('/login', async (req, res) => {
       org: user.org,
     };
 
-    const token = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: '24h' });
+    const token = jwt.sign(payload, "1Y%N0`7(?P'MzQAm+lt*+?#$FuRRpF", { expiresIn: '24h' });
     res.json({ token });
   } catch (err) {
     console.error(err);
@@ -36,7 +37,7 @@ router.get('/id/:id', authMiddleWare, (req, res, next) => {
   console.log('router get users by id called')
   users.findOne(
     { _id: req.params.id },
-    { username: 1, role: 1, _id: 0 }, // projection parameter
+    { username: 1, role: 1, _id: 0 },
     (error, data) => {
       if (error) {
         return next(error);
