@@ -1,5 +1,5 @@
 <template>
-  <div class="shadow-lg rounded-lg overflow-hidden">
+  <div class="overflow-hidden">
     <!--the bar chart is created here-->
     <canvas class="p-10" ref="attendanceChart"></canvas>
   </div>

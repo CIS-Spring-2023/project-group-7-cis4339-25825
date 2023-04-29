@@ -1,5 +1,5 @@
 <template>
-  <div class="shadow-lg rounded-lg overflow-hidden">
+  <div class="overflow-hidden">
     <!--the pie chart is created here-->
     <canvas id="myPieChart" class="p-10"></canvas>
   </div>

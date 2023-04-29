@@ -362,10 +362,11 @@ export default {
         },
 
         goBack() {
-          const mainParam = this.$route.query.main;
-          if (mainParam === 'true') {
-            this.$router.push('/findevents')
+          if (this.$route.query.dash) {
+            console.log('dash is true')
+            this.$router.push('/dashboard')
           } else {
+            console.log('regular go back')
             this.$router.back()
           }
         },

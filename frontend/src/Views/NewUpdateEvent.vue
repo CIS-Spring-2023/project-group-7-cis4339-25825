@@ -482,14 +482,17 @@ export default {
         },
 
         goBack() {
-          const mainParam = this.$route.query.main;
-          if (mainParam === 'true') {
+          if (this.$route.query.main) {
+            console.log('main is true')
             this.$router.push('/findevents')
+          } else if (this.$route.query.dash) {
+            console.log('dash is true')
+            this.$router.push('/dashboard')
           } else {
+            console.log('regular go back')
             this.$router.back()
           }
         },
-
         toggleDetails(serviceId) {
           console.log('toggleDetails called')
           if (this.openDescriptions.includes(serviceId)) {
