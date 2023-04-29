@@ -25,7 +25,7 @@ router.post('/login', async (req, res) => {
       org: user.org,
     };
 
-    const token = jwt.sign(payload, "1Y%N0`7(?P'MzQAm+lt*+?#$FuRRpF", { expiresIn: '24h' });
+    const token = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: '24h' });
     res.json({ token });
   } catch (err) {
     console.error(err);
