@@ -1,3 +1,5 @@
+<!-- This component allows a user to update a specific service's information. -->
+
 <template>
     <main>
       <!--Header-->
@@ -121,10 +123,12 @@
           </table>
         </div>
       </div>
+      <!-- Loading modal appears when API calls are being made -->
       <div>
         <LoadingModal v-if="isLoading"></LoadingModal>
       </div>
 
+      <!-- ConfirmModal appears when the user wants to update/delete the service -->
       <Transition name="bounce">
           <ConfirmModal v-if="confirmModal" @close="closeConfirmModal" :title="title" :message="message"/>
       </Transition>
@@ -132,14 +136,19 @@
 </template>
 
 <script>
+//import vuelidate functionalities
 import useVuelidate from '@vuelidate/core'
 import { required } from '@vuelidate/validators'
+// import API calls
 import { getServiceById, getEventsByServiceId, updateService, removeServiceFromOrgEvents, deactivateService } from '../../api/api'
+// import modal components
 import LoadingModal from '../components/LoadingModal.vue'
 import ConfirmModal from '../components/ConfirmModal.vue'
 
 export default {
+  //accept service ID as data from parent components, either "FindClient.vue" or "EventDetails.vue"
     props: ['id'],
+    // allow components
     components: {
         LoadingModal,
         ConfirmModal
@@ -156,7 +165,9 @@ export default {
             events: [],
             // variable stores the ID of the row that the mouse is currently hovering over (to highlight the row red)
             hoverId: null,
+            // variable that determines if loading wheel appears
             isLoading: false,
+            // variable that determines if confirmation modal appears
             confirmModal: false
         }
     },
@@ -168,6 +179,7 @@ export default {
     },
 
     validations() {
+      // validations      
       return {
         service: {
           name: { required },
@@ -176,32 +188,33 @@ export default {
     },
 
     mounted() {
+      // when component is mounted, data is loaded
         this.loadData();
     },
 
     methods: {
+      // method called when component is mounted, loads all the necessary data
         async loadData() {
+          // show loading wheel
           this.isLoading = true;
+          // get service information, and get all events which the service is registered in
             try {
                 const [serviceResponse, eventsResponse] = await Promise.all([
                     getServiceById(this.$route.params.id),
                     getEventsByServiceId(this.$route.params.id),
                 ]);
 
-                console.log('serviceResponse:', serviceResponse);
-                console.log('eventsResponse:', eventsResponse);
-
                 this.service = serviceResponse;
                 this.events = eventsResponse;
 
-                console.log('this.service', this.service);
-                console.log('this.events', this.events);
             } catch (error) {
                 console.log('error loading data', error);
             }
+          // hide loading wheel
           this.isLoading = false;
         },
 
+        // method to format the event dates
         formatDate(date) {
             const isoDate = new Date(date);
             const year = isoDate.getUTCFullYear();
@@ -210,6 +223,7 @@ export default {
             return `${month}/${day}/${year}`;
         },
 
+        // method called when user attempts to update the service -> asks for confirmation
         submitServiceUpdateRequest() {
           // Trigger validation
           this.v$.$validate();
@@ -218,15 +232,23 @@ export default {
             // Form is invalid, do not proceed
             return;
           }
-          // Submit form
+          // If form is valid, ask for confirmation
           this.confirmModal = true
           this.title = 'Please Confirm Update'
           this.message = 'Are you sure you want to update this service?'
         },
 
+        // method called when user attempts to delete the service -> asks for confirmation
+        submitDeleteServiceRequest() {
+          // Submit form
+          this.confirmModal = true
+          this.title = 'Please Confirm Delete'
+          this.message = 'Are you sure you want to delete this service?'
+        },
+
+        // method to close the confirmation modal. If user clicks "yes" when attempting to update/delete the service, then API calls will proceed to update/delete the service
         closeConfirmModal(value) {
             this.confirmModal = false
-            console.log(value)
             if (value === 'yes') {
               if (this.title === 'Please Confirm Update') {                    
                     this.title = '';
@@ -241,28 +263,21 @@ export default {
             }
         },
 
+        // method to make the API call to update the service
         async submitServiceUpdate() {
             try {
                 const response = await updateService(this.$route.params.id, this.service);
-                if (response.success) {
-                    console.log(response.message);
+                if (response.success) {                    
+                    this.$router.push('/findservice?update=true')
                 } else {
                     console.log('Service update failed');
                 }
             } catch (error) {
                 console.log('error updating service', error)
             }
-            this.$router.push('/findservice?update=true')
-          
         },
 
-        submitDeleteServiceRequest() {
-          // Submit form
-          this.confirmModal = true
-          this.title = 'Please Confirm Delete'
-          this.message = 'Are you sure you want to delete this service?'
-        },
-
+        // method to make the API call to soft delete the service. It also makes an API call to remove the service from all events that it is registered in.
         async submitDeleteService() {
           this.isLoading = true;
           try {
@@ -274,8 +289,6 @@ export default {
 
             // Check if both operations were successful
             if (removeResponse.success && deactivateResponse.success) {
-              console.log(removeResponse.message);
-              console.log(deactivateResponse.message);
               this.$router.push('/findservice?delete=true');
             } else {
               console.log('Remove service from events failed or deactivating service failed');
@@ -286,12 +299,12 @@ export default {
           this.isLoading = false;
         },
 
-
         //method called when user clicks on an event row in "List of Events". It pushes the user to "ViewEvent.vue" with the event ID as a parameter so that the user may view the event information, not edit.
         editEvent(eventID) {
             this.$router.push({ name: 'eventdetails', params: { id: eventID } })
         },
 
+        // method called when user clicks the "Go Back" button
         goBack() {
           const mainParam = this.$route.query.main;
           if (mainParam === 'true') {
@@ -305,8 +318,8 @@ export default {
 </script>
 
 <style scoped>
-  .hoverRow {
-    background-color: rgba(255, 0, 0, 0.1);
-    transition: background-color 0.3s ease-in-out;
-  }
+.hoverRow {
+  background-color: rgba(255, 0, 0, 0.1);
+  transition: background-color 0.3s ease-in-out;
+}
 </style>

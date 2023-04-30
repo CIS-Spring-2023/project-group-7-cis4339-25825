@@ -1,3 +1,5 @@
+<!-- This component allows a user to view a specific client's information. This component is only for users with the role "viewer". It does not allow update/delete. -->
+
 <template>
     <main>
       <!--Header-->
@@ -66,7 +68,6 @@
               <input
                 type="email"
                 class="w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
-                pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$"
                 v-model="client.email"
                 style="color: gray; font-style: italic;"
                 disabled
@@ -81,8 +82,7 @@
               <input
                 type="text"
                 class="w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
-                pattern="[0-9]{3}[0-9]{3}[0-9]{4}"
-                v-model="client.phone"
+                v-model="client.phoneNumber.primary"
                 style="color: gray; font-style: italic;"
                 disabled
               />
@@ -95,8 +95,7 @@
               <input
                 type="text"
                 class="w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
-                pattern="[0-9]{3}[0-9]{3}[0-9]{4}"
-                v-model="client.altPhone"
+                v-model="client.phoneNumber.alternate"
                 style="color: gray; font-style: italic;"
                 disabled
               />
@@ -116,7 +115,7 @@
               <input
                 type="text"
                 class="w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
-                v-model="client.address1"
+                v-model="client.address.line1"
                 style="color: gray; font-style: italic;"
                 disabled
               />
@@ -129,7 +128,7 @@
               <input
                 type="text"
                 class="w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
-                v-model="client.address2"
+                v-model="client.address.line2"
                 style="color: gray; font-style: italic;"
                 disabled
                 />
@@ -143,7 +142,7 @@
               <input
                 type="text"
                 class="w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
-                v-model="client.city"
+                v-model="client.address.city"
                 style="color: gray; font-style: italic;"
                 disabled
               />
@@ -157,7 +156,7 @@
               <input
                 type="text"
                 class="w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
-                v-model="client.county"
+                v-model="client.address.county"
                 style="color: gray; font-style: italic;"
                 disabled
               />
@@ -170,7 +169,7 @@
               <input
                 type="text"
                 class="w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
-                v-model="client.zip"
+                v-model="client.address.zip"
                 style="color: gray; font-style: italic;"
                 disabled
               />
@@ -216,17 +215,17 @@
               <tbody class="divide-y divide-gray-300">
                 <!-- allow click through to event details -->
                 <tr
-                  @click="goToEvent(event.id)"
-                  v-for="event in clientEvents"
-                  :key="event.id"
+                  @click="goToEvent(event._id)"
+                  v-for="event in events"
+                  :key="event._id"
                   class="cursor-pointer"
-                  :class="{ 'hoverRow': hoverId === event.id }"
-                  @mouseenter="hoverId = event.id"
+                  :class="{ 'hoverRow': hoverId === event._id }"
+                  @mouseenter="hoverId = event._id"
                   @mouseleave="hoverId = null"
                 >
                   <td class="p-2 text-left">{{ event.name }}</td>
                   <td class="p-2 text-left">
-                    {{ formattedDate(event.date) }}
+                    {{ formatDate(event.date) }}
                   </td>
                 </tr>
               </tbody>
@@ -234,95 +233,104 @@
           </div>
         </div>        
       </div>
+      <!-- Loading modal appears when API calls are being made -->
+      <div>
+        <LoadingModal v-if="isLoading"></LoadingModal>
+      </div>
     </main>
-  </template>
+</template>
 
 <script>
-//import functionalities
-import { DateTime } from 'luxon'
-import { mapState } from 'vuex'
+// import modal component
+import LoadingModal from '../components/LoadingModal.vue'
+// import API calls
+import { getClientById, getClientEvents } from '../../api/api'
 
 export default {
-  //client ID accepted from parent components, either "FindClient.vue" or "ViewEvent.vue"
-  props: ['id'],
-  data() {
-    return {
-      //variable to hold all events that the client is associated with
-      clientEvents: [],    
-      //variable to hold client information  
-      client: {
-        id: null,
-        firstName: '',
-        middleName: '',
-        lastName: '',
-        email: '',
-        phone: '',
-        altPhone: '',
-        address1: '',
-        address2: '',
-        city: '',
-        county: '',
-        zip: ''
-      },
-      // variable stores the ID of the row that the mouse is currently hovering over (to highlight the row red)
-      hoverId: null,
-    }
-  },
-  computed: {
-    //computed states so they can be referenced in code
-    ...mapState(['organizationClients', 'organizationEvents', 'organizationEventClients']),
-  },
-  //when component is mounted
-  mounted() {
-    //scroll to the top
-    window.scrollTo(0, 0)
-    //create temporary variable to store the client ID from the parent component - this.$route.params.id stores the ID as a string so parseInt converts it to a number
-    const clientId_temp = parseInt(this.$route.params.id)
-    //create temporary client variable to store an array of all information for the selected client
-    const client_temp = this.organizationClients.find(e => e.id === clientId_temp)
-    //distribute the temporary client variable to the client variable that the input fields use. This is how the client information is already present in the input fields when the view renders on the page
-    this.client.id = clientId_temp
-    this.client.firstName = client_temp.firstName
-    this.client.middleName = client_temp.middleName
-    this.client.lastName = client_temp.lastName
-    this.client.email = client_temp.email
-    this.client.phone = client_temp.phone
-    this.client.altPhone = client_temp.altPhone
-    this.client.address1 = client_temp.address1
-    this.client.address2 = client_temp.address2
-    this.client.city = client_temp.city
-    this.client.county = client_temp.county
-    this.client.zip = client_temp.zip
-    this.client.eventIds = client_temp.eventIds
-    //set clientEvents to an array containing Event IDs
-    this.clientEvents = this.organizationEventClients
-      .filter(ec => ec.clientIds.includes(this.client.id))
-      .map(ec => ec.eventId)
-    //set clientEvents to hold info on all Events related to Client
-    this.clientEvents = this.organizationEvents.filter(event => this.clientEvents.includes(event.id))
-  },
-  methods: {
-    // better formattedDate function
-    formattedDate(datetimeDB) {
-      const dt = DateTime.fromISO(datetimeDB, {
-        zone: 'utc'
-      })
-      return dt
-        .setZone(DateTime.now().zoneName, { keepLocalTime: true })
-        .toLocaleString()
+  //accept client ID as data from parent components
+    props: ['id'],
+    // allow components
+    components: {
+      LoadingModal,
     },
-    //method called when user clicks on an event row in "Events for Client"
-    goToEvent(eventID) {
-      //push user to "ViewEvent.vue" with the event ID as a parameter, where the user may view the edit information, not edit
-      this.$router.push({ name: 'viewevent', params: { id: eventID } })
-    }
-  }
+    data() {
+        return {
+            //variable to hold all events that the client is associated with
+            events: [],    
+            //variable to hold client information  
+            client: {
+                _id: null,
+                firstName: null,
+                middleName: null,
+                lastName: null,
+                email: null,
+                phoneNumber: {
+                    primary: null,
+                    alternate: null
+                },
+                address: {
+                    line1: null,
+                    line2: null,
+                    city: null,
+                    county: null,
+                    zip: null
+                },
+                orgs: []
+            },
+            // variable stores the ID of the row that the mouse is currently hovering over (to highlight the row red)
+            hoverId: null,
+            // variable that determines when loading wheel appears
+            isLoading: false,
+        }
+    },
+
+    mounted() {
+      // when component is mounted, load the data
+        this.loadData();
+    },
+
+    methods: {
+      // method called when component is mounted -> loads the necessary data
+        async loadData() {
+          // show loading wheel
+          this.isLoading = true;
+          // get client information, and get events that the client is registered in
+            try {
+                const [clientResponse, eventsResponse] = await Promise.all([
+                    getClientById(this.$route.params.id),
+                    getClientEvents(this.$route.params.id),
+                ]);
+
+                this.client = clientResponse;
+                this.events = eventsResponse;
+            } catch (error) {
+                console.log('error loading data:', error)
+            }
+          // hide loading wheel
+          this.isLoading = false;
+        },
+
+        // method called to format the events' dates
+        formatDate(date) {
+            const isoDate = new Date(date);
+            const year = isoDate.getUTCFullYear();
+            const month = String(isoDate.getUTCMonth() + 1).padStart(2, '0');
+            const day = String(isoDate.getUTCDate()).padStart(2, '0');
+            return `${month}/${day}/${year}`;
+        },
+
+        //method called when user clicks on an event row in "Events for Client"
+        goToEvent(eventID) {
+          //push user to "ViewEvent.vue" with the event ID as a parameter, where the user may view the edit information, not edit
+          this.$router.push({ name: 'viewevent', params: { id: eventID } })
+        },
+    },
 }
 </script>
 
 <style scoped>
-  .hoverRow {
-    background-color: rgba(255, 0, 0, 0.1);
-    transition: background-color 0.3s ease-in-out;
-  }
+.hoverRow {
+  background-color: rgba(255, 0, 0, 0.1);
+  transition: background-color 0.3s ease-in-out;
+}
 </style>

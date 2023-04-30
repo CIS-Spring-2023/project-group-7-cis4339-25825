@@ -1,10 +1,12 @@
+<!-- This is the login component. Users can login by entering a correct username and password -->
+
 <template>
     <div>
       <!--Header-->
-      <h1 class="font-bold text-4xl text-red-700 tracking-widest text-center mt-10">Old Login</h1>
+      <h1 class="font-bold text-4xl text-red-700 tracking-widest text-center mt-10">Login</h1>
       <br>
       <!--Form-->
-      <form class="flex flex-col items-center" @submit.prevent="userLogin">
+      <form class="flex flex-col items-center" @submit.prevent="newlogin">
         <!--Username input field-->
         <label class="text-2xl font-bold">
           Username:
@@ -26,38 +28,36 @@
     <forProfessor v-if="showLoginInfo" @close="toggleProfModal"/>
 
     </div>
+    <!-- Loading wheel appears when API calls are being made -->  
+    <div>
+      <LoadingModal v-if="isLoading"></LoadingModal>
+    </div>
 
-    <!--modal component that shows if login was a success-->
-    <div style="display: flex; justify-content: center;">
-      <modalComponent v-if="showLoginSuccess" @close="loginPush">
-        <template v-slot:loginSuccess>
-          Login Success!
-          <p>Hello {{ username }}</p>
-        </template>
-      </modalComponent>
-    </div>
-    <!--modal component that shows if login failed-->
-    <div style="display: flex; justify-content: center;">
-      <modalComponent v-if="showLoginFailed" @close="loginFail">
-        <template v-slot:loginSuccess>
-          Login Failed
-          <p>Please try again</p>
-        </template>
-      </modalComponent>
-    </div>
+      <!-- Modal component that appears when user fails the login -->
+      <Transition name="bounce">
+          <DeleteModal v-if="showLoginFailed" @close="closeDeleteModal" :title="title" :message="message" />
+      </Transition>
 </template>
 
 <script>
-//import functionalities
+//import Vuex functionality to calls actions from store
 import { mapActions } from 'vuex'
+// import API calls
+import { loginUser } from '../../api/api'
+// import JSON Web Token decoder to decode the token into the user's information
+import jwt_decode from 'jwt-decode';
+// import modal components
 import forProfessor from '../components/forProfessor.vue'
-import modalComponent from '../components/modalComponent.vue'
+import LoadingModal from '../components/LoadingModal.vue'
+import DeleteModal from '../components/DeleteModal.vue'
+
 
 export default {
   //allow components
   components: {
     forProfessor,
-    modalComponent
+    LoadingModal,
+    DeleteModal
   },
   data() {
     return {
@@ -74,43 +74,54 @@ export default {
       //variable to hold user's organization data
       organization: null,
       //variable to hold user's information
-      user: null
+      user: null,
+      // variable that determines if loading wheel appears
+      isLoading: false,
+      title: '',
+      message: ''
     }
   },
   methods: {
-    //import actions from /store/index.js so they can be referenced in code
-    ...mapActions(['login', 'initializeUser']),
-    //method called when user attempts to login
-      async userLogin() {
-        //call the "login" action from /store/index.js to attempt to login the user - checks to see if username and password are correct
-        const { success, organization, user } = await this.login({ username: this.username, password: this.password })
-        //if username and password are correct
-        if (success) {
-          //show modal component that displays login success
-          this.showLoginSuccess = true
-          //set organization variable to hold the user's organization's data to pass to the "initializeUser" action
-          this.organization = organization
-          //set user variable to hold the user's information to pass to "initializeUser" action
-          this.user = user
-        //if username and password are incorrect
-        } else {
-          //show modal component that displays login failure
-          this.showLoginFailed = true
+    // allow Vuex action of "fetchUserData" to be referenced in code
+    ...mapActions(['fetchUserData']),
+    // method called when user attempts to login
+    async newlogin() {
+        // show loading wheel
+        this.isLoading = true;
+        // make API call to loginUser
+        try {
+            const token = await loginUser(this.username, this.password);
+            
+            // Get the user's ID from the JWT token
+            const decodedToken = jwt_decode(token);
+            const userId = decodedToken.id;
+            const orgId = decodedToken.org;
+
+            // Fetch the user data and org name
+            try {
+                await this.$store.dispatch('fetchUserData', { userId, orgId, token });
+                this.$router.push('/dashboard?success=true')
+            } catch (error) {
+                this.showLoginFailed = true
+                this.title = 'Login Failed';
+                this.message = 'Invalid username or password';
+            }
+        } catch (error) {          
+            this.showLoginFailed = true;
+            this.title = 'Login Failed';
+            this.message = 'Invalid username or password';
         }
-      },
-      //when modal component that displays login success emits a 'close' event, this method is called.
-      async loginPush() {
-        //call the "initializeUser" action from /store/index.js which assigns the user's organization data as states
-        await this.initializeUser({ organization: this.organization, user: this.user }) 
-        //push the user to the dashboard   
-        this.$router.push('/dashboard')
-      },
-    //when modal component that displays login failure emits a 'close' event, this method is called
-    loginFail() {
-      //stop showing the modal component
-      this.showLoginFailed = false
+        this.isLoading = false;
     },
-    //method called when professor/ta clicks the login info button
+
+    // method to close the modal that appears when user fails to login
+    closeDeleteModal() {
+      this.showLoginFailed = false;
+      this.title = '';
+      this.message = '';
+    },
+
+    //method called when professor/TA clicks the login info button
     toggleProfModal() {
       this.showLoginInfo = !this.showLoginInfo
     }

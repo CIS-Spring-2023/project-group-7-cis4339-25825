@@ -1,5 +1,7 @@
+<!-- This component allows for the creation of a new service -->
+
 <template>
-    <main>
+      <main>
       <!--Header-->
       <h1
         class="font-bold text-4xl text-red-700 tracking-widest text-center mt-10"
@@ -24,16 +26,11 @@
                   type="text"
                   class="w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
                   v-model="service.name"
+                  :disabled="confirmModal"
                 />
-                <!--Show errors, if any-->
-                <span class="text-black" v-if="v$.service.name.$error">
-                  <p
-                    class="text-red-700"
-                    v-for="error of v$.service.name.$errors"
-                    :key="error.$uid"
-                  >
-                    {{ error.$message }}!
-                  </p>
+                <!-- Validation error messages -->
+                <span v-if="v$.service.name.$error" class="text-red-500">
+                  Service Name is required
                 </span>
               </label>
             </div>
@@ -42,22 +39,8 @@
             <div class="flex flex-col">
             <label>
               <span class="text-gray-700">Description:</span>
-              <textarea class="w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50" v-model="service.description"></textarea>
+              <textarea class="w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50" v-model="service.description" :disabled="confirmModal"></textarea>
             </label>
-            </div>
-  
-            <!--Active Status checkbox-->
-            <div class="flex flex-col">
-              <label>
-                  <span class="text-gray-700">Active </span>
-                  <input 
-                      type="checkbox"
-                      class="rounded border-gray-300 text-indigo-600 shadow-sm focus:border-indigo-300 focus:ring focus:ring-offset-0 focus:ring-indigo-200 focus:ring-opacity-50"
-                      checked
-                      v-model="service.active"
-                      >
-              </label>
-  
             </div>
            
           </div>
@@ -68,88 +51,126 @@
           >
             <!-- Add Service submit button -->
             <div class="flex justify-between mt-10 mr-20">
-              <button class="bg-red-700 text-white rounded" type="submit">
+              <button class="bg-red-700 text-white rounded" type="submit" :disabled="confirmModal">
                 Add Service
               </button>
             </div>
           </div>
         </form>
       </div>
-
-      <!--Modal Component that appears when service is created-->
-      <div v-if="showServiceCreatedModal">
-        <modalComponent @close="serviceCreatedPush">
-          <template v-slot:serviceCreatedSlot>
-            Service Created!
-            <p>Redirecting...</p>
-          </template>
-        </modalComponent>
+      <!-- Loading wheel appears when API calls are being made -->
+      <div>
+        <LoadingModal v-if="isLoading"></LoadingModal>
       </div>
-    </main>
-  </template>
+
+      <!-- Confirmation modal appears when user attempts to create a new service -->
+      <Transition name="bounce">
+          <ConfirmModal v-if="confirmModal" @close="closeConfirmModal" :title="title" :message="message"/>
+      </Transition>
+    </main>    
+</template>
 
 <script>
-//import functionalities
+// import vuelidate validations
 import useVuelidate from '@vuelidate/core'
 import { required } from '@vuelidate/validators'
+// import functionality to reference session states
 import { mapState } from 'vuex'
-import modalComponent from '../components/modalComponent.vue'
+// Import API calls
+import { createService } from '../../api/api'
+// Import modal components
+import LoadingModal from '../components/LoadingModal.vue'
+import ConfirmModal from '../components/ConfirmModal.vue'
 
 export default {
-  setup() {
-    //setup vuelidate
-    return { v$: useVuelidate({ $autoDirty: true }) }
-  },
-  //allow modal component
+  // allow modal components
   components: {
-    modalComponent
+      LoadingModal,
+      ConfirmModal
   },
-  data() {
-    return {
-      //variable to hold new service information
-      service: {
-        id: null,
-        name: '',
-        description: '',
-        active: true,
-      },
-      //variable that determines if modal component appears
-      showServiceCreatedModal: false
-    }
-  },
-  computed: {
-    //computed states so I can refer to them in code
-    ...mapState(['organizationId', 'organizationServices'])
-  },
-  methods: {
-    //method called when user clicks "Add Service" button
-    async handleSubmitForm() {
-      // Checks to see if there are any errors in validation
-      const isFormCorrect = await this.v$.$validate()
-      // If no errors found. isFormCorrect = True then the form is submitted
-      if (isFormCorrect) {
-        //assign service ID
-        this.service.id = Math.max(...this.organizationServices.map(service => service.id)) + 1;
-        // call the mutation "addService" in /store/index.js, which will add a new service the organization's services
-        this.$store.commit('addService', { organizationId: this.organizationId, service: this.service });
-        //show modal component displaying that a service was created
-        this.showServiceCreatedModal = true        
+    data() {
+        return {
+            //variable to hold new service information
+            service: {
+                name: null,
+                description: null,
+                active: true,
+            },
+            // variable that determines if loading wheel appears
+            isLoading: false,
+            // variable that determines if confirmation modal appears
+            confirmModal: false,
+        }
+    },
 
+    computed: {
+      //computed states so they can be referenced in code
+        ...mapState(['role'])
+    },
+
+    setup() {
+      // Register Vuelidate
+      const v$ = useVuelidate();
+      return { v$ };
+    },
+
+    validations() {
+      // validations for service
+      return {
+        service: {
+          name: { required },
+        }
       }
     },
-    //when modal component emits a 'close' event, this method is called. It will push the user to "FindService.vue"
-    serviceCreatedPush() {
-      this.showServiceCreatedModal = false
-      this.$router.push('/findservice')
+
+    methods: {
+      // method called when user attempts to create new service
+        async handleSubmitForm() {
+          // Trigger validation
+          this.v$.$validate();
+
+          if (this.v$.$error) {
+            // Form is invalid, do not proceed
+            return;
+          }
+
+          // If form is valid, ConfirmModal will appear asking for confirmation
+          this.confirmModal = true
+          this.title = 'Please Confirm Creation'
+          this.message = 'Are you sure you want to create this service?'
+        },
+
+        // method called when ConfirmModal closes. If user clicked "yes" then the service creation will proceed
+        closeConfirmModal(value) {
+            this.confirmModal = false
+            this.title = ''
+            this.message = ''
+            if (value === 'yes') {
+                this.registerService();
+            }
+        },
+
+        // method called when user clicks "yes" in the ConfirmModal. API call to create new service is made.
+        async registerService() {
+          this.isLoading = true;
+          try {
+              const response = await createService(this.service);
+              if (response.success) {
+                      this.$router.push('/findservice?success=true')
+                  } else {
+                      console.log('Event creation failed');
+                  }
+          } catch (error) {
+              console.log('Error creating new service:', error)
+          }
+          this.isLoading = false;
+        }
     }
-  },
-  // sets validations for the various data properties
-  validations() {
-    return {
-      service: {
-        name: { required }
-      }
-    }
-  }
+
+
 }
 </script>
+
+<style>
+
+</style>

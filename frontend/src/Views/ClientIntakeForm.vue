@@ -1,5 +1,7 @@
+<!-- This is the component that allows for the creation of a new client -->
+
 <template>
-    <main>
+      <main>
       <!--Header-->
       <h1
         class="font-bold text-4xl text-red-700 tracking-widest text-center mt-10"
@@ -9,7 +11,7 @@
       <div class="px-10 py-20">
         <!-- form field -->
         <!-- @submit.prevent stops the submit event from reloading the page-->
-        <form @submit.prevent="registerClient">
+        <form @submit.prevent="submitForm">
           <!-- grid container -->
           <div
             class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-x-6 gap-y-10"
@@ -24,18 +26,13 @@
                   type="text"
                   class="w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
                   v-model="client.firstName"
+                  :disabled="confirmModal"
                 />
-                <!--Errors will show, if any-->
-                <span class="text-black" v-if="v$.client.firstName.$error">
-                  <p
-                    class="text-red-700"
-                    v-for="error of v$.client.firstName.$errors"
-                    :key="error.$uid"
-                  >
-                    {{ error.$message }}!
-                  </p>
-                </span>
               </label>
+              <!-- Validation error messages -->
+              <span v-if="v$.client.firstName.$error" class="text-red-500">
+                First Name is required
+              </span>
             </div>
   
             <!--Middle Name Input Field-->
@@ -47,6 +44,7 @@
                   class="w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
                   placeholder
                   v-model="client.middleName"
+                  :disabled="confirmModal"
                 />
               </label>
             </div>
@@ -61,18 +59,13 @@
                   class="w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
                   placeholder
                   v-model="client.lastName"
+                  :disabled="confirmModal"
                 />
-                <!--Errors will show, if any-->
-                <span class="text-black" v-if="v$.client.lastName.$error">
-                  <p
-                    class="text-red-700"
-                    v-for="error of v$.client.lastName.$errors"
-                    :key="error.$uid"
-                  >
-                    {{ error.$message }}!
-                  </p>
-                </span>
               </label>
+              <!-- Validation error messages -->
+              <span v-if="v$.client.lastName.$error" class="text-red-500">
+                Last Name is required
+              </span>
             </div>
   
             <div></div>
@@ -80,23 +73,18 @@
             <div class="flex flex-col">
               <label class="block">
                 <span class="text-gray-700">Email</span>
+                <span style="color: #ff0000">*</span>
                 <input
                   type="email"
                   class="w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
-                  pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$"
                   v-model="client.email"
+                  :disabled="confirmModal"
                 />
-                <!--Errors will show, if any-->
-                <span class="text-black" v-if="v$.client.email.$error">
-                  <p
-                    class="text-red-700"
-                    v-for="error of v$.client.email.$errors"
-                    :key="error.$uid"
-                  >
-                    {{ error.$message }}!
-                  </p>
-                </span>
               </label>
+              <!-- Validation error messages -->
+              <span v-if="v$.client.email.$error" class="text-red-500">
+                Valid Email is required
+              </span>
             </div>
             <!-- Phone Number Input Field -->
             <div class="flex flex-col">
@@ -107,23 +95,24 @@
                   type="text"
                   class="w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
                   pattern="[0-9]{3}[0-9]{3}[0-9]{4}"
-                  v-model="client.phone"
+                  v-model="client.phoneNumber.primary"
+                  :disabled="confirmModal"
                 />
-                <!--Errors will show, if any-->
-                <span
-                  class="text-black"
-                  v-if="v$.client.phone.$error"
-                >
-                  <p
-                    class="text-red-700"
-                    v-for="error of v$.client.phone.$errors"
-                    :key="error.$uid"
-                  >
-                    {{ error.$message }}!
-                  </p>
-                </span>
               </label>
+              <!-- Validation error messages -->
+              <span v-if="v$.client.phoneNumber.primary.$error" class="text-red-500">
+                <span v-if="v$.client.phoneNumber.primary.required.$invalid">
+                  Phone Number is required
+                </span>
+                <span v-else-if="!v$.client.phoneNumber.primary.required.$invalid && v$.client.phoneNumber.primary.numeric.$invalid">
+                  Phone Number must contain only digits
+                </span>
+                <span v-else-if="!v$.client.phoneNumber.primary.required.$invalid && !v$.client.phoneNumber.primary.numeric.$invalid && (v$.client.phoneNumber.primary.minLength.$invalid || v$.client.phoneNumber.primary.maxLength.$invalid)">
+                  Phone Number must be exactly 10 digits
+                </span>
+              </span>
             </div>
+
             <!-- Alternative Phone Number Input Field -->
             <div class="flex flex-col">
               <label class="block">
@@ -132,7 +121,8 @@
                   type="text"
                   class="w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
                   pattern="[0-9]{3}[0-9]{3}[0-9]{4}"
-                  v-model="client.altPhone"
+                  v-model="client.phoneNumber.alternate"
+                  :disabled="confirmModal"
                 />
               </label>
             </div>
@@ -150,10 +140,11 @@
                 <input
                   type="text"
                   class="w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
-                  v-model="client.address1"
+                  v-model="client.address.line1"
                 />
               </label>
             </div>
+
             <!-- Address 2 Input Field -->
             <div class="flex flex-col">
               <label class="block">
@@ -161,10 +152,11 @@
                 <input
                   type="text"
                   class="w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
-                  v-model="client.address2"
+                  v-model="client.address.line2"
                 />
               </label>
             </div>
+
             <!-- City Input Field -->
             <div class="flex flex-col">
               <label class="block">
@@ -173,21 +165,16 @@
                 <input
                   type="text"
                   class="w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
-                  v-model="client.city"
+                  v-model="client.address.city"
                 />
-                <!--Errors will show, if any-->
-                <span class="text-black" v-if="v$.client.city.$error">
-                  <p
-                    class="text-red-700"
-                    v-for="error of v$.client.city.$errors"
-                    :key="error.$uid"
-                  >
-                    {{ error.$message }}!
-                  </p>
-                </span>
               </label>
+              <!-- Validation error messages -->
+              <span v-if="v$.client.address.city.$error" class="text-red-500">
+                City is required
+              </span>
             </div>
             <div></div>
+
             <!-- County Input Field -->
             <div class="flex flex-col">
               <label class="block">
@@ -195,10 +182,11 @@
                 <input
                   type="text"
                   class="w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
-                  v-model="client.county"
+                  v-model="client.address.county"
                 />
               </label>
             </div>
+
             <!-- Zip Code Input Field -->
             <div class="flex flex-col">
               <label class="block">
@@ -206,136 +194,159 @@
                 <input
                   type="text"
                   class="w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
-                  v-model="client.zip"
+                  v-model="client.address.zip"
                 />
               </label>
             </div>
             <div></div>
+
             <!-- Add Client Submit Button -->
             <div class="flex justify-between mt-10 mr-20">
-              <button class="bg-red-700 text-white rounded" type="submit">
+              <button class="bg-red-700 text-white rounded" type="submit" :disabled="confirmModal">
                 Add Client
               </button>
             </div>
           </div>
         </form>
       </div>
+      <!-- Loading modal appears when API calls are being made -->
+      <div>
+        <LoadingModal v-if="isLoading"></LoadingModal>
+      </div>
 
-      <!--Modal component that appears if phone number is already registered-->
-      <div v-if="showClientRegisteredModal" >
-        <modalComponent @close="clientAlreadyRegisteredPush">
-          <template v-slot:clientRegisteredSlot>
-            Client Phone # Already Registered
-            <p>Please try again</p>
-          </template>
-        </modalComponent>
-      </div>
-      <!--Modal component that appears when client is created-->
-      <div v-if="showClientAddedModal">
-        <modalComponent @close="clientAddedPush">
-          <template v-slot:clientAddedSlot>
-            Client Added!
-            <p>Redirecting...</p>
-          </template>
-        </modalComponent>
-      </div>
+      <!-- ConfirmModal appears when the user wants to create the new client -->
+      <Transition name="bounce">
+          <ConfirmModal v-if="confirmModal" @close="closeConfirmModal" :title="title" :message="message"/>
+      </Transition>
+
     </main>
-  </template>
-  
+</template>
 
 <script>
-//import functionalities
+//import functionalities for validation
 import useVuelidate from '@vuelidate/core'
-import { required, email, alpha, numeric } from '@vuelidate/validators'
+import { required, email, numeric, minLength, maxLength } from '@vuelidate/validators'
+// import functionality to reference session states
 import { mapState } from 'vuex'
-import modalComponent from '../components/modalComponent.vue'
+// import API calls
+import { createClient } from '../../api/api'
+// import modal components
+import LoadingModal from '../components/LoadingModal.vue'
+import ConfirmModal from '../components/ConfirmModal.vue'
+
 
 export default {
-  // allow modal component
+  // allow modal components
   components: {
-    modalComponent
-  },
-  // setup vuelidate
-  setup() {
-    return { v$: useVuelidate({ $autoDirty: true }) }
+      LoadingModal,
+      ConfirmModal
   },
   data() {
-    return {
-      //client variable to hold new client information
-      client: {
-        id: null,
-        firstName: '',
-        middleName: '',
-        lastName: '',
-        email: '',
-        phone: '',
-        altPhone: '',
-        address1: '',
-        address2: '',
-        city: '',
-        county: '',
-        zip: ''
-      },
-      //variables that determines if modal components appears
-      showClientRegisteredModal: false,
-      showClientAddedModal: false
-    }
-  },
-  computed: {
-    // setup computed property "organizationClients" so it can be referenced in code - it holds all the clients of the user's organization
-    ...mapState(['organizationClients'])
-  },
-  mounted() {
-    // scroll the top of the screen when component is mounted
-    window.scrollTo(0, 0)
-  },
-  methods: {
-    // method called when "Add Client" submit button is pressed
-    registerClient() {
-      // validation check
-      this.v$.$validate().then((valid) => {
-        // if no validation errors
-        if (valid) {
-          //this checks if the phone number already exists is organizationClients
-            if (this.organizationClients.some(client => client.phone === this.client.phone)){
-              //show the modal component stating that the client's phone number already exists
-                this.showClientRegisteredModal = true
-            }
-            // if phone number does not already exist, then a new client is added
-            else {
-              // assign new client ID
-                this.client.id = Math.max(...this.organizationClients.map(client => client.id)) + 1;
-                //call the "addClient" mutation in 'store/index.js' to add a client with the new client information
-                this.$store.commit('addClient', this.client)
-                // show the client added modal component
-                this.showClientAddedModal = true
-            }
-        }        
-        //nothing occurs if form is not validated - vuelidate will already show errors below the input fields
-      })
-    },
-    // when modal component showing that the phone number is already registered emits a 'close' event, this method is called, which pushes the user to "FindClient.vue"
-    clientAlreadyRegisteredPush() {
-      this.showClientRegisteredModal = false
-      this.$router.push('/findclient')
-    },
-    // when modal component showing that client has been added emits a 'close' event, this method is called. It pushes the user to "FindClient.vue"
-    clientAddedPush() {
-      this.clientAdded = false
-      this.$router.push('/findclient')
-    }
-  },
-  // sets validations for the various data properties
-  validations() {
-    return {
-      client: {
-        firstName: { required, alpha },
-        lastName: { required, alpha },
-        email: { email },
-        city: { required },
-        phone: { required, numeric }
+      return {
+          //client variable to hold new client information
+          client: {
+              _id: null,
+              firstName: null,
+              middleName: null,
+              lastName: null,
+              email: null,
+              phoneNumber: {
+                  primary: null,
+                  alternate: null
+              },
+              address: {
+                  line1: null,
+                  line2: null,
+                  city: null,
+                  county: null,
+                  zip: null
+              },
+          },
+          // variable that determines if LoadingModal appears
+          isLoading: false,
+          // variable that determines if ConfirmModal appears
+          confirmModal: false
       }
-    }
+  },
+
+  computed: {
+      //computed states so they can be referenced in code
+      ...mapState(['role'])
+  },
+
+  setup() {
+    // Register Vuelidate
+    const v$ = useVuelidate();
+    return { v$ };
+  },
+
+  validations() {
+    // validations for client
+    return {
+      client: {
+        firstName: { required },
+        lastName: { required },
+        email: { required, email },
+        phoneNumber: {
+          primary: {
+            required,
+            numeric,
+            minLength: minLength(10),
+            maxLength: maxLength(10),
+          },
+        },
+        address: {
+          city: { required },
+        },
+      },
+    };
+  },
+
+  methods: {
+    // method called when user submits the form
+      submitForm() {
+        // Trigger validation
+        this.v$.$validate();
+
+        if (this.v$.$error) {
+          // Form is invalid, do not proceed
+          return;
+        }
+        // If form is valid, make ConfirmModal appear to confirm the creation
+        this.confirmModal = true
+        this.title = 'Please Confirm Creation'
+        this.message = 'Are you sure you want to create this client?'
+      },
+
+      // method called when the ConfirmModal closes. If user clicked "yes" then client creation will proceed. 
+      closeConfirmModal(value) {
+          this.confirmModal = false
+          this.title = ''
+          this.message = ''
+          if (value === 'yes') {
+              this.registerClient();
+          }
+      },
+
+      // method to make the axios call to create the new client
+      async registerClient() {
+        this.isLoading = true;
+        try {
+            const response = await createClient(this.client);
+            if (response.success) {
+                this.$router.push('/findclient?success=true')
+            } else {
+                console.log('Client creation failed');
+            }
+        } catch (error) {
+            console.log('Error registering client', error)
+        }
+        this.isLoading = false;
+      },
   }
 }
 </script>
+
+<style>
+
+</style>

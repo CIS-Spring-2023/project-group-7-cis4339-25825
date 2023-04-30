@@ -1,3 +1,5 @@
+<!-- This component shows a list of active services. Users can search for services and click on a service to be redirected to another component that displays the service's details -->
+
 <template>
     <main>
       <div>
@@ -41,7 +43,7 @@
               <input
                 type="text"
                 class="w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
-                v-model="desc"
+                v-model="description"
                 v-on:keyup.enter="handleSubmitForm"
                 placeholder="Enter service description"
               />
@@ -57,7 +59,7 @@
             <!--Clear Search button-->
             <button
               class="mr-10 border border-red-700 bg-white text-red-700 rounded"
-              @click="clearSearch"
+              @click="loadData"
               type="submit"
             >
               Clear Search
@@ -83,8 +85,8 @@
         <div class="ml-10">
           <h2 class="text-2xl font-bold">List of Services</h2>
           <h3 class="italic">
-            <span v-if="userRole === 'editor'">Click table row to edit/display an entry</span>
-            <span v-if="userRole === 'viewer'">Click table row to display an entry</span>
+            <span v-if="role === 'editor'">Click table row to edit/display an entry</span>
+            <span v-if="role === 'viewer'">Click table row to display an entry</span>
           </h3>
         </div>
         <div class="flex flex-col col-span-2">
@@ -97,12 +99,12 @@
             </thead>
             <tbody class="divide-y divide-gray-300">
               <tr
-                @click="editService(service.id)"
-                v-for="service in servicesList"
-                :key="service.id"
+                @click="editService(service._id)"
+                v-for="service in services"
+                :key="service._id"
                 class="cursor-pointer"
-                :class="{ 'hoverRow': hoverId === service.id }"
-                @mouseenter="hoverId = service.id"
+                :class="{ 'hoverRow': hoverId === service._id }"
+                @mouseenter="hoverId = service._id"
                 @mouseleave="hoverId = null"
               >
                 <td class="p-4 text-left">{{ service.name }}</td>
@@ -112,72 +114,198 @@
           </table>
         </div>
       </div>
+
+      <!-- Loading wheel appears when API calls are being made -->
+      <div>
+        <LoadingModal v-if="isLoading"></LoadingModal>
+      </div>
+
+      <!-- Success modal appears after a new service is created -->
+      <Transition name="bounce">
+          <SuccessModal v-if="successModal" @close="closeSuccessModal" :title="title" :message="message" />
+      </Transition>
+
+      <!-- Update modal appears after a service is updated -->
+      <Transition name="bounce">
+          <UpdateModal v-if="updateModal" @close="closeUpdateModal" :title="title" :message="message" />
+      </Transition>
+
+      <!-- Update modal appears after a service is deleted -->
+      <Transition name="bounce">
+          <DeleteModal v-if="deleteModal" @close="closeDeleteModal" :title="title" :message="message" />
+      </Transition>
+
     </main>
-  </template>
+</template>
 
 <script>
-//import functionalities
+// Import functionality to reference session states
 import { mapState } from 'vuex'
+// Import API calls
+import { getOrgRecentServices, searchServices } from '../../api/api'
+// Import modal components
+import LoadingModal from '../components/LoadingModal.vue'
+import SuccessModal from '../components/SuccessModal.vue'
+import UpdateModal from '../components/UpdateModal.vue'
+import DeleteModal from '../components/DeleteModal.vue'
 
 export default {
-  data() {
-    return {
-      //variable to hold the services for the organization
-      servicesList: [],
-      // Parameters for search to occur
-      searchBy: '',
-      name: '',
-      desc: '',
-      // variable stores the ID of the row that the mouse is currently hovering over (to highlight the row red)
-      hoverId: null,
-    }
+  // allow modal components
+  components: {
+      LoadingModal,
+      SuccessModal,
+      UpdateModal,
+      DeleteModal
   },
-  computed: {
-    //computed states so they can be referenced in code
-    ...mapState(['organizationServices', 'userRole'])
-  },
-  //when component is mounted, setServicesList is called
-  mounted() {
-    this.setServicesList() 
-  },
-  methods: {
-    //method called when component is mounted, it sets the "servicesList" variable to the "organizationServices" state, which holds all services and their information for the organization
-    setServicesList() {
-        this.servicesList = this.organizationServices
-    },
-    //method called when user searches for services with criteria
-    handleSubmitForm() {
-      //if user searched by service name
-        if (this.searchBy === 'Service Name') {
-          //filter the services list by service name
-            this.servicesList = this.organizationServices.filter((service) => service.name.toLowerCase().includes(this.name.toLowerCase()));
-        } 
-        //if user searched by service description
-        else if (this.searchBy === 'Service Description') {
-            //filter the services list by service description
-            this.servicesList = this.organizationServices.filter((service) => service.description.toLowerCase().includes(this.desc.toLowerCase()));
+    data() {
+        return {
+            //variable to hold the services for the organization
+            services: null,
+            // Parameters for search to occur
+            searchBy: null,
+            name: null,
+            description: null,
+            // variable stores the ID of the row that the mouse is currently hovering over (to highlight the row red)
+            hoverId: null,
+            // variable that determines if Loading wheel appears
+            isLoading: false,
+            // variable to check if the component has already been mounted - this is so that any modal components do not reappear after the user searches for a service
+            alreadyMounted: false,
+            // variable that determines if the SuccessModal appears
+            successModal: false,
+            // variable that determines if the UpdateModal appears
+            updateModal: false,
+            // variable that determines if the DeleteModal appears
+            deleteModal: false,
+            // title and message variables to be shown in the modal components
+            title: "",
+            message: ""
         }
     },
-    //method called when user clicks "Clear Search" button
-    clearSearch() {
-      // Resets all the variables
-      this.searchBy = ''
-      this.name = ''
-      this.desc = ''
-      this.setServicesList()
+
+    computed: {
+        //computed states so they can be referenced in code
+        ...mapState(['role'])
     },
-    //method called when user clicks on a service row in the "List of Services" section
-    editService(serviceID) {
-      //if user has the role "editor", they will be pushed to "ServiceDetails.vue" with the service ID as a parameter, where they may view and edit the selected service.
-      if (this.userRole === 'editor') {
-        this.$router.push({ name: 'servicedetails', params: { id: serviceID } })
-      }
-      //if user has the role "viewer", they will be pushed to "ViewService.vue" with the service ID as a parameter, where they may only view the service information, not edit.
-      else if (this.userRole === 'viewer') {
-        this.$router.push({ name: 'viewservice', params: { id: serviceID } })
-      }
-    }
-  }
+
+    mounted() {
+      // when component is mounted, load the data
+        this.loadData();
+    },
+
+    methods: {
+      // method called when component is mounted
+        async loadData() {
+                // Resets all the variables
+                this.searchBy = ''
+                this.name = ''
+                this.description = ''
+                
+                // loading wheel appears
+                this.isLoading = true;
+                // get list of services
+                try {
+                    const response = await getOrgRecentServices();
+                    this.services = response;
+                } catch (error) {
+                    console.log('loadData error', error)
+                }
+                // loading wheel disappears
+                this.isLoading = false;
+
+                // show modal components
+                if (!this.alreadyMounted) {
+                  const query = new URLSearchParams(this.$route.query);
+                  // show SuccessModal
+                  if (query.get('success') === 'true') {
+                      this.successModal = true;
+                      this.title = "Success!"
+                      this.message = "Service successfully created"
+                  }
+                  // show UpdateModal
+                  if (query.get('update') === 'true') {                      
+                      this.updateModal = true;
+                      this.title = "Updated!"
+                      this.message = "Service successfully updated."
+                  }
+                  // show DeleteModal
+                  if (query.get('delete') === 'true') {                      
+                      this.deleteModal = true;
+                      this.title = "Deleted!"
+                      this.message = "Service successfully deleted."
+                  }
+                  this.alreadyMounted = true;
+                }
+
+            },
+
+            // method called when user searches for a service
+            async handleSubmitForm() {
+              // if user searches by service name
+                if (this.searchBy === 'Service Name') {
+                    if (this.name) {
+                      try {
+                          const query = {
+                              searchBy: 'name',
+                              name: this.name
+                          }
+                          const response = await searchServices(query)
+                          this.services = response;
+                      } catch (error) {
+                          console.error('Error searching services:', error)
+                      }
+                    }
+                // if user searches by service description
+                } else if (this.searchBy === 'Service Description') {
+                    if (this.description) {
+                        try {
+                            const query = {
+                                searchBy: 'description',
+                                description: this.description
+                            }
+                            const response = await searchServices(query)
+                            this.services = response;
+                        } catch (error) {
+                            console.error('Error searching services:', error)
+                        }
+                    }
+                }
+            },
+
+            //method called when user clicks on a service row in the "List of Services" section
+            editService(serviceID) {
+              //if user has the role "editor", they will be pushed to "ServiceDetails.vue" with the service ID as a parameter, where they may view and edit the selected service.
+              if (this.role === 'editor') {
+                this.$router.push({ name: 'servicedetails', params: { id: serviceID }, query: { main: true } })
+              }
+              //if user has the role "viewer", they will be pushed to "ViewService.vue" with the service ID as a parameter, where they may only view the service information, not edit.
+              else if (this.role === 'viewer') {
+                this.$router.push({ name: 'viewservice', params: { id: serviceID } })
+              }
+            },
+
+        // method to close SuccessModal
+        closeSuccessModal() {
+          this.successModal = false;
+          this.title = '';
+          this.message = '';
+        },
+
+        // method to close UpdateModal
+        closeUpdateModal() {
+          this.updateModal = false;
+          this.title = '';
+          this.message = '';
+        },
+
+        // method to close DeleteModal
+        closeDeleteModal() {
+          this.deleteModal = false;
+          this.title = '';
+          this.message = '';
+        },
+
+    },
 }
 </script>
 

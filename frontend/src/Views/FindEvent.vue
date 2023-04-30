@@ -1,5 +1,7 @@
+<!-- This component displays a list of events. Users can search for events, and click on an event to be redirected to another component to view that event's details -->
+
 <template>
-    <main>
+      <main>
       <div>
         <!--Header-->
         <h1
@@ -54,7 +56,7 @@
           <div class="mt-5 grid-cols-2">
             <button
               class="mr-10 border border-red-700 bg-white text-red-700 rounded"
-              @click="clearSearch"
+              @click="loadData"
               type="submit"
             >
               Clear Search
@@ -80,8 +82,8 @@
         <div class="ml-10">
           <h2 class="text-2xl font-bold">List of Events</h2>
           <h3 class="italic">
-            <span v-if="userRole === 'editor'">Click table row to edit/display an entry</span>
-            <span v-if="userRole === 'viewer'">Click table row to display an entry</span>
+            <span v-if="role === 'editor'">Click table row to edit/display an entry</span>
+            <span v-if="role === 'viewer'">Click table row to display an entry</span>
           </h3>
         </div>
         <div class="flex flex-col col-span-2">
@@ -95,104 +97,228 @@
             </thead>
             <tbody class="divide-y divide-gray-300">
               <tr
-                @click="editEvent(event.id)"
+                @click="editEvent(event._id)"
                 v-for="event in events"
-                :key="event.id"
+                :key="event._id"
                 class="cursor-pointer"
-                :class="{ 'hoverRow': hoverId === event.id }"
-                @mouseenter="hoverId = event.id"
+                :class="{ 'hoverRow': hoverId === event._id }"
+                @mouseenter="hoverId = event._id"
                 @mouseleave="hoverId = null"
               >
                 <td class="p-2 text-left">{{ event.name }}</td>
-                <td class="p-2 text-left">{{ formattedDate(event.date) }}</td>
-                <td class="p-2 text-left">{{ event.address }}</td>
+                <td class="p-2 text-left">{{ formatDate(event.date) }}</td>
+                <td class="p-2 text-left">{{ event.address.line1 }}</td>
               </tr>
             </tbody>
           </table>
         </div>
       </div>
+
+      <!-- Loading wheel appears when API calls are being made -->
+      <div>
+        <LoadingModal v-if="isLoading"></LoadingModal>
+      </div>
+
+      <!-- Success modal appears after a new event is created -->
+      <Transition name="bounce">
+          <SuccessModal v-if="successModal" @close="closeSuccessModal" :title="title" :message="message" />
+      </Transition>
+
+      <!-- Update modal appears after an event is updated -->
+      <Transition name="bounce">
+          <UpdateModal v-if="updateModal" @close="closeUpdateModal" :title="title" :message="message" />
+      </Transition>
+
+      <!-- Delete modal appears after an event is deleted -->
+      <Transition name="bounce">
+          <DeleteModal v-if="deleteModal" @close="closeDeleteModal" :title="title" :message="message" />
+      </Transition>
+
     </main>
-  </template>
+</template>
 
 <script>
-//import functionalities
-import { DateTime } from 'luxon'
+// Import functionality to reference session states
 import { mapState } from 'vuex'
+// Import API calls
+import { getOrgRecentEvents, searchEvents } from '../../api/api'
+// Import modal components
+import LoadingModal from '../components/LoadingModal.vue'
+import SuccessModal from '../components/SuccessModal.vue'
+import UpdateModal from '../components/UpdateModal.vue'
+import DeleteModal from '../components/DeleteModal.vue'
 
 export default {
-  data() {
-    return {
-      //variable to hold all events for the organization
-      events: [],
-      // Parameters for search to occur
-      searchBy: '',
-      name: '',
-      eventDate: '',
-      // variable stores the ID of the row that the mouse is currently hovering over (to highlight the row red)
-      hoverId: null,
-    }
+  // allow modal components
+  components: {
+      LoadingModal,
+      SuccessModal,
+      UpdateModal,
+      DeleteModal
   },
-  computed: {
-    //computed states so they can be referenced in code
-    ...mapState(['organizationId', 'organizationEvents', 'userRole'])
-  },
-  //when component is mounted, setEvents method is called
-  mounted() {
-    this.setEvents() 
-  },
-  methods: {
-    //method called when component is mounted. It sets the "events" variable to the "organizationEvents" state, which holds all events and their information for the organization
-    setEvents() {
-        this.events = this.organizationEvents
-    },
-    // better formattedDate
-    formattedDate(datetimeDB) {
-      const dt = DateTime.fromISO(datetimeDB, {
-        zone: 'utc'
-      })
-      return dt
-        .setZone(DateTime.now().zoneName, { keepLocalTime: true })
-        .toLocaleString()
-    },
-    //method called when user searches with event criteria
-    handleSubmitForm() {
-      //if user searched by event name
-        if (this.searchBy === 'Event Name') {
-          //filter the events list by event name
-            this.events = this.organizationEvents.filter((event) => event.name.toLowerCase().includes(this.name.toLowerCase()));
-        } 
-        //if user searched by event datd
-        else if (this.searchBy === 'Event Date') {
-          //filter the events list by event date
-            this.events = this.organizationEvents.filter((event) => event.date === this.eventDate);
+    data() {
+        return {
+            //variable to hold all events for the organization
+            events: null,
+            // Parameters for search to occur
+            searchBy: null,
+            name: null,
+            eventDate: null,
+            // variable stores the ID of the row that the mouse is currently hovering over (to highlight the row red)
+            hoverId: null,
+            // variable that determines if Loading wheel appears
+            isLoading: false,
+            // variable to check if the component has already been mounted - this is so that any modal components do not reappear after the user searches for an event
+            alreadyMounted: false,
+            // variable that determines if the SuccessModal appears
+            successModal: false,
+            // variable that determines if the UpdateModal appears
+            updateModal: false,
+            // variable that determines if the DeleteModal appears
+            deleteModal: false,
+            // title and message variables to be shown in the modal components
+            title: "",
+            message: ""
         }
     },
-    //method called when user clicks "Clear Search" button
-    clearSearch() {
-      // Resets all the variables
-      this.searchBy = ''
-      this.name = ''
-      this.eventDate = ''
-      this.setEvents()
+    computed: {
+        //computed states so they can be referenced in code
+        ...mapState(['role'])
     },
-    //method called when user clicks on an event row in the "List of Events" section
-    editEvent(eventID) {
-      //if the user is an editor, this will push them to "EventDetails.vue" with the event ID as a parameter, where they can view and edit the event information.
-      if (this.userRole === 'editor') {
-        this.$router.push({ name: 'eventdetails', params: { id: eventID } })
-      }
-      //if the user is an editor, this will push them to "ViewEvent.vue" with the event ID as a parameter, where they can only view the event information.
-      else if (this.userRole === 'viewer') {
-        this.$router.push({ name: 'viewevent', params: { id: eventID } })
-      }
-    }
-  }
+    mounted() {
+      // when component is mounted, load the data
+        this.loadData();
+    },
+    methods: {
+      // method called when component is mounted
+        async loadData() {
+            // Resets variables used for search
+            this.searchBy = null
+            this.name = null
+            this.eventDate = null
+
+            // show loading wheel
+            this.isLoading = true;
+            // get list of events
+            try {
+                const response = await getOrgRecentEvents();
+                this.events = response;
+            } catch (error) {
+                console.log('loadData error', error)
+            }
+            // loading wheel disappears
+            this.isLoading = false;
+
+            // show modal components
+            if (!this.alreadyMounted) {
+              const query = new URLSearchParams(this.$route.query);
+              // show success modal
+              if (query.get('success') === 'true') {
+                  this.successModal = true;
+                  this.title = "Success!"
+                  this.message = "Event successfully created"
+              }
+              // show update modal
+              if (query.get('update') === 'true') {
+                  this.updateModal = true;
+                  this.title = "Updated!"
+                  this.message = "Event successfully updated."
+              }
+              // show delete modal
+              if (query.get('delete') === 'true') {
+                  this.deleteModal = true;
+                  this.title = "Deleted!"
+                  this.message = "Event successfully deleted."
+              }
+              this.alreadyMounted = true;
+            }
+
+        },
+
+        // method called when user searches for an event
+        async handleSubmitForm() {
+          // if user searches by event name
+            if (this.searchBy === 'Event Name') {
+                if (this.name) {
+                    try {
+                        const query = {
+                            searchBy: 'name',
+                            name: this.name
+                        };
+                        const response = await searchEvents(query);
+                        this.events = response;
+                    } catch (error) {
+                        console.log('Error searching events', error)
+                    }
+                }
+            // if user searches by event date
+            } else if (this.searchBy === 'Event Date') {
+                if (this.eventDate) {
+                    try {
+                        const eventDate = new Date(this.eventDate);
+                        const formattedDate = eventDate.toISOString().substring(0, 10);
+                        const query = {
+                            searchBy: 'date',
+                            eventDate: formattedDate
+                        };
+                        const response = await searchEvents(query);
+                        this.events = response;
+                    } catch (error) {
+                        console.log('Error searching events:', error)
+                    }
+                }
+            }
+        },
+
+        // method called for each event date so it will be formatted correctly on the table
+        formatDate(date) {
+            const isoDate = new Date(date);
+            const year = isoDate.getUTCFullYear();
+            const month = String(isoDate.getUTCMonth() + 1).padStart(2, '0');
+            const day = String(isoDate.getUTCDate()).padStart(2, '0');
+            return `${month}/${day}/${year}`;
+        },
+
+        // method called when user clicks on an event
+        editEvent(eventID) {
+          //if the user is an editor, this will push them to "EventDetails.vue" with the event ID as a parameter, where they can view and edit the event information.
+          if (this.role === 'editor') {
+            this.$router.push({ name: 'eventdetails', params: { id: eventID }, query: { main: true } })
+          }
+          //if the user is an editor, this will push them to "ViewEvent.vue" with the event ID as a parameter, where they can only view the event information.
+          else if (this.role === 'viewer') {
+            this.$router.push({ name: 'viewevent', params: { id: eventID } })
+          }
+        },
+
+        // method to close the SuccessModal
+        closeSuccessModal() {
+            this.successModal = false;
+            this.title = '';
+            this.message = '';
+        },
+
+        // method to close the UpdateModal
+        closeUpdateModal() {
+            this.updateModal = false;
+            this.title = '';
+            this.message = '';
+        },
+        
+        // method to close the DeleteModal
+        closeDeleteModal() {
+            this.deleteModal = false;
+            this.title = '';
+            this.message = '';
+        },
+
+    },
 }
 </script>
 
 <style scoped>
-  .hoverRow {
-    background-color: rgba(255, 0, 0, 0.1);
-    transition: background-color 0.3s ease-in-out;
-  }
+.hoverRow {
+  background-color: rgba(255, 0, 0, 0.1);
+  transition: background-color 0.3s ease-in-out;
+}
 </style>

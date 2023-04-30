@@ -1,64 +1,72 @@
+<!-- This file is the modal component that appears whenever the user successfully creates a new client, event, or service. It provides visual confirmation feedback to let the user know the client/event/service was successfully created. -->
+
 <template>
-    <Transition name="bounce">
-      <div
-        class="bg-green-200 text-green-900 rounded shadow-xl p-4 fixed top-20 right-4 max-w-md w-full"
-        role="alert"
-        v-if="isVisible"
+  <Transition name="bounce">
+    <div
+      class="bg-green-200 text-green-900 rounded shadow-xl p-4 fixed top-20 right-4 max-w-md w-full"
+      role="alert"
+      v-if="isVisible"
+    >
+    <!-- Show title and message -->
+      <h4 class="text-xl font-quicksand font-semibold mb-2 text-green-900">{{ title }}</h4>
+      <p class="text-lg font-quicksand font-semibold text-green-900">{{ message }}</p>
+      <!-- Button to close the modal -->
+      <button
+        class="absolute top-2 right-2 focus:outline-none text-3xl"
+        aria-label="Close"
+        @click="closeModal"
       >
-        <h4 class="text-xl font-quicksand font-semibold mb-2 text-green-900">{{ title }}</h4>
-        <p class="text-lg font-quicksand font-semibold text-green-900">{{ message }}</p>
-        <button
-          class="absolute top-2 right-2 focus:outline-none text-3xl"
-          aria-label="Close"
-          @click="closeModal"
-        >
-          &times;
-        </button>
-        <div class="progress w-full h-1 absolute bottom-0 left-0 bg-transparent"></div>
-      </div>
-    </Transition>
-  </template>
+        &times;
+      </button>
+      <div class="progress w-full h-1 absolute bottom-0 left-0 bg-transparent"></div>
+    </div>
+  </Transition>
+</template>
   
   
   
   
   
-  <script>
-  export default {
-    props: {
-      title: {
-        type: String,
-        default: "Alert",
-      },
-      message: {
-        type: String,
-        default: "",
-      },
+<script>
+export default {
+  // accept title and message as props from parent component
+  props: {
+    title: {
+      type: String,
+      default: "Alert",
     },
-    data() {
-      return {
-        isVisible: true,
-      };
+    message: {
+      type: String,
+      default: "",
     },
-    mounted() {
-      this.startTimer();
-    },
-    methods: {
-      startTimer() {
-        setTimeout(() => {
-          this.isVisible = false;
-          this.$emit("close");
-        }, 5000); // close after 5 seconds
-      },
-      closeModal() {
+  },
+  data() {
+    return {
+      isVisible: true,
+    };
+  },
+  // when component is mounted, timer starts
+  mounted() {
+    this.startTimer();
+  },
+  methods: {
+    // method for timer, after 5 seconds the modal will close automatically
+    startTimer() {
+      setTimeout(() => {
         this.isVisible = false;
         this.$emit("close");
-      },
+      }, 5000); // close after 5 seconds
     },
-  };
-  </script>
+    // method to close the modal, either when the user clicks the "X" button or after 5 seconds have passed
+    closeModal() {
+      this.isVisible = false;
+      this.$emit("close");
+    },
+  },
+};
+</script>
   
-  <style scoped>
+<style scoped>
 .progress::after {
   content: "";
   position: absolute;
@@ -69,36 +77,35 @@
   background-color: rgba(6, 95, 70, 1);
   animation: decrease-width 5s linear forwards;
 }
-  
-  @keyframes decrease-width {
-    from {
-      width: 100%;
-    }
-    to {
-      width: 0;
-    }
+
+@keyframes decrease-width {
+  from {
+    width: 100%;
   }
-  
-  .bounce-enter-active {
-    transform: translate(-50%, -50%);
-    animation: bounce-in 0.5s;
+  to {
+    width: 0;
   }
-  
-  .bounce-leave-active {
-    transform: translate(-50%, -50%);
-    animation: bounce-in 0.5s reverse;
+}
+
+.bounce-enter-active {
+  transform: translate(-50%, -50%);
+  animation: bounce-in 0.5s;
+}
+
+.bounce-leave-active {
+  transform: translate(-50%, -50%);
+  animation: bounce-in 0.5s reverse;
+}
+
+@keyframes bounce-in {
+  0% {
+    transform: translate(0, 0) scale(0);
   }
-  
-  @keyframes bounce-in {
-    0% {
-      transform: translate(0, 0) scale(0);
-    }
-    50% {
-      transform: translate(0, 0) scale(1.25);
-    }
-    100% {
-      transform: translate(0, 0) scale(1);
-    }
+  50% {
+    transform: translate(0, 0) scale(1.25);
   }
-  </style>
-  
+  100% {
+    transform: translate(0, 0) scale(1);
+  }
+}
+</style>

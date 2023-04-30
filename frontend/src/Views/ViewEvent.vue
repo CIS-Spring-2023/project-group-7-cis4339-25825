@@ -1,4 +1,6 @@
-<template>  
+<!-- This component allows a user to view a specific event's information. This component is only for users with the role "viewer". It does not allow update/delete. -->
+
+<template>
     <main>
       <div>
         <!--Header-->
@@ -63,29 +65,72 @@
           <div></div>
           <div></div>
           <div></div>
-          <!-- Services checkboxes -->
+          <!-- Services Offered at Event checkboxes -->
           <div class="flex flex-col grid-cols-3">
-            <label>Services Offered at Event</label>
-              <div>
-                <ul v-if="hasActiveServices">
-                  <li v-for="service in organizationServices" :key="service.id" v-show="service.active">
+            <label class="text-lg font-semibold mb-2">Services Offered at Event</label>
+            <div>
+              <ul v-if="services.length" class="space-y-2">
+                <li v-for="service in services" :key="service._id" :data-service-id="service._id" class="rounded-lg border border-gray-300 p-2 hover:bg-gray-100 transition-colors relative">
+                  <label class="block w-full h-full">
                     <input
                       type="checkbox"
-                      :id="service.id"
-                      :value="service.id"
-                      :checked="isAnEventService(service.id)"
-                      v-model="eventServiceIds"
-                      class="rounded border-gray-300 text-indigo-600 shadow-sm focus:border-indigo-300 focus:ring focus:ring-offset-0 focus:ring-indigo-200 focus:ring-opacity-50"
-                      style="color: gray; font-style: italic;"
-                      disabled
+                      :id="service._id"
+                      :value="service._id"
+                      :checked="event.services.includes(service._id)"
+                      v-model="event.services"
+                      class="rounded border-gray-300 text-indigo-600 shadow-sm focus:border-indigo-300 focus:ring focus:ring-offset-0 focus:ring-indigo-200 focus:ring-opacity-50 mr-2"
+                      :disabled="true"
                     >
-                    <label :for="service.name">{{ service.name }}</label>
-                  </li>
-                </ul>
-                <!--If there are no active services for the user's organization, this will appear instead of list of checkboxes-->
-                <p v-else>No Active Services Available</p>
-              </div>
+                    <span class="font-medium">{{ service.name }}</span>
+                  </label>
+                  <div
+                    class="absolute top-1/2 right-2 transform -translate-y-1/2 cursor-pointer"
+                    @click.stop="toggleDetails(service._id)"
+                  >
+                    <svg
+                      v-if="!descriptionOpenStates[service._id]"
+                      class="h-4 w-4 text-gray-600"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth="2"
+                        d="M19 9l-7 7-7-7"
+                      />
+                    </svg>
+                    <svg
+                      v-else
+                      class="h-4 w-4 text-gray-600"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth="2"
+                        d="M5 15l7-7 7 7"
+                      />
+                    </svg>
+                  </div>
+                  <transition name="slide-fade">
+                    <p
+                      v-show="descriptionOpenStates[service._id]"
+                      class="text-sm text-gray-600 mt-2 pr-8"
+                    >
+                      {{ service.description }}
+                    </p>
+                  </transition>
+                </li>
+              </ul>
+              <!--If there are no active services for the user's organization, this will appear instead of list of checkboxes-->
+              <p v-else class="text-gray-600">No Active Services Available</p>
+            </div>
           </div>
+
         </div>
 
         <!-- grid container -->
@@ -101,7 +146,7 @@
                 type="text"
                 class="w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
                 placeholder
-                v-model="event.address1"
+                v-model="event.address.line1"
                 style="color: gray; font-style: italic;"
                 disabled
               />
@@ -115,7 +160,7 @@
                 type="text"
                 class="w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
                 placeholder
-                v-model="event.address2"
+                v-model="event.address.line2"
                 style="color: gray; font-style: italic;"
                 disabled
               />
@@ -129,7 +174,7 @@
                 type="text"
                 class="w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
                 placeholder
-                v-model="event.city"
+                v-model="event.address.city"
                 style="color: gray; font-style: italic;"
                 disabled
               />
@@ -144,7 +189,7 @@
                 type="text"
                 class="w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
                 placeholder
-                v-model="event.county"
+                v-model="event.address.county"
                 style="color: gray; font-style: italic;"
                 disabled
               />
@@ -158,7 +203,7 @@
                 type="text"
                 class="w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
                 placeholder
-                v-model="event.zip"
+                v-model="event.address.zip"
                 style="color: gray; font-style: italic;"
                 disabled
               />
@@ -175,7 +220,7 @@
             <button
               type="reset"
               class="border border-red-700 bg-white text-red-700 rounded"
-              @click="$router.back()"
+              @click="goBack"
             >
               Go back
             </button>
@@ -204,20 +249,20 @@
               </thead>
               <tbody class="divide-y divide-gray-300">
                   <tr
-                  @click="goToClient(client.id)"
-                  v-for="client in eventClients"
-                  :key="client.id"
+                  @click="goToClient(client._id)"
+                  v-for="client in clients"
+                  :key="client._id"
                   class="cursor-pointer"
-                  :class="{ 'hoverRow': hoverId === client.id }"
-                  @mouseenter="hoverId = client.id"
+                  :class="{ 'hoverRow': hoverId === client._id }"
+                  @mouseenter="hoverId = client._id"
                   @mouseleave="hoverId = null"
                   >
                   <td class="p-2 text-left">
                     {{ client.firstName + ' ' + client.lastName }}
                   </td>
-                  <td class="p-2 text-left">{{ client.city }}</td>
+                  <td class="p-2 text-left">{{ client.address.city }}</td>
                   <td class="p-2 text-left">
-                    {{ client.phone }}
+                    {{ client.phoneNumber.primary }}
                   </td>
                 </tr>
               </tbody>
@@ -225,101 +270,119 @@
           </div>
         </div>
       </div>
+      <!-- Loading modal appears when API calls are being made -->
+      <div>
+        <LoadingModal v-if="isLoading"></LoadingModal>
+      </div>
     </main>
-  </template>
+</template>
 
 <script>
-//import functionalities
-import { DateTime } from 'luxon'
-import { mapState } from 'vuex'
+// import API calls
+import { getEventById, getEventAttendees, getActiveServices } from '../../api/api'
+// import modal component
+import LoadingModal from '../components/LoadingModal.vue'
 
 export default {
-  //accept event ID as prop passed down from parent component, either "HomeView.vue", "FindEvent.vue", "ViewClient.vue", or "ViewService.vue"
-  props: ['id'],
-  data() {
-    return {
-      //variable to hold client IDs for selected event
-      eventClientIds: [],
-      //variable to hold all clients and their information for selected event
-      eventClients: [],
-      //variable to hold service IDs for selected event
-      eventServiceIds: [],
-      //variable to hold all services and their information for selected event
-      eventServices: [],
-      //variable to hold event information
-      event: {
-        id: null,
-        name: '',
-        description: '',
-        date: '',
-        address1: '',
-        address2: '',
-        county: '',
-        city: '',
-        zip: ''
+  //accept event ID as data from parent components
+    props: ['id'],
+    // allow components
+    components: {
+      LoadingModal,
+    },
+    data() {
+        return {
+            //variable to hold clients for selected event
+            clients: [],
+            //variable to hold services for selected event
+            services: [],
+            //variable to hold event information
+            event: {
+                _id: null,
+                name: null,
+                description: null,
+                date: null,
+                address: {
+                    line1: null,
+                    line2: null,
+                    city: null,
+                    county: null,
+                    zip: null
+                },
+                attendees: [],
+                services: []
+            },
+            // variable stores the ID of the row that the mouse is currently hovering over (to highlight the row red)
+            hoverId: null,
+            // variable that determines which services have their descriptions opened
+            openDescriptions: [],
+            // variable that determines when loading wheel appears
+            isLoading: false,
+        }
+    },
+
+    computed: {
+      // computed function to allow services to have their descriptions opened
+      descriptionOpenStates() {
+        return this.services.reduce((acc, service) => {
+          acc[service._id] = this.openDescriptions.includes(service._id);
+          return acc;
+        }, {});
       },
-      // variable stores the ID of the row that the mouse is currently hovering over (to highlight the row red)
-      hoverId: null,
-    }
-  },
-  //lifecycle hook that fires when component is mounted
-  mounted() {
-    //temporary varaible to grab the event ID that was passed from parent component -> this.$route.params.id returns a string, so parseInt converts it to an integer
-    const eventId_temp = parseInt(this.$route.params.id)
-    //temporary variable to hold event information -> search through all of the organization's events to find the specific event selected
-    const event_temp = this.organizationEvents.find(e => e.id === eventId_temp)
-    //if event selected exists in the organization's events, then the this.event variable will be filled with the event's current information. This is how the input fields are already filled when user visits the page
-    if (event_temp) {
-        this.event.id = eventId_temp
-        this.event.name = event_temp.name
-        this.event.description = event_temp.description
-        this.event.date = event_temp.date
-        this.event.address1 = event_temp.address1
-        this.event.address2 = event_temp.address2
-        this.event.county = event_temp.county
-        this.event.city = event_temp.city
-        this.event.zip = event_temp.zip
-        this.event.serviceIds = event_temp.serviceIds
-        this.event.clientIds = event_temp.clientIds
-        //fetching array of service IDs associated with the selected event
-        this.eventServiceIds = this.organizationEventServices.find(event => event.eventId === eventId_temp).serviceIds
-        //fetching all services and their information associated with the selected event
-        this.eventServices = this.organizationServices.filter(service => this.eventServiceIds.includes(service.id))
-        //fetching array of clientIds in the event
-        this.eventClientIds = this.organizationEventClients.find(event => event.eventId === eventId_temp).clientIds
-        //fetching client information for the clients in the event
-        this.eventClients = this.organizationClients.filter(client => this.eventClientIds.includes(client.id))
-    }
-  },
-  computed: {
-    //computed states so they can be referenced in code
-    ...mapState(['organizationEvents', 'organizationServices', 'organizationClients', 'organizationEventServices', 'organizationEventClients']),
-    //Checks to see if there are any active services for the organization instance. If there are, returns true. If not, returns false, and the page will show "No Active Services Available"
-    hasActiveServices() {
-      return this.organizationServices.some(service => service.active);
     },
-    //determines if a service checkbox is checked by the time the list of service checkboxes render on the page
-    isAnEventService() {
-      return (serviceId) => {
-        return this.eventServices.some(service => service.id === serviceId)
-      }
-  }
-  },
-  methods: {
-    // better formatted date, converts UTC to local time
-    formattedDate(datetimeDB) {
-      const dt = DateTime.fromISO(datetimeDB, {
-        zone: 'utc'
-      })
-      return dt
-        .setZone(DateTime.now().zoneName, { keepLocalTime: true })
-        .toISODate()
+
+    mounted() {
+      // when component is mounted, load the necessary data
+        this.loadData();
     },
-    //method called when user clicks on a client row in "List of Attendees" section. It pushes the user to "ViewClient.vue" with the client ID as a parameter so they may view the selected client, not edit.
-    goToClient(clientID) {
-      this.$router.push({ name: 'viewclient', params: { id: clientID } })
+
+    methods: {
+      // method called when component is mounted -> loads all necessary data
+        async loadData() {
+          // show loading wheel
+          this.isLoading = true;
+          // get event information, all clients registered under this event, and all active services
+            try {
+                const [eventResponse, clientsResponse, servicesResponse] = await Promise.all([
+                    getEventById(this.$route.params.id),
+                    getEventAttendees(this.$route.params.id),
+                    getActiveServices(),
+                ]);
+
+                eventResponse.date = new Date(eventResponse.date).toISOString().substring(0, 10);
+
+                this.event = eventResponse;
+                this.clients = clientsResponse;
+                this.services = servicesResponse;
+            } catch (error) {
+                console.log('error loading data:', error)
+            }
+          this.isLoading = false;
+        },
+
+        //method called when user clicks on a client row in "List of Attendees" section. It pushes the user to "ViewClient.vue" with the client ID as a parameter so they may view the selected client, not edit.
+        goToClient(clientID) {
+          this.$router.push({ name: 'viewclient', params: { id: clientID } })
+        },
+
+        // method called when user clicks the arrow to expand a service to show its description, or to hide its description
+        toggleDetails(serviceId) {          
+          if (this.openDescriptions.includes(serviceId)) {
+            this.openDescriptions = this.openDescriptions.filter(id => id !== serviceId);
+          } else {
+            this.openDescriptions.push(serviceId);
+          }
+        },
+
+        // method called when user clicks the "Go back" button
+        goBack() {
+          if (this.$route.query.dash) {
+            this.$router.push('/dashboard')
+          } else {
+            this.$router.back()
+          }
+        },
     },
-  }
 }
 </script>
 
@@ -327,5 +390,42 @@ export default {
   .hoverRow {
     background-color: rgba(255, 0, 0, 0.1);
     transition: background-color 0.3s ease-in-out;
+  }
+
+/* Style for disabled checkboxes */
+input[type="checkbox"]:disabled {
+  color: #a0aec0; /* Text color */
+  border-color: #e2e8f0; /* Border color */
+  background-color: #edf2f7; /* Background color */
+}
+
+/* Style for checked checkboxes */
+input[type="checkbox"]:checked {
+  color: #fff; /* Text color */
+  border-color: #4299e1; /* Border color */
+  background-color: #4299e1; /* Background color */
+}
+
+  
+  .arrow-container {
+    position: absolute;
+    top: 50%;
+    right: 0;
+    transform: translateY(-50%);
+  }
+
+  .slide-fade-enter-active,
+  .slide-fade-leave-active {
+    transition: all 0.3s ease;
+  }
+  .slide-fade-enter-from,
+  .slide-fade-leave-to {
+    opacity: 0;
+    transform: translateY(-1rem);
+  }
+  .slide-fade-enter-to,
+  .slide-fade-leave-from {
+    opacity: 1;
+    transform: translateY(0);
   }
 </style>

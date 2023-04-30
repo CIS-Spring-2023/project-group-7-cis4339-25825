@@ -1,5 +1,7 @@
+<!-- This component allows a user to view a specific service's information. This component is only for users with the role "viewer". It does not allow update/delete. -->
+
 <template>
-    <main>
+      <main>
       <!--Header-->
       <h1
         class="font-bold text-4xl text-red-700 tracking-widest text-center mt-10"
@@ -37,21 +39,6 @@
               disabled
               ></textarea>
             </label>
-            </div>
-            <!--Active status checkbox-->
-            <div class="flex flex-col">
-              <label>
-                  <span class="text-gray-700">Active </span>
-                  <input 
-                      type="checkbox"
-                      class="rounded border-gray-300 text-indigo-600 shadow-sm focus:border-indigo-300 focus:ring focus:ring-offset-0 focus:ring-indigo-200 focus:ring-opacity-50"
-                      checked
-                      v-model="service.active"
-                      style="color: gray; font-style: italic;"
-                      disabled
-                      >
-              </label>
-  
             </div>
            
           </div>
@@ -95,94 +82,107 @@
             </thead>
             <tbody class="divide-y divide-gray-300">
               <tr
-                @click="goToEvent(event.id)"
-                v-for="event in serviceEvents"
-                :key="event.id"
+                @click="goToEvent(event._id)"
+                v-for="event in events"
+                :key="event._id"
                 class="cursor-pointer"
-                :class="{ 'hoverRow': hoverId === event.id }"
-                @mouseenter="hoverId = event.id"
+                :class="{ 'hoverRow': hoverId === event._id }"
+                @mouseenter="hoverId = event._id"
                 @mouseleave="hoverId = null"
               >
                 <td class="p-2 text-left">{{ event.name }}</td>
-                <td class="p-2 text-left">{{ formattedDate(event.date) }}</td>
-                <td class="p-2 text-left">{{ event.address1 }}</td>
+                <td class="p-2 text-left">{{ formatDate(event.date) }}</td>
+                <td class="p-2 text-left">{{ event.address.line1 }}</td>
               </tr>
             </tbody>
           </table>
         </div>
       </div>
+      <!-- Loading modal appears when API calls are being made -->
+      <div>
+        <LoadingModal v-if="isLoading"></LoadingModal>
+      </div>
     </main>
-  </template>
+</template>
 
 <script>
-//import functionalities
-import { DateTime } from 'luxon'
-import { mapState } from 'vuex'
+// import modal components
+import LoadingModal from '../components/LoadingModal.vue'
+// import API calls
+import { getServiceById, getEventsByServiceId } from '../../api/api'
 
 export default {
-  data() {
-    return {
-      //variable to store service information
-      service: {
-        id: null,
-        name: '',
-        description: '',
-        active: true
-      },
-      //all the Event Ids that host the service
-      serviceEventIds: [],
-      // information on the Events that host the service
-      serviceEvents: [],
-      // variable stores the ID of the row that the mouse is currently hovering over (to highlight the row red)
-      hoverId: null,
-    }
-  },
-  mounted() {
-    //create temporary variable to hold the service ID - this.$route.params.id returns a string, so parseInt converts it to an integer
-    const serviceId_temp = parseInt(this.$route.params.id)
-    //create temporary variable to hold service information - search through all the organization's services to find the right service
-    const service_temp = this.organizationServices.find(e => e.id === serviceId_temp)
-    //if service found, assign the "service" variable will service information - this is how the input fields are already filled with existing information when user is redirected to this page
-    if (service_temp) {
-        this.service.id = serviceId_temp
-        this.service.name = service_temp.name
-        this.service.description = service_temp.description
-        this.service.active = service_temp.active
-        this.service.eventIds = service_temp.eventIds
-        //get event Ids that host the service
-        this.serviceEventIds = this.organizationEventServices
-          .filter(event => event.serviceIds.includes(this.service.id))
-          .map(event => event.eventId)
-        //using the event Ids that host the service, get information on those events and store them in a variable. This is so we can output the event name, event date, and event address on the page
-        this.serviceEvents = this.organizationEvents.filter(event => this.serviceEventIds.includes(event.id));
+  //accept service ID as data from parent components
+    props: ['id'],
+    // allow components
+    components: {
+      LoadingModal,
+    },
+    data() {
+        return {
+            //variable to store service information
+            service: {
+                _id: null,
+                name: null,
+                description: null,
+                active: true
+            },
+            // all events that host the service
+            events: [],
+            // variable stores the ID of the row that the mouse is currently hovering over (to highlight the row red)
+            hoverId: null,
+            // variable that determines when loading wheel appears
+            isLoading: false,
+        }
+    },
 
-    }
-  },
-  computed: {
-    //computed states so they can be referenced in code
-    ...mapState(['organizationServices', 'organizationEvents', 'organizationEventServices'])
-  },
-  methods: {
-    // better formatted date, converts UTC to local time
-    formattedDate(datetimeDB) {
-      const dt = DateTime.fromISO(datetimeDB, {
-        zone: 'utc'
-      })
-      return dt
-        .setZone(DateTime.now().zoneName, { keepLocalTime: true })
-        .toISODate()
+    mounted() {
+      // when component is mounted, loads all data
+        this.loadData();
     },
-    //method called when user clicks on an event row in "List of Events". It pushes the user to "ViewEvent.vue" with the event ID as a parameter so that the user may view the event information, not edit.
-    goToEvent(eventID) {
-        this.$router.push({ name: 'viewevent', params: { id: eventID } })
+
+    methods: {
+      // method called when component is mounted -> loads all necessary data
+        async loadData() {
+          // show loading wheel
+          this.isLoading = true;
+          // get service information, and get all events that host the service
+            try {
+                const [serviceResponse, eventsResponse] = await Promise.all([
+                    getServiceById(this.$route.params.id),
+                    getEventsByServiceId(this.$route.params.id),
+                ]);
+
+                this.service = serviceResponse;
+                this.events = eventsResponse;
+
+            } catch (error) {
+                console.log('error loading data', error);
+            }
+          this.isLoading = false;
+        },
+
+        // method called to format the events' dates
+        formatDate(date) {
+            const isoDate = new Date(date);
+            const year = isoDate.getUTCFullYear();
+            const month = String(isoDate.getUTCMonth() + 1).padStart(2, '0');
+            const day = String(isoDate.getUTCDate()).padStart(2, '0');
+            return `${month}/${day}/${year}`;
+        },
+
+        //method called when user clicks on an event row in "List of Events". It pushes the user to "ViewEvent.vue" with the event ID as a parameter so that the user may view the event information, not edit.
+        goToEvent(eventID) {
+            this.$router.push({ name: 'viewevent', params: { id: eventID } })
+        },
+
     },
-  },
 }
 </script>
 
 <style scoped>
-  .hoverRow {
-    background-color: rgba(255, 0, 0, 0.1);
-    transition: background-color 0.3s ease-in-out;
-  }
+.hoverRow {
+  background-color: rgba(255, 0, 0, 0.1);
+  transition: background-color 0.3s ease-in-out;
+}
 </style>

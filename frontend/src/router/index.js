@@ -1,7 +1,9 @@
+// This is the file that handles all routing between components.
+
 //import router functionality
 import { createRouter, createWebHistory } from 'vue-router'
 // import store functionality
-import store from '../store/newindex.js';
+import store from '../store/index.js';
 
 // make all paths and names lowercase for consistency
 const routes = [
@@ -9,14 +11,14 @@ const routes = [
   {
     path: '/',
     props: true,
-    component: () => import('../Views/NewLoginView.vue')
+    component: () => import('../Views/LoginView.vue')
   },
   // route to the client intake form - only appears for users with "editor" role
   {
     path: '/intakeform',
     name: 'intakeform',
     props: true,
-    component: () => import('../Views/NewClientIntakeForm.vue'),
+    component: () => import('../Views/ClientIntakeForm.vue'),
     //if page is accessed without logging in, this routes to 404 Not Found page
     beforeEnter: (to, from, next) => {
       if (!store.state.role || !store.state.role === 'editor') {
@@ -32,7 +34,7 @@ const routes = [
   {
     path: '/findclient',
     name: 'findclient',
-    component: () => import('../Views/NewFindClient.vue'),
+    component: () => import('../Views/FindClient.vue'),
     //if page is accessed without logging in, this routes to 404 Not Found page
     beforeEnter: (to, from, next) => {
       if (!store.state.role) {
@@ -49,7 +51,7 @@ const routes = [
     path: '/updateclient/:id',
     name: 'updateclient',
     props: true,
-    component: () => import('../Views/NewUpdateClient.vue'),
+    component: () => import('../Views/UpdateClient.vue'),
     //if page is accessed without logging in, this routes to 404 Not Found page
     beforeEnter: (to, from, next) => {
       if (!store.state.role) {
@@ -66,7 +68,7 @@ const routes = [
     path: '/viewclient/:id',
     name: 'viewclient',
     props: true,
-    component: () => import('../Views/NewViewClient.vue'),
+    component: () => import('../Views/ViewClient.vue'),
     //if page is accessed without logging in, this routes to 404 Not Found page
     beforeEnter: (to, from, next) => {
       if (!store.state.role || !store.state.role === 'viewer') {
@@ -82,7 +84,7 @@ const routes = [
   {
     path: '/eventform',
     name: 'eventform',
-    component: () => import('../Views/NewCreateEvent.vue'),
+    component: () => import('../Views/CreateEvent.vue'),
     //if page is accessed without logging in, this routes to 404 Not Found page
     beforeEnter: (to, from, next) => {
       if (!store.state.role || !store.state.role === 'editor') {
@@ -98,7 +100,7 @@ const routes = [
   {
     path: '/serviceform',
     name: 'serviceform',
-    component: () => import('../Views/NewCreateService.vue'),
+    component: () => import('../Views/CreateService.vue'),
     //if page is accessed without logging in, this routes to 404 Not Found page
     beforeEnter: (to, from, next) => {
       if (!store.state.role || !store.state.role === 'editor') {
@@ -114,7 +116,7 @@ const routes = [
   {
     path: '/findevents',
     name: 'findevents',
-    component: () => import('../Views/NewFindEvent.vue'),
+    component: () => import('../Views/FindEvent.vue'),
     //if page is accessed without logging in, this routes to 404 Not Found page
     beforeEnter: (to, from, next) => {
       if (!store.state.role) {
@@ -131,7 +133,7 @@ const routes = [
     path: '/eventdetails/:id',
     name: 'eventdetails',
     props: true,
-    component: () => import('../Views/NewUpdateEvent.vue'),
+    component: () => import('../Views/UpdateEvent.vue'),
     //if page is accessed without logging in, this routes to 404 Not Found page
     beforeEnter: (to, from, next) => {
       if (!store.state.role) {
@@ -148,7 +150,7 @@ const routes = [
     path: '/viewevent/:id',
     name: 'viewevent',
     props: true,
-    component: () => import('../Views/NewViewEvent.vue'),
+    component: () => import('../Views/ViewEvent.vue'),
     //if page is accessed without logging in, this routes to 404 Not Found page
     beforeEnter: (to, from, next) => {
       if (!store.state.role || !store.state.role === 'viewer') {
@@ -164,13 +166,13 @@ const routes = [
   {
     path: '/dashboard',
     name: 'dashboard',
-    component: () => import('../Views/NewHomeView.vue')
+    component: () => import('../Views/HomeView.vue')
   },
   // route to find service view
   {
     path: '/findservice',
     name: 'findservice',
-    component: () => import('../Views/NewFindService.vue'),
+    component: () => import('../Views/FindService.vue'),
     //if page is accessed without logging in, this routes to 404 Not Found page
     beforeEnter: (to, from, next) => {
       if (!store.state.role) {
@@ -187,7 +189,7 @@ const routes = [
     path: '/servicedetails/:id',
     name: 'servicedetails',
     props: true,
-    component: () => import('../Views/NewUpdateService.vue'),
+    component: () => import('../Views/UpdateService.vue'),
     //if page is accessed without logging in, this routes to 404 Not Found page
     beforeEnter: (to, from, next) => {
       if (!store.state.role) {
@@ -204,7 +206,7 @@ const routes = [
     path: '/viewservice/:id',
     name: 'viewservice',
     props: true,
-    component: () => import('../Views/NewViewService.vue'),
+    component: () => import('../Views/ViewService.vue'),
     //if page is accessed without logging in, this routes to 404 Not Found page
     beforeEnter: (to, from, next) => {
       if (!store.state.role || !store.state.role === 'viewer') {

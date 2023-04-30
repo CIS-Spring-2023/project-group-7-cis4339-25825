@@ -1,12 +1,16 @@
+// This file contains API endpoints for interacting with the "services" collection of the MongoDB database
+
+// import functionalities
 const express = require('express');
 const router = express.Router();
 
+// import services schema
 const { services } = require('../models/models');
+
+// Middleware for authorization. For API calls that require authorization, this middleware checks if the header of API calls have a valid security token. If no security token or invalid security token, then the API call is not made.
 const authMiddleWare = require('../auth/authMiddleWare');
 
-// checked
-// accounted
-// GET 10 most recent services for org
+// API endpoint to GET 10 most recent services for org
 router.get('/', authMiddleWare, (req, res, next) => {
   const org = req.user.org;
   services
@@ -21,8 +25,7 @@ router.get('/', authMiddleWare, (req, res, next) => {
     .limit(10);
 });
 
-// accounted
-// GET all active services from org
+// API endpoint to GET all active services from org
 router.get('/active', authMiddleWare, (req, res, next) => {
   const org = req.user.org;
   services
@@ -35,9 +38,7 @@ router.get('/active', authMiddleWare, (req, res, next) => {
     })
 });
 
-// checked
-// accounted
-// GET single service by ID
+// API endpoint to GET single service by ID
 router.get('/id/:id', authMiddleWare, (req, res, next) => {
   const org = req.user.org;
   services.findOne({ _id: req.params.id, org: org }, (error, data) => {
@@ -51,9 +52,7 @@ router.get('/id/:id', authMiddleWare, (req, res, next) => {
   });
 });
 
-// checked
-// accounted
-// GET entries based on search query
+// API endpoint to GET entries based on search query
 router.get('/search', authMiddleWare, (req, res, next) => {
   const org = req.user.org;
   const dbQuery = { org: org, active: true };
@@ -76,9 +75,7 @@ router.get('/search', authMiddleWare, (req, res, next) => {
   });
 });
 
-// checked
-// accounted
-// POST new service
+// API endpoint to POST new service
 router.post('/', authMiddleWare, (req, res, next) => {
   const org = req.user.org;
   const newService = req.body;
@@ -86,32 +83,26 @@ router.post('/', authMiddleWare, (req, res, next) => {
   services.create(newService, (error, data) => {
     if (error) {
       return next(error);
-    } else {
-      // res.json(data);
+    } else {      
       const message = { success: true, message: "New service created successfully" };
       res.status(201).json(message);
     }
   });
 });
 
-// checked
-// accounted
-// PUT update service
+// API endpoint to PUT -> update service
 router.put('/update/:id', authMiddleWare, (req, res, next) => {
-  // const org = req.user.org;
   services.findByIdAndUpdate(req.params.id, req.body, (error, data) => {
     if (error) {
       return next(error);
     } else {
-      // res.json(data);
       const message = { success: true, message: "Service updated successfully" };
       res.status(201).json(message);
     }
   });
 });
 
-// accounted
-// PUT soft delete service
+// API endpoint to PUT -> soft delete service
 router.put('/deactivate/:id', authMiddleWare, (req, res, next) => {
   const update = { active: false };
   services.findByIdAndUpdate(req.params.id, update, (error, data) => {
@@ -120,21 +111,6 @@ router.put('/deactivate/:id', authMiddleWare, (req, res, next) => {
     } else {
       const message = { success: true, message: "Service deactivated successfully" };
       res.status(200).json(message);
-    }
-  });
-});
-
-// checked
-// hard DELETE service by ID
-router.delete('/:id', authMiddleWare, (req, res, next) => {
-  const org = req.user.org;
-  services.findByIdAndDelete(req.params.id, (error, data) => {
-    if (error) {
-      return next(error);
-    } else if (!data) {
-      res.status(400).send('Service not found');
-    } else {
-      res.send('Service deleted');
     }
   });
 });

@@ -1,4 +1,6 @@
-const uuid = require('uuid')
+// This file contains the data models of the collections in the MongoDB database
+
+//Import functionalities
 const mongoose = require('mongoose')
 const Schema = mongoose.Schema
 

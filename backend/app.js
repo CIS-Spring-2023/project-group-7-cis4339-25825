@@ -1,3 +1,6 @@
+// This is the main file for the backend
+
+// import functionalities
 const express = require('express')
 const mongoose = require('mongoose') //require mongoose library functionaility
 const morgan = require('morgan') // better debugging

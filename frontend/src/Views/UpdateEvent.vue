@@ -1,3 +1,5 @@
+<!-- This component allows a user to update a specific event's information. -->
+
 <template>
     <main>
       <div>
@@ -136,11 +138,6 @@
               <p v-else class="text-gray-600">No Active Services Available</p>
             </div>
           </div>
-
-
-
-
-
         </div>
 
         <!-- grid container -->
@@ -298,10 +295,12 @@
           </div>
         </div>
       </div>
+      <!-- Loading modal appears when API calls are being made -->
       <div>
         <LoadingModal v-if="isLoading"></LoadingModal>
       </div>
 
+      <!-- ConfirmModal appears when the user wants to update/delete the event -->
       <Transition name="bounce">
           <ConfirmModal v-if="confirmModal" @close="closeConfirmModal" :title="title" :message="message"/>
       </Transition>      
@@ -310,14 +309,19 @@
 </template>
 
 <script>
+//import vuelidate functionalities
 import useVuelidate from '@vuelidate/core'
 import { required } from '@vuelidate/validators'
+// import API calls
 import { getEventById, getEventAttendees, getActiveServices, updateEvent, deleteEventById } from '../../api/api'
+// import modal components
 import LoadingModal from '../components/LoadingModal.vue'
 import ConfirmModal from '../components/ConfirmModal.vue'
 
 export default {
+  //accept event ID as data from parent components
     props: ['id'],
+    // allow components
     components: {
       LoadingModal,
       ConfirmModal
@@ -346,8 +350,11 @@ export default {
             },
             // variable stores the ID of the row that the mouse is currently hovering over (to highlight the row red)
             hoverId: null,
+            // variable that determines when loading wheel appears
             isLoading: false,
+            // variable that determines when confirmation modal appears
             confirmModal: false,            
+            // variable that determines which services have their descriptions opened
             openDescriptions: [],
         }
     },
@@ -359,6 +366,7 @@ export default {
     },
 
     validations() {
+      // validations
       const validDate = (value) => {
         const date = new Date(value)
         return !isNaN(date)
@@ -376,6 +384,7 @@ export default {
     },
 
     computed: {
+      // computed function for which services to have their descriptions opened
       descriptionOpenStates() {
         return this.services.reduce((acc, service) => {
           acc[service._id] = this.openDescriptions.includes(service._id);
@@ -384,14 +393,17 @@ export default {
       },
     },
 
-
     mounted() {
+      // when component is mounted, data is loaded
         this.loadData();
     },
 
     methods: {
+      // method called when component is mounted -> loads all the data
         async loadData() {
+          // show loading wheel
           this.isLoading = true;
+          // get event information, get clients registered under this event, and get all active services
             try {
                 const [eventResponse, clientsResponse, servicesResponse] = await Promise.all([
                     getEventById(this.$route.params.id),
@@ -408,9 +420,11 @@ export default {
             } catch (error) {
                 console.log('error loading data', error)
             }
+          // hide loading wheel
           this.isLoading = false;
         },
 
+        // method called when user attempts to update the event -> asks for confirmation
         submitEventUpdateRequest() {
           // Trigger validation
           this.v$.$validate();
@@ -419,12 +433,13 @@ export default {
             // Form is invalid, do not proceed
             return;
           }
-          // Submit form
+          // If form is valid, ConfirmModal appears to ask for confirmation
           this.confirmModal = true
           this.title = 'Please Confirm Update'
           this.message = 'Are you sure you want to update this event?'
         },
 
+        // method called when user attempts to delete the event
         submitDeleteEventRequest() {
           // Submit form
           this.confirmModal = true
@@ -432,9 +447,9 @@ export default {
           this.message = 'Are you sure you want to delete this event?'
         },
 
+        // method to close ConfirmModal. If user clicks "yes" when attempting to update/delete the event, then the API calls are made and the event will be updated/deleted
         closeConfirmModal(value) {
             this.confirmModal = false
-            console.log(value)
             if (value === 'yes') {
               if (this.title === 'Please Confirm Update') {                    
                     this.title = '';
@@ -449,11 +464,11 @@ export default {
             }
         },
 
+        // method to make the API call to update the event
         async submitEventUpdate() {
           try {
               const response = await updateEvent(this.$route.params.id, this.event);
               if (response.success) {
-                  console.log(response.message);
                   this.$router.push('/findevents?update=true')
               } else {
                   console.log('Event update failed');
@@ -463,11 +478,11 @@ export default {
           }
         },
 
+        // method to make the API call to delete the event
         async submitDeleteEvent() {
           try {
             const response = await deleteEventById(this.$route.params.id);
             if (response.success) {
-                console.log(response.message);
                 this.$router.push('/findevents?delete=true')
             } else {
                 console.log('Event delete failed');
@@ -477,62 +492,59 @@ export default {
           }
         },
 
+        // method called when user clicks on a client in the clients table
         editClient(clientID) {
           this.$router.push({ name: 'updateclient', params: { id: clientID } })
         },
 
+        // method called when user clicks the "Go Back" button
         goBack() {
           if (this.$route.query.main) {
-            console.log('main is true')
             this.$router.push('/findevents')
-          } else if (this.$route.query.dash) {
-            console.log('dash is true')
+          } else if (this.$route.query.dash) {          
             this.$router.push('/dashboard')
-          } else {
-            console.log('regular go back')
+          } else {            
             this.$router.back()
           }
         },
-        toggleDetails(serviceId) {
-          console.log('toggleDetails called')
+
+        // method called when user expands a service in the list to also show its description
+        toggleDetails(serviceId) {          
           if (this.openDescriptions.includes(serviceId)) {
             this.openDescriptions = this.openDescriptions.filter(id => id !== serviceId);
           } else {
             this.openDescriptions.push(serviceId);
           }
         },
-
-
-
     }
 }
 </script>
 
 <style scoped>
-  .hoverRow {
-    background-color: rgba(255, 0, 0, 0.1);
-    transition: background-color 0.3s ease-in-out;
-  }
+.hoverRow {
+  background-color: rgba(255, 0, 0, 0.1);
+  transition: background-color 0.3s ease-in-out;
+}
 
-  .arrow-container {
-    position: absolute;
-    top: 50%;
-    right: 0;
-    transform: translateY(-50%);
-  }
+.arrow-container {
+  position: absolute;
+  top: 50%;
+  right: 0;
+  transform: translateY(-50%);
+}
 
-  .slide-fade-enter-active,
-  .slide-fade-leave-active {
-    transition: all 0.3s ease;
-  }
-  .slide-fade-enter-from,
-  .slide-fade-leave-to {
-    opacity: 0;
-    transform: translateY(-1rem);
-  }
-  .slide-fade-enter-to,
-  .slide-fade-leave-from {
-    opacity: 1;
-    transform: translateY(0);
-  }
+.slide-fade-enter-active,
+.slide-fade-leave-active {
+  transition: all 0.3s ease;
+}
+.slide-fade-enter-from,
+.slide-fade-leave-to {
+  opacity: 0;
+  transform: translateY(-1rem);
+}
+.slide-fade-enter-to,
+.slide-fade-leave-from {
+  opacity: 1;
+  transform: translateY(0);
+}
 </style>

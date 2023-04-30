@@ -1,3 +1,5 @@
+<!-- This is my main frontend file. It displays a navigation bar and rendered components. -->
+
 <template>
   <main class="flex flex-row">
     <div id="_container" class="h-screen">
@@ -121,35 +123,17 @@
       </div>
     </div>
   </main>
-  <div>
-    <!--Modal Component when user logs out-->
-    <modalComponent v-if="logoutModal" @close="logoutPush">
-      <template v-slot:logoutSlot>
-        Logging out...
-        <p>See you Soon!</p>
-      </template>
-    </modalComponent>
-  </div>
 
 </template>
 
 <script>
+// import functionalities from Vuex
 import { mapState, mapActions } from 'vuex'
-import modalComponent from './components/modalComponent.vue'
+// import API call
 import { logoutUser } from '../api/api'
 
 export default {
   name: 'App',
-  // modal component
-  components: {
-    modalComponent
-  },
-  data() {
-    return {
-      // variable that determines if logout modal component appears
-      logoutModal: false
-    }
-  },
   computed: {
     ...mapState({
       //sets the role state as either "viewer" or "editor" when the user logs in
@@ -160,9 +144,8 @@ export default {
   },
   methods: {
     ...mapActions(['clearSessionData']),
-    // method called when user clicks the "Logout" router link -> it renders the Logout modal component
+    // method called when user clicks the "Logout" router link
     async logout() {
-      // this.logoutModal = true
       try {
         await logoutUser();
         this.$store.dispatch('clearSessionData');
@@ -171,15 +154,6 @@ export default {
         console.log('logout error', error)
       }
     },
-    // method called when Logout modal component emits a 'close' event - this will calls the "logOut" action from /store/index.js, then push the user back to login view
-    // ...mapActions(['logOut']),
-    // logoutPush() {
-    //   this.logoutModal = false
-    //   this.$nextTick(() => {
-    //     this.logOut()
-    //     this.$router.push('/')
-    //   });
-    // }
   }
 }
 </script>

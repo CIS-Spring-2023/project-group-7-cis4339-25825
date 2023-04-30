@@ -1,5 +1,7 @@
+<!-- This component displays a list of clients. The user can search for clients, and click on a client to redirect to another component to view that client's information -->
+
 <template>
-    <main>
+      <main>
       <div>
         <!--Header-->
         <h1
@@ -53,7 +55,7 @@
             <input
               class="w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
               type="text"
-              v-model="phone"
+              v-model="phoneNumber"
               v-on:keyup.enter="handleSubmitForm"
               placeholder="Enter Client Phone Number"
             />
@@ -68,7 +70,7 @@
           <div class="mt-5 grid-cols-2">
             <button
               class="mr-10 border border-red-700 bg-white text-red-700 rounded"
-              @click="clearSearch"
+              @click="loadData"
               type="submit"
             >
               Clear Search
@@ -93,8 +95,8 @@
         <div class="ml-10">
           <h2 class="text-2xl font-bold">List of Clients</h2>
           <h3 class="italic">
-            <span v-if="userRole === 'editor'">Click table row to edit/display an entry</span>
-            <span v-if="userRole === 'viewer'">Click table row to display an entry</span>
+            <span v-if="role === 'editor'">Click table row to edit/display an entry</span>
+            <span v-if="role === 'viewer'">Click table row to display an entry</span>
           </h3>
         </div>
         <!--Table showing list of Clients-->
@@ -109,112 +111,222 @@
             </thead>
             <tbody class="divide-y divide-gray-300">
               <tr
-                @click="editClient(client.id)"
+                @click="editClient(client._id)"
                 v-for="client in clients"
-                :key="client.id"
+                :key="client._id"
                 class="cursor-pointer"
-                :class="{ 'hoverRow': hoverId === client.id }"
-                @mouseenter="hoverId = client.id"
+                :class="{ 'hoverRow': hoverId === client._id }"
+                @mouseenter="hoverId = client._id"
                 @mouseleave="hoverId = null"
               >
                 <td class="p-2 text-left">
                   {{ client.firstName + ' ' + client.lastName }}
                 </td>
                 <td class="p-2 text-left">
-                  {{ client.phone }}
+                  {{ client.phoneNumber.primary }}
                 </td>
-                <td class="p-2 text-left">{{ client.city }}</td>
+                <td class="p-2 text-left">{{ client.address.city }}</td>
               </tr>
             </tbody>
           </table>
         </div>
       </div>
+
+      <!-- Loading wheel appears when API calls are being made -->
+      <div>
+        <LoadingModal v-if="isLoading"></LoadingModal>
+      </div>
+
+      <!-- Success modal appears after a new client is created -->
+      <Transition name="bounce">
+          <SuccessModal v-if="successModal" @close="closeSuccessModal" :title="title" :message="message" />
+      </Transition>
+
+      <!-- Update modal appears after a client is updated -->
+      <Transition name="bounce">
+          <UpdateModal v-if="updateModal" @close="closeUpdateModal" :title="title" :message="message" />
+      </Transition>
+
+      <!-- Delete modal appears after a client is deleted -->
+      <Transition name="bounce">
+          <DeleteModal v-if="deleteModal" @close="closeDeleteModal" :title="title" :message="message" />
+      </Transition>
+
     </main>
-  </template>
-  
+</template>
 
 <script>
-//import functionalities
+// Import functionality to reference session states
 import { mapState } from 'vuex'
+// Import API calls
+import { getOrgRecentClients, searchClients } from '../../api/api'
+// Import modal components
+import LoadingModal from '../components/LoadingModal.vue'
+import SuccessModal from '../components/SuccessModal.vue'
+import UpdateModal from '../components/UpdateModal.vue'
+import DeleteModal from '../components/DeleteModal.vue'
 
 export default {
+  // allow modal components
+  components: {
+      LoadingModal,
+      SuccessModal,
+      UpdateModal,
+      DeleteModal
+  },
     data() {
-    return {
-      //variable to store all clients and their information for the organization
-      clients: [],
-      // Parameters for search to occur
-      searchBy: '',
-      firstName: '',
-      lastName: '',
-      phone: '',
-      // variable stores the ID of the row that the mouse is currently hovering over (to highlight the row red)
-      hoverId: null,
-    }
-  },
-  computed: {
-    //computed states so they can be referenced in code
-    ...mapState(['organizationId', 'organizationClients', 'userRole'])
-  },
-  mounted() {
-    //when this component is mounted, the setClients method is called
-    this.setClients() 
-  },
-  methods: {
-    //method called when component is mounted. This sets the "clients" variable to the "organizationClients" state, which holds all clients and their information for the organization
-    setClients() {
-        this.clients = this.organizationClients
-    },
-    //method called when user searches by client name or number
-    handleSubmitForm() {
-      //if user searches by client name
-        if (this.searchBy === 'Client Name') {
-          //if user searches by both first name and last name
-            if (this.firstName && this.lastName) {
-            //filter the client list by first and last name
-              this.clients = this.organizationClients.filter((client) => client.firstName.toLowerCase().includes(this.firstName.toLowerCase()) && client.lastName.toLowerCase().includes(this.lastName.toLowerCase()));
-            } 
-            //if user searches only by first name
-            else if (this.firstName && !this.lastName) {
-              //filter the client list by first name only
-              this.clients = this.organizationClients.filter((client) => client.firstName.toLowerCase().includes(this.firstName.toLowerCase()));
-            } 
-            //if user searches only by last name
-            else if (this.lastName && !this.firstName) {
-              //filter the client list by last name only
-              this.clients = this.organizationClients.filter((client) => client.lastName.toLowerCase().includes(this.lastName.toLowerCase()));
-            }
-        //if user searches by client phone number
-        } else if (this.searchBy === 'Client Number') {
-          //filter the client list by phone number
-            this.clients = this.organizationClients.filter((client) => client.phone.includes(this.phone));
+        return {
+            //variable to store all clients and their information for the organization
+            clients: null,
+            // Parameters for search to occur
+            searchBy: '',
+            firstName: '',
+            lastName: '',
+            phoneNumber: '',
+            // variable stores the ID of the row that the mouse is currently hovering over (to highlight the row red)
+            hoverId: null,
+            // variable that determines if Loading wheel appears
+            isLoading: false,
+            // variable to check if the component has already been mounted  - this is so that any modal components do not reappear after the user searches for an client
+            alreadyMounted: false,
+            // variable that determines if the SuccessModal appears
+            successModal: false,
+            // variable that determines if the UpdateModal appears
+            updateModal: false,
+            // variable that determines if the DeleteModal appears
+            deleteModal: false,
+            // title and message variables to be shown in the modal components
+            title: "",
+            message: ""
         }
     },
-    //method called when user clicks "Clear Search" button
-    clearSearch() {
-      // Resets all the variables
-      this.searchBy = ''
-      this.name = ''
-      this.phone = ''
-      this.setClients()
+    computed: {
+        //computed states so they can be referenced in code
+        ...mapState(['role'])
     },
-    //method called when user clicks on a client row in the list of clients
-    editClient(clientId) {
-      //if the user is an editor, they will be pushed to "UpdateClient.vue" with the client ID as a parameter. This will allow them to edit the selected client.
-      if (this.userRole === 'editor') {
-        this.$router.push({ name: 'updateclient', params: { id: clientId } })
-      }
-      //if the user is a viewer, they will be pushed to "ViewClient.vue" with the client ID as a parameter. This will only allow them to view the selected client's information, not edit.
-      else if (this.userRole === 'viewer') {
-        this.$router.push({name: 'viewclient', params: { id: clientId } })
-      }
-      }
-    }
-  }
+    mounted() {
+      // when component is mounted, load the data
+        this.loadData();
+    },
+    methods: {
+      // method called when component is mounted
+        async loadData() {
+            // Resets all the variables
+            this.searchBy = ''
+            this.firstName = ''
+            this.lastName = ''
+            this.phoneNumber = ''
+
+            // loading wheel appears
+            this.isLoading = true;
+            // get list of clients
+            try {
+                const response = await getOrgRecentClients();
+                this.clients = response;
+            } catch (error) {
+                console.log('loadData error', error)
+            }
+            // loading wheel disappears
+            this.isLoading = false;
+
+            // show modal components
+            if (!this.alreadyMounted) {
+              const query = new URLSearchParams(this.$route.query);
+              // show success modal
+              if (query.get('success') === 'true') {
+                  this.successModal = true;
+                  this.title = "Success!"
+                  this.message = "Client successfully created"
+              }
+              // show update modal
+              if (query.get('update') === 'true') {
+                  this.updateModal = true;
+                  this.title = "Updated!"
+                  this.message = "Client successfully updated."
+              }
+              // show delete modal
+              if (query.get('delete') === 'true') {
+                  this.deleteModal = true;
+                  this.title = "Deleted!"
+                  this.message = "Client successfully deleted."
+              }
+              this.alreadyMounted = true;
+            }
+        },
+        // method called when user searches for clients
+        async handleSubmitForm() {
+          // if user searched by client name
+            if (this.searchBy === 'Client Name') {
+                if (this.firstName || this.lastName) {
+                  try {
+                      const query = {
+                          searchBy: 'name',
+                          firstName: this.firstName,
+                          lastName: this.lastName,
+                      }                      
+                      const response = await searchClients(query)
+                      this.clients = response;
+                  } catch (error) {
+                      console.error('Error searching clients:', error)
+                  }
+                }
+            // if user searches by client phone number
+            } else if (this.searchBy === 'Client Number') {
+                if (this.phoneNumber) {
+                    try {
+                        const query = {
+                            searchBy: 'number',
+                            phoneNumber: this.phoneNumber
+                        }
+                        const response = await searchClients(query)
+                        this.clients = response;
+                    } catch (error) {
+                        console.error('Error searching clients:', error)
+                    }                    
+                }
+            }
+        },
+
+        //method called when user clicks on a client row in the list of clients
+        editClient(clientId) {
+          //if the user is an editor, they will be pushed to "UpdateClient.vue" with the client ID as a parameter. This will allow them to edit the selected client.
+          if (this.role === 'editor') {
+            this.$router.push({ name: 'updateclient', params: { id: clientId }, query: { main: true } })
+          }
+          //if the user is a viewer, they will be pushed to "ViewClient.vue" with the client ID as a parameter. This will only allow them to view the selected client's information, not edit.
+          else if (this.role === 'viewer') {
+            this.$router.push({name: 'viewclient', params: { id: clientId } })
+          }
+        },
+
+        // method to close the SuccessModal
+        closeSuccessModal() {
+            this.successModal = false;
+            this.title = '';
+            this.message = '';
+        },
+
+        // method to close the UpdateModal
+        closeUpdateModal() {
+            this.updateModal = false;
+            this.title = '';
+            this.message = '';
+        },
+        
+        // method to close the DeleteModal
+        closeDeleteModal() {
+            this.deleteModal = false;
+            this.title = '';
+            this.message = '';
+        },
+  
+    },
+}
 </script>
 
 <style scoped>
-  .hoverRow {
-    background-color: rgba(255, 0, 0, 0.1);
-    transition: background-color 0.3s ease-in-out;
-  }
+.hoverRow {
+  background-color: rgba(255, 0, 0, 0.1);
+  transition: background-color 0.3s ease-in-out;
+}
 </style>
