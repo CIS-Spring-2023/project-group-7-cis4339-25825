@@ -149,7 +149,7 @@ export default {
       try {
         await logoutUser();
         this.$store.dispatch('clearSessionData');
-        this.$router.push('/')
+        this.$router.push('/?logout=true')
       } catch (error) {
         console.log('logout error', error)
       }

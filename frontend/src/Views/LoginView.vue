@@ -33,6 +33,12 @@
       <LoadingModal v-if="isLoading"></LoadingModal>
     </div>
 
+
+    <!-- Success modal appears after user successfully logs out -->
+    <Transition name="bounce">
+        <SuccessModal v-if="successModal" @close="closeSuccessModal" :title="title" :message="message" />
+    </Transition>
+
       <!-- Modal component that appears when user fails the login -->
       <Transition name="bounce">
           <DeleteModal v-if="showLoginFailed" @close="closeDeleteModal" :title="title" :message="message" />
@@ -50,6 +56,7 @@ import jwt_decode from 'jwt-decode';
 import forProfessor from '../components/forProfessor.vue'
 import LoadingModal from '../components/LoadingModal.vue'
 import DeleteModal from '../components/DeleteModal.vue'
+import SuccessModal from '../components/SuccessModal.vue'
 
 
 export default {
@@ -57,7 +64,8 @@ export default {
   components: {
     forProfessor,
     LoadingModal,
-    DeleteModal
+    DeleteModal,
+    SuccessModal
   },
   data() {
     return {
@@ -67,8 +75,6 @@ export default {
       password: 'editor1',
       //variable that determines if the "forProfessor" component appears 
       showLoginInfo: false,
-      //variable that determines if the modal component that shows login success appears
-      showLoginSuccess: false,
       //variable that determines if the modal component that shows login failed appears
       showLoginFailed: false,
       //variable to hold user's organization data
@@ -77,10 +83,24 @@ export default {
       user: null,
       // variable that determines if loading wheel appears
       isLoading: false,
+      // variable that determines if the modal to show logout success appears
+      successModal: false,
       title: '',
       message: ''
     }
   },
+
+  mounted() {
+    // when component is mounted, this checks if the user has logged out. If so, then a logout success modal will appear
+    const query = new URLSearchParams(this.$route.query);
+      // show success modal when user logs in
+      if (query.get('logout') === 'true') {
+        this.successModal = true;
+        this.title = "Logged Out!"
+        this.message = "See you soon!";
+      }
+  },
+
   methods: {
     // allow Vuex action of "fetchUserData" to be referenced in code
     ...mapActions(['fetchUserData']),
@@ -124,7 +144,14 @@ export default {
     //method called when professor/TA clicks the login info button
     toggleProfModal() {
       this.showLoginInfo = !this.showLoginInfo
-    }
+    },
+
+    // method to close SuccessModal
+    closeSuccessModal() {
+        this.successModal = false;
+        this.title = '';
+        this.message = '';
+    },
   }
 }
 </script>
