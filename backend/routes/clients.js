@@ -38,6 +38,7 @@ router.get('/org', authMiddleWare, async (req, res) => {
   }
 });
 
+// checked
 // API endpoint to GET 10 most recent clients for org
 router.get('/', authMiddleWare, (req, res, next) => {
   const org = req.user.org;
@@ -53,7 +54,7 @@ router.get('/', authMiddleWare, (req, res, next) => {
     .limit(10);
 });
 
-
+// checked
 // API endpoint to GET single client by ID
 router.get('/id/:id', authMiddleWare, (req, res, next) => {
   const org = req.user.org;
@@ -72,6 +73,7 @@ router.get('/id/:id', authMiddleWare, (req, res, next) => {
   });
 });
 
+// checked
 // API endpoint to GET entries based on search query
 // Ex: '...?firstName=Bob&lastName=&searchBy=name'
 router.get('/search', authMiddleWare, (req, res, next) => {
@@ -111,6 +113,7 @@ router.get('/search', authMiddleWare, (req, res, next) => {
   });
 });
 
+// checked
 // API endpoint to POST new client
 router.post('/', authMiddleWare, (req, res, next) => {
   const org = req.user.org;
@@ -126,6 +129,7 @@ router.post('/', authMiddleWare, (req, res, next) => {
   });
 });
 
+// checked
 // API endpoint to PUT update client
 router.put('/update/:id', authMiddleWare, (req, res, next) => {
   clients.findByIdAndUpdate(req.params.id, req.body, (error, data) => {
@@ -138,6 +142,7 @@ router.put('/update/:id', authMiddleWare, (req, res, next) => {
   });
 });
 
+// checked
 // API endpoint to PUT -> add existing client to org
 router.put('/register/:id', authMiddleWare, (req, res, next) => {
   const org = req.user.org;
@@ -154,6 +159,7 @@ router.put('/register/:id', authMiddleWare, (req, res, next) => {
   );
 });
 
+// checked
 // API endpoint to PUT - remove existing client from org and all events under that org
 router.put('/deregister/:id', authMiddleWare, async (req, res, next) => {
   const org = req.user.org;
@@ -177,6 +183,7 @@ router.put('/deregister/:id', authMiddleWare, async (req, res, next) => {
   }
 });
 
+// checked
 // API endpoint to hard DELETE client by ID, as per project specifications
 router.delete('/:id', authMiddleWare, (req, res, next) => {
   clients.findByIdAndDelete(req.params.id, (error, data) => {

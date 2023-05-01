@@ -32,6 +32,7 @@ export async function loginUser(username, password) {
     const token = response.data.token;
     localStorage.setItem('authToken', token);
     setAuthHeader(token);
+    console.log('token', token)
     return token;
   } catch (error) {
     throw error;

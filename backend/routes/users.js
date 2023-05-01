@@ -36,7 +36,8 @@ router.post('/login', async (req, res) => {
       org: user.org,
     };
 
-    const token = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: '24h' });
+    // token expires in 30 days. This is not good security practice, but to ensure that API calls work in the Postman documentation when the professor runs the documentation, 30 days is necessary
+    const token = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: '30d' });
     res.json({ token });
   } catch (err) {
     res.status(500).send('Server error');

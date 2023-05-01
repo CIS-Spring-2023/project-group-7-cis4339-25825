@@ -10,6 +10,7 @@ const { services } = require('../models/models');
 // Middleware for authorization. For API calls that require authorization, this middleware checks if the header of API calls have a valid security token. If no security token or invalid security token, then the API call is not made.
 const authMiddleWare = require('../auth/authMiddleWare');
 
+// checked
 // API endpoint to GET 10 most recent services for org
 router.get('/', authMiddleWare, (req, res, next) => {
   const org = req.user.org;
@@ -25,6 +26,7 @@ router.get('/', authMiddleWare, (req, res, next) => {
     .limit(10);
 });
 
+// checked
 // API endpoint to GET all active services from org
 router.get('/active', authMiddleWare, (req, res, next) => {
   const org = req.user.org;
@@ -38,6 +40,7 @@ router.get('/active', authMiddleWare, (req, res, next) => {
     })
 });
 
+// checked
 // API endpoint to GET single service by ID
 router.get('/id/:id', authMiddleWare, (req, res, next) => {
   const org = req.user.org;
@@ -52,6 +55,7 @@ router.get('/id/:id', authMiddleWare, (req, res, next) => {
   });
 });
 
+// checked
 // API endpoint to GET entries based on search query
 router.get('/search', authMiddleWare, (req, res, next) => {
   console.log('search Services API Endpoint')
@@ -76,6 +80,7 @@ router.get('/search', authMiddleWare, (req, res, next) => {
   });
 });
 
+// checked
 // API endpoint to POST new service
 router.post('/', authMiddleWare, (req, res, next) => {
   const org = req.user.org;
@@ -91,6 +96,7 @@ router.post('/', authMiddleWare, (req, res, next) => {
   });
 });
 
+// checked
 // API endpoint to PUT -> update service
 router.put('/update/:id', authMiddleWare, (req, res, next) => {
   services.findByIdAndUpdate(req.params.id, req.body, (error, data) => {
@@ -103,6 +109,7 @@ router.put('/update/:id', authMiddleWare, (req, res, next) => {
   });
 });
 
+// checked
 // API endpoint to PUT -> soft delete service
 router.put('/deactivate/:id', authMiddleWare, (req, res, next) => {
   const update = { active: false };

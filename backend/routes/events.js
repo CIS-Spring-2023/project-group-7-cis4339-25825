@@ -26,6 +26,7 @@ router.get('/all', (req, res, next) => {
     .limit(10);
 });
 
+// checked
 // API endpoint to GET 10 most recent events for org
 router.get('/', authMiddleWare, (req, res, next) => {
   const org = req.user.org;  
@@ -42,6 +43,7 @@ router.get('/', authMiddleWare, (req, res, next) => {
     .limit(10);
 });
 
+// checked
 // API endpoint to GET single event by ID
 router.get('/id/:id', authMiddleWare, (req, res, next) => {
   const org = req.user.org;
@@ -56,6 +58,7 @@ router.get('/id/:id', authMiddleWare, (req, res, next) => {
   });
 });
 
+// checked
 // API endpoint to GET events based on search query
 // Ex: '...?name=Food&searchBy=name'
 router.get('/search/', authMiddleWare, (req, res, next) => {
@@ -80,6 +83,7 @@ router.get('/search/', authMiddleWare, (req, res, next) => {
   });
 });
 
+// checked
 // API endpoint to GET events for which a client is signed up
 router.get('/client/:id', authMiddleWare, (req, res, next) => {
   const org = req.user.org;
@@ -92,6 +96,7 @@ router.get('/client/:id', authMiddleWare, (req, res, next) => {
   });
 });
 
+// checked
 // API endpoint to GET events for which a client is not signed up
 router.get('/client/:id/not-registered', authMiddleWare, async (req, res, next) => {
   const org = req.user.org;
@@ -103,6 +108,7 @@ router.get('/client/:id/not-registered', authMiddleWare, async (req, res, next) 
   }
 });
 
+// checked
 // API endpoint to GET all attendees for an event
 router.get('/attendees/:id', authMiddleWare, (req, res, next) => {
   const eventId = req.params.id;
@@ -122,6 +128,7 @@ router.get('/attendees/:id', authMiddleWare, (req, res, next) => {
   });
 });
 
+// checked
 // API endpoint to GET all events for a given service
 router.get('/service/:id', authMiddleWare, async (req, res, next) => {
   const org = req.user.org;
@@ -137,6 +144,7 @@ router.get('/service/:id', authMiddleWare, async (req, res, next) => {
   }
 });
 
+// checked
 // API endpoint to POST new event
 router.post('/', authMiddleWare, (req, res, next) => {
   const org = req.user.org;
@@ -152,6 +160,7 @@ router.post('/', authMiddleWare, (req, res, next) => {
   });
 });
 
+// checked
 // API endpoint to PUT -> update event
 router.put('/update/:id', authMiddleWare, (req, res, next) => {
   const org = req.user.org;
@@ -165,6 +174,7 @@ router.put('/update/:id', authMiddleWare, (req, res, next) => {
   });
 });
 
+// checked
 // API endpoint to PUT -> add attendee to event
 router.put('/register', authMiddleWare, (req, res, next) => {
   const org = req.user.org;
@@ -196,6 +206,7 @@ router.put('/register', authMiddleWare, (req, res, next) => {
   );
 });
 
+// checked
 // API endpoint to PUT -> remove attendee from event
 router.put('/deregister', authMiddleWare, (req, res, next) => {
   const org = req.user.org;
@@ -213,6 +224,7 @@ router.put('/deregister', authMiddleWare, (req, res, next) => {
   );
 });
 
+// checked
 // API endpoint called when service is inactive, remove service from all events
 router.put('/remove-service-all/:id', authMiddleWare, (req, res, next) => {
   const org = req.user.org;
@@ -231,6 +243,7 @@ router.put('/remove-service-all/:id', authMiddleWare, (req, res, next) => {
   });
 });
 
+// checked
 // API endpoint to hard DELETE event by ID, as per project specifications
 router.delete('/:id', authMiddleWare, (req, res, next) => {
   const org = req.user.org;

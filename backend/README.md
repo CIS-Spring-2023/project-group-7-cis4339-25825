@@ -23,4 +23,7 @@ Setup a .env file with the following variables: MONGO_URL, PORT and ORG
 
 ## Postman Documentation
 
-Can be found at <https://documenter.getpostman.com/view/23133138/2s83mdJiqh>
+Can be found at <https://documenter.getpostman.com/view/19551705/2s93eU2EDv>
+
+
+The JWT token contains information about the user's organization. Whenever an API call is made that requires a specific organization. It is taken from the JWT token.
