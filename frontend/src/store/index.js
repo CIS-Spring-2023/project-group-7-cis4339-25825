@@ -45,7 +45,7 @@ export default createStore({
       }
     },
     // when user logs out, session stores are cleared
-    clearSessionData({ commit }) {
+    clearSessionData({ commit }) {      
       commit('clearSessionData');
     }
   },

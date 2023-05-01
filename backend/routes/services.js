@@ -54,6 +54,7 @@ router.get('/id/:id', authMiddleWare, (req, res, next) => {
 
 // API endpoint to GET entries based on search query
 router.get('/search', authMiddleWare, (req, res, next) => {
+  console.log('search Services API Endpoint')
   const org = req.user.org;
   const dbQuery = { org: org, active: true };
   switch (req.query.searchBy) {
@@ -69,7 +70,7 @@ router.get('/search', authMiddleWare, (req, res, next) => {
   services.find(dbQuery, (error, data) => {
     if (error) {
       return next(error);
-    } else {
+    } else {      
       res.json(data);
     }
   });

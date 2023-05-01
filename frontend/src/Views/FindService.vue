@@ -248,7 +248,7 @@ export default {
                           const query = {
                               searchBy: 'name',
                               name: this.name
-                          }
+                          }                          
                           const response = await searchServices(query)
                           this.services = response;
                       } catch (error) {

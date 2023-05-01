@@ -1,4 +1,10 @@
 <!-- This is the login component. Users can login by entering a correct username and password -->
+<!-- For Professor: 
+      viewer username: viewer1
+      viewer password: viewer1
+      editor username: editor1
+      editor password: editor1
+-->
 
 <template>
     <div>
@@ -21,11 +27,6 @@
         <!--Login button-->
         <button class="bg-red-700 text-white rounded" type="submit">Login</button>
       </form>
-    <!--Button for professor/TAs-->
-    <button @click="toggleProfModal">Click Me for Login Info</button>
-
-    <!--component that shows if "Click Me for Login Info" button is clicked-->
-    <forProfessor v-if="showLoginInfo" @close="toggleProfModal"/>
 
     </div>
     <!-- Loading wheel appears when API calls are being made -->  
@@ -53,7 +54,6 @@ import { loginUser } from '../../api/api'
 // import JSON Web Token decoder to decode the token into the user's information
 import jwt_decode from 'jwt-decode';
 // import modal components
-import forProfessor from '../components/forProfessor.vue'
 import LoadingModal from '../components/LoadingModal.vue'
 import DeleteModal from '../components/DeleteModal.vue'
 import SuccessModal from '../components/SuccessModal.vue'
@@ -62,7 +62,6 @@ import SuccessModal from '../components/SuccessModal.vue'
 export default {
   //allow components
   components: {
-    forProfessor,
     LoadingModal,
     DeleteModal,
     SuccessModal
@@ -70,11 +69,13 @@ export default {
   data() {
     return {
       //variable to hold username
-      username: 'editor1',
+      // viewer username: viewer1
+      // viewer password: viewer1
+      // editor username: editor1
+      // editor password: editor1
+      username: '',
       //variable to hold password
-      password: 'editor1',
-      //variable that determines if the "forProfessor" component appears 
-      showLoginInfo: false,
+      password: '',
       //variable that determines if the modal component that shows login failed appears
       showLoginFailed: false,
       //variable to hold user's organization data
@@ -139,11 +140,6 @@ export default {
       this.showLoginFailed = false;
       this.title = '';
       this.message = '';
-    },
-
-    //method called when professor/TA clicks the login info button
-    toggleProfModal() {
-      this.showLoginInfo = !this.showLoginInfo
     },
 
     // method to close SuccessModal

@@ -107,6 +107,7 @@
         </div>
       </div>
     </div>
+
     <!-- Pie Chart -->
     <div class="col-span-1">
       <div class="bg-white shadow-lg rounded-lg p-6">
@@ -116,11 +117,12 @@
             <clientChart :label="pieLabels" :chart-data="pieChartData" />
           </div>
           <div v-else>
-            Loading data... (set loading wheel)
+            Loading data...
           </div>
         </div>
       </div>
     </div>
+
     <!-- Bar Chart -->
     <div class="col-span-2">
       <div class="bg-white shadow-lg rounded-lg p-6">
@@ -130,7 +132,7 @@
             <AttendanceChart :label="labels" :chart-data="chartData" />
           </div>
           <div v-else>
-            Loading data... (set loading wheel)
+            Loading data...
           </div>
         </div>
       </div>
@@ -240,6 +242,7 @@ export default {
             this.recentEvents = eventsResponse;
             this.clients = clientsResponse;
 
+
             // load bar chart and pie chart
             this.getChartData();
             this.getPieData();
@@ -312,6 +315,7 @@ export default {
 
       this.pieLabels = labels;
       this.pieChartData = data;
+
     },
 
     // method called for each event in the table -> formats date correctly

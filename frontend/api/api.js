@@ -365,6 +365,7 @@ export const getServiceById = async (id) => {
   
 // API call to GET services based on search query
 export const searchServices = async (query) => {
+  console.log('searchServices API Call')
   try {
     let params = {};
     params.searchBy = query.searchBy;

@@ -146,7 +146,6 @@ router.put('/register/:id', authMiddleWare, (req, res, next) => {
     { $push: { orgs: org } },
     (error, data) => {
       if (error) {
-        console.log(error);
         return next(error);
       } else {
         res.send('Client registered with org');
