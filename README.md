@@ -2,7 +2,7 @@
 
 This project has been developed over time by students in the CIS 4339 course.
 
-The current iteration is based on development done by Elliot Farmer Garcia, Agatha	Molski and Chris	Blanco in Fall of 2022.
+The current iteration is based on development done by Philip Eriksson, Raul Guevera, and Sydney Blackburn in Spring of 2023.
 
 Requirements:
 
