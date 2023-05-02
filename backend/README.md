@@ -11,11 +11,12 @@ You need a MongoDB database ready.
 
 Make sure you have a collection named 'org' in your database that contains at least one organization with the orgid listed in your environment variable (see below).
 
-Setup a .env file with the following variables: MONGO_URL, PORT and ORG
+Setup a .env file with the following variables: MONGO_URL, PORT, ORG, and JWT_SECRET
 
     MONGO_URL= that is the Mongo URL connection string
     PORT= e.g.3000
     ORG= that is the orgid (as a string)
+    JWT_SECRET=this can be a randomly generated string. It is used to verify JWT tokens
 
 ### Compiles and hot-reloads for development
 
